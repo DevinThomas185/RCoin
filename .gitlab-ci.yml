@@ -1,0 +1,33 @@
+stages:
+  - build
+  - deploy
+
+build-frontend:
+  image: node:alpine
+  stage: build
+  script:
+    - cd frontend
+    - npm install
+    - CI=false npm run build
+
+# Need some way to check python compiles
+build-backend:
+  stage: build
+  script:
+    - cd backend
+    - echo "add build check and formatting"
+
+deploy:
+  image: docker/compose:debian-1.29.2
+  stage: deploy
+  script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$ID_RSA" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker-compose up --remove-orphans -d --build
+  only:
+    - master
