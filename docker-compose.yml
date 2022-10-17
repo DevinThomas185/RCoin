@@ -9,3 +9,19 @@ services:
     build: ./backend
     ports:
       - 8000:8000
+    depends_on:
+      - db
+
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=stablecoin_database
+      - POSTGRES_PASSWORD=stablecoin
+    volumes:
+      - db:/var/lib/postgresql/data/
+
+volumes:
+  db:
+    driver: local
+
