@@ -8,7 +8,7 @@ from spl.token.constants import TOKEN_PROGRAM_ID
 # Solana dependencies
 from spl.token.instructions import create_associated_token_account, transfer_checked, TransferCheckedParams
 from solana.rpc.commitment import Confirmed
-from solana.rpc.types import TxOpts
+from solana.rpc.types import TokenAccountOpts, TxOpts
 from solana.keypair import Keypair
 
 import json
@@ -71,6 +71,8 @@ def create_new_stablecoin_account_for(existing_username):
         print(e)
         return None
 
+
+
 def issue_stablecoins_to(username):
     user_wallet = load_wallet(username)
     assert(user_wallet != None)
@@ -125,6 +127,16 @@ def fund_account(sender_username, amount):
     except Exception as e:
         print('error:', e)
         return None
+
+def inspect_token_accounts_for(username):
+    try:
+        wallet = load_wallet(username)
+        assert(wallet != None)
+        public_key = PublicKey(wallet['public_key'])
+        print(solana_client.get_token_accounts_by_owner(public_key, TokenAccountOpts(mint=MINT_ACCOUNT)))
+
+    except Exception as e:
+        print(e)
 
 
 def get_balance(sender_username):
