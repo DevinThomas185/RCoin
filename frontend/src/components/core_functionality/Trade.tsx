@@ -1,6 +1,6 @@
 const Trade = () => {
   return (
-    <h1>Issuing new coins</h1>
+    <h1>Trading coins</h1>
   )
 }
 
