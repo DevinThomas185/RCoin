@@ -1,16 +1,12 @@
-import { Box } from "@chakra-ui/react";
-import * as React from "react";
 import { useState } from "react";
 import { BrowserRouter as Router, Link as RouterLink, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import Issue from "./components/core_functionality/Issue";
+import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
 
 const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
 
   if (!isAuth) {
-    // Redirect them to the /login page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience
-    // than dropping them off on the home page.
     return <Navigate to="/login" />
   }
 
@@ -18,7 +14,7 @@ const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
 }
 
 const App = () => {
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(true);
   let header;
   if (isAuth) {
     header = (
@@ -59,8 +55,8 @@ const App = () => {
       </div>
       <Routes>
         <Route path='/' element={<Home />}></Route>
-        <Route path='/issue' element={RequireAuth(<Home />, isAuth)}></Route>
-        <Route path='/trade' element={RequireAuth(<Home />, isAuth)}></Route>
+        <Route path='/issue' element={RequireAuth(<Issue />, isAuth)}></Route>
+        <Route path='/trade' element={RequireAuth(<Trade />, isAuth)}></Route>
         <Route path='/redeem' element={RequireAuth(<Home />, isAuth)}></Route>
         <Route path='/login' element={<Home />}></Route>
         <Route path='/sign-up' element={<Home />}></Route>
