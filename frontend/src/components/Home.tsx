@@ -10,9 +10,8 @@ import {
 } from "@chakra-ui/react"
 import { ColorModeSwitcher } from "../ColorModeSwitcher"
 import Test from "../components/Test"
-import { Logo } from "../Logo"
 
-let Home = () => {
+const Home = () => {
   return (
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="xl">
