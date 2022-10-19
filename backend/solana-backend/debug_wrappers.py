@@ -249,14 +249,10 @@ def create_account(username):
     '''
 
     kp = Keypair.generate()
-    # the public and private keys have different formats and hence we need to
-    # convert the public one into a string
-    public_key = str(kp.public_key)
-    secret_key = kp.secret_key
 
-    register_user_credentials(username, public_key, secret_key)
+    register_user_credentials(username, kp.public_key, kp.secret_key)
 
-    return public_key
+    return kp.public_key
 
 def register_user_credentials(username, public_key, secret_key):
     ''' Save user credentials by writing them to a text file (UNSAFE)
@@ -269,8 +265,10 @@ def register_user_credentials(username, public_key, secret_key):
 
     '''
 
+    # the public and private keys have different formats and hence we need to
+    # convert the public one into a string
     data = {
-        'public_key': public_key,
+        'public_key': str(public_key),
         'secret_key': secret_key.decode("latin-1"),
     }
 

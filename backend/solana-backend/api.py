@@ -23,7 +23,7 @@ RESERVE_ACCOUNT_ADDRESS  = PublicKey(str(os.getenv("RESERVE_ACCOUNT_ADDRESS")))
 
 # Secret key of the account of the token owner. Used for issuing new tokens
 # for users who have provided equivalent collateral.
-SECRET_KEY = bytes([188,96,134,197,236,92,143,57,175,146,225,231,63,164,158,10,76,35,113,167,71,31,6,66,33,177,61,200,13,133,132,171,156,247,141,68,243,172,183,207,182,44,212,70,179,178,189,245,50,23,44,4,9,124,241,169,107,115,23,170,239,62,111,59])
+SECRET_KEY = bytes([201,177,177,188,30,250,36,198,219,122,244,184,157,71,143,105,203,124,174,14,68,41,225,32,187,118,101,31,0,173,89,33,4,54,216,80,246,76,169,16,88,205,213,99,67,163,133,26,174,194,62,168,113,163,244,82,57,118,41,208,25,202,218,243])
 
 # The precision that we support in transactions involving our stablecoin token
 # is up to 9 decimal places.
