@@ -4,6 +4,8 @@ services:
     build: ./frontend
     ports:
       - 3000:80
+    depends_on:
+      - backend
   
   backend:
     build: ./backend
@@ -18,12 +20,10 @@ services:
     environment:
       - POSTGRES_USER=stablecoin_database
       - POSTGRES_PASSWORD=stablecoin
+      - POSTGRES_HOST=localhost
     volumes:
       - db:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
 
 volumes:
   db:
     driver: local
-

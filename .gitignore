@@ -2,4 +2,7 @@
 env
 venv
 
+# Pycache
+__pycache__
+
 node_modules

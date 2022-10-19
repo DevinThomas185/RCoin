@@ -1,39 +1,104 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Response
 import stripe
 from data_models import UserInformation
-import external_apis
+import database_api
+import bcrypt
+import sqlalchemy.orm as orm
 
 app = FastAPI()
 stripe.api_key = "sk_test_51LtqDCKxXCYYgE1FyOIt9SDyZyW8qJ3IGU6i0DeAc2k0SLNekbCwVwLpnR74g48SSyBAPADZRZEz8UzCdrzeg145005r6zXxcD"
 
 stripe.Balance.retrieve()
 
+# Password functions
+def hash_password(
+    password: str,
+) -> str:
+    return bcrypt.hashpw(password, bcrypt.gensalt())
+
+def verify_password(
+    password: str,
+    hashed_password: str
+) -> bool:
+    return bcrypt.checkpw(password, hashed_password)
+
 #TODO[Devin]: Add return types for these functions
 
 # TEST
-@app.get("/api/tests")
-async def root():
-    balance = "{:,}".format(stripe.Balance.retrieve().available[0].amount / 100)
+@app.get("/api/test")
+async def root(
+    db: orm.Session = Depends(database_api.connect_to_DB),
+):
+    balances = stripe.Balance.retrieve()
+    available_balance = balances.available[0].amount / 100
+    pending_balance = balances.pending[0].amount / 100
+    total_balance = available_balance + pending_balance
 
+    ab = "{:,}".format(available_balance)
+    pb = "{:,}".format(pending_balance)
+    tb = "{:,}".format(total_balance)
 
+    p = "Hello"
 
-    return {"message": "There is R{} in the reserve".format(balance)}
+    kon = UserInformation(first_name="Kon", last_name="stantinos", email="kon@group4.com", password=hash_password(p), wallet_id="1", bank_account="00012345", sort_code="108800")
+
+    await database_api.create_user(user=kon, db=db)
+    user = await database_api.get_user(email="kon@group4.com", db=db)
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User does not exist")
+
+    return {"message": "There is R{} available and R{} unavailable in the reserve. This is R{} in total.".format(ab, pb, tb)}
 
 # SIGNUP
-@app.put("/api/signup")
-async def signup():
-    return None
+@app.post("/api/signup")
+async def signup(
+    user: UserInformation,
+    response: Response,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+    try:
+        user.password = hash_password(user.password)
+        await database_api.create_user(user=user, db=db)
+        response.status_code = 200
+    except: # TODO[devin]: Catch the explicit exception
+        response.status_code = 500
+
+# LOGIN
+@app.post("/api/login")
+async def login(
+    email: str,
+    password: str,
+    response: Response,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+    try:
+        match = await database_api.get_user(email=email, db=db)
+        if verify_password(password, match.password):
+            response.status_code = 200
+        else:
+            response.status_code = 401
+
+    except:
+        response.status_code = 500
 
 # REAL TIME AUDITING
 @app.get("/api/audit")
 async def audit():
-    reserve_balance = stripe.Balance.retrieve()
-    issued_coins = 0 #TODO[Devin] connect with blockchain and get current coins issued (OR WITH DB)
+    balances = stripe.Balance.retrieve()
+    available_balance = balances.available[0].amount / 100
+    pending_balance = balances.pending[0].amount / 100
+    total_balance = available_balance + pending_balance
+
+    ab = "{:,}".format(available_balance)
+    pb = "{:,}".format(pending_balance)
+    tb = "{:,}".format(total_balance)
+
+    issued_coins = "0" #TODO[Devin] connect with blockchain and get current coins issued (OR WITH DB)
+    
     return {
-        "message": str({
-            "reserve": reserve_balance,
-            "issued": issued_coins
-        })
+        "reserve": tb,
+        "issued": issued_coins
     }
 
 # ISSUE
@@ -73,7 +138,7 @@ async def trade():
     return None
 
 # REDEEM
-@app.get("/api/test")
+@app.get("/api/testx")
 async def redeem():
     # Check that user has sufficient balance to redeem
 
@@ -126,4 +191,4 @@ async def redeem():
         # Return SUCCESS
         pass
 
-    return {"message": str(x)}
+    return {"message": "hello"}
