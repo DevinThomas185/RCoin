@@ -12,6 +12,7 @@ import {
 import { ColorModeSwitcher } from "./ColorModeSwitcher"
 import Test from "./components/Test"
 import { Logo } from "./Logo"
+import PhantomSigner from "./components/phantom/Phantom"
 
 export const App = () => (
   <ChakraProvider theme={theme}>
@@ -19,6 +20,7 @@ export const App = () => (
       <Grid minH="100vh" p={3}>
         <ColorModeSwitcher justifySelf="flex-end" />
         <Test></Test>
+        <PhantomSigner></PhantomSigner>
       </Grid>
     </Box>
   </ChakraProvider>

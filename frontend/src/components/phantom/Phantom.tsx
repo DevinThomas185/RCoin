@@ -97,3 +97,5 @@ export const PhantomSigner = () => {
         </>
     );
 };
+
+export default PhantomSigner
