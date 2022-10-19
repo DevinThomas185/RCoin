@@ -56,7 +56,7 @@ const SignUp = () => {
                 <Field name='password'>
                   {({ field, form }: { field: any, form: any }) => (
                     <FormControl>
-                      <FormLabel>Last name</FormLabel>
+                      <FormLabel>Password</FormLabel>
                       <Input {...field} placeholder='your password' type='password' />
                     </FormControl>
                   )}
