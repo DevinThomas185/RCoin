@@ -37,10 +37,10 @@ const Login = () => {
                     </FormControl>
                   )}
                 </Field>
-                <Field name='lastname'>
+                <Field name='password'>
                   {({ field, form }: { field: any, form: any }) => (
                     <FormControl>
-                      <FormLabel>Last name</FormLabel>
+                      <FormLabel>Password</FormLabel>
                       <Input {...field} placeholder='your password' type='password' />
                     </FormControl>
                   )}
