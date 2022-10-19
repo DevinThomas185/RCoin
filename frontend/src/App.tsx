@@ -1,16 +1,16 @@
-import { Box } from "@chakra-ui/react";
-import * as React from "react";
+import { Flex, Link, Spacer } from "@chakra-ui/react";
 import { useState } from "react";
-import { BrowserRouter as Router, Link as RouterLink, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import Login from "./components/auth/Login";
+import SignUp from "./components/auth/SignUp";
+import Issue from "./components/core_functionality/Issue";
+import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
+import './main.css';
 
 const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
 
   if (!isAuth) {
-    // Redirect them to the /login page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience
-    // than dropping them off on the home page.
     return <Navigate to="/login" />
   }
 
@@ -19,51 +19,49 @@ const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
 
 const App = () => {
   const [isAuth, setIsAuth] = useState(false);
-  let header;
+  let navbar;
   if (isAuth) {
-    header = (
-      <ul className="App-header">
-        <li>
-          <RouterLink to="/">Home</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="/issue">Issue</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="/trade">Trade</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="/redeem">Redeem</RouterLink>
-        </li>
-      </ul>
+    navbar = (
+      <Flex className="navbar">
+        <Spacer></Spacer>
+        <Link href="/">Home</Link>
+        <Spacer></Spacer>
+        <Spacer></Spacer>
+        <Spacer></Spacer>
+        <Link href="/issue">Issue</Link>
+        <Spacer></Spacer>
+        <Link href="/trade">Trade</Link>
+        <Spacer></Spacer>
+        <Link href="/redeem">Redeem</Link>
+        <Spacer></Spacer>
+      </Flex>
+
     )
   } else {
-    header = (
-      <ul>
-        <li>
-          <RouterLink to="/">Home</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="/sign-up">Sign up</RouterLink>
-        </li>
-        <li>
-          <RouterLink to="/login">Login</RouterLink>
-        </li>
-      </ul>
+    navbar = (
+      <Flex className="navbar">
+        <Spacer></Spacer>
+        <Link href="/">Home</Link>
+        <Spacer></Spacer>
+        <Link href="/sign-up">Sign Up</Link>
+        <Spacer></Spacer>
+        <Link href="/login">Login</Link>
+        <Spacer></Spacer>
+      </Flex>
     )
   }
   return (
     <Router>
       <div className="App">
-        {header}
+        {navbar}
       </div>
       <Routes>
         <Route path='/' element={<Home />}></Route>
-        <Route path='/issue' element={RequireAuth(<Home />, isAuth)}></Route>
-        <Route path='/trade' element={RequireAuth(<Home />, isAuth)}></Route>
+        <Route path='/issue' element={RequireAuth(<Issue />, isAuth)}></Route>
+        <Route path='/trade' element={RequireAuth(<Trade />, isAuth)}></Route>
         <Route path='/redeem' element={RequireAuth(<Home />, isAuth)}></Route>
-        <Route path='/login' element={<Home />}></Route>
-        <Route path='/sign-up' element={<Home />}></Route>
+        <Route path='/login' element={<Login />}></Route>
+        <Route path='/sign-up' element={<SignUp />}></Route>
       </Routes>
     </Router>
   )
