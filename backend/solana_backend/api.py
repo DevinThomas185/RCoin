@@ -87,10 +87,16 @@ def request_create_token_account(public_key):
     return transaction.to_solders().to_json()
 
 def new_stablecoin_transaction(sender, amount, recipient):
-    return construct_stablecoin_transaction(
+    bytes = construct_stablecoin_transaction(
             PublicKey(sender),
             amount,
-            PublicKey(recipient)).to_solders().to_json()
+            PublicKey(recipient)).to_solders().__bytes__()
+
+    byte_array = []
+    for byte in bytes:
+        byte_array.append(byte)
+
+    return byte_array
 
 def construct_stablecoin_transaction(sender, amount, recipient):
     ''' Creates a transfer transaction to move stablecoin tokens from one

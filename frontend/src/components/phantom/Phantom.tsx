@@ -13,6 +13,8 @@ export const PhantomSigner = () => {
         undefined
     );
 
+    var transactionBytes: Uint8Array;
+
     const connectWallet = async () => {
         // @ts-ignore
         const { solana } = window;
@@ -39,7 +41,21 @@ export const PhantomSigner = () => {
             setWalletKey(undefined);
         }
     };
+    const getTransaction = () => {
+        const requestOptions = {
+            method: "GET"
+            }
 
+            fetch("/api/test_transaction", requestOptions)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                transactionBytes = new Uint8Array(data)
+                console.log(transactionBytes)
+
+            })
+
+    }
     const signTransaction = async () => {
         if (phantomProvider) {
             const network = "http://api.devnet.solana.com";
@@ -51,9 +67,10 @@ export const PhantomSigner = () => {
             // console.log(`txhash: ${txhash}`);
 
             // Decode transaction from backend
-            const byteArray: number[] = []; // from backend
-            var data = new Uint8Array(byteArray);
-            const transaction = Transaction.from(data);
+                //byteArray = [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,5,88,136,61,56,255,3,19,225,124,184,129,70,14,56,226,77,35,231,196,97,74,254,16,116,63,238,96,42,93,47,213,195,6,27,246,117,60,44,169,145,62,173,91,70,173,221,228,137,59,40,9,171,247,152,188,169,152,153,205,104,239,185,206,2,226,204,14,94,197,224,149,121,31,6,227,220,152,245,60,73,159,247,103,83,13,218,203,95,246,184,57,40,217,113,56,45,6,221,246,225,215,101,161,147,217,203,225,70,206,235,121,172,28,180,133,237,95,91,55,145,58,140,245,133,126,255,0,169,82,207,124,15,142,43,230,101,208,173,27,0,243,200,197,159,54,18,255,58,171,40,82,190,63,105,82,100,205,157,156,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,4,2,4,1,0,10,12,0,202,154,59,0,0,0,0,9]
+            getTransaction()
+            const transaction = Transaction.from(transactionBytes);
+            console.log(transaction)
             transaction.recentBlockhash = blockhash;
             // (provider as any).signAndSendTransaction()
 
