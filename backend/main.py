@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Response
 import stripe
-from data_models import UserInformation
+from data_models import UserInformation, LoginInformation
 import database_api
 import bcrypt
 import sqlalchemy.orm as orm
@@ -13,42 +13,18 @@ stripe.Balance.retrieve()
 # Password functions
 def hash_password(
     password: str,
-) -> str:
-    return bcrypt.hashpw(password, bcrypt.gensalt())
+) -> bytes:
+    bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(bytes, salt)
 
 def verify_password(
     password: str,
-    hashed_password: str
+    hashed_password: bytes
 ) -> bool:
-    return bcrypt.checkpw(password, hashed_password)
+    return hash_password(password) == hashed_password
 
 #TODO[Devin]: Add return types for these functions
-
-# TEST
-@app.get("/api/test")
-async def root(
-    db: orm.Session = Depends(database_api.connect_to_DB),
-):
-    balances = stripe.Balance.retrieve()
-    available_balance = balances.available[0].amount / 100
-    pending_balance = balances.pending[0].amount / 100
-    total_balance = available_balance + pending_balance
-
-    ab = "{:,}".format(available_balance)
-    pb = "{:,}".format(pending_balance)
-    tb = "{:,}".format(total_balance)
-
-    p = "Hello"
-
-    kon = UserInformation(first_name="Kon", last_name="stantinos", email="kon@group4.com", password=hash_password(p), wallet_id="1", bank_account="00012345", sort_code="108800")
-
-    await database_api.create_user(user=kon, db=db)
-    user = await database_api.get_user(email="kon@group4.com", db=db)
-
-    if user is None:
-        raise HTTPException(status_code=404, detail="User does not exist")
-
-    return {"message": "There is R{} available and R{} unavailable in the reserve. This is R{} in total.".format(ab, pb, tb)}
 
 # SIGNUP
 @app.post("/api/signup")
@@ -58,7 +34,7 @@ async def signup(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     try:
-        user.password = hash_password(user.password)
+        user.password=hash_password(user.password)
         await database_api.create_user(user=user, db=db)
         response.status_code = 200
     except: # TODO[devin]: Catch the explicit exception
@@ -67,19 +43,18 @@ async def signup(
 # LOGIN
 @app.post("/api/login")
 async def login(
-    email: str,
-    password: str,
+    login: LoginInformation,
     response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     try:
-        match = await database_api.get_user(email=email, db=db)
-        if verify_password(password, match.password):
+        match = await database_api.get_user(email=login.email, db=db)
+        if match == None or verify_password(login.password, match.password):
             response.status_code = 200
         else:
             response.status_code = 401
 
-    except:
+    except:  # TODO[devin]: Catch explicit exception
         response.status_code = 500
 
 # REAL TIME AUDITING

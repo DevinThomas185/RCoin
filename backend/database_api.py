@@ -16,7 +16,7 @@ Base = declarative.declarative_base()
 class User(Base):
     __tablename__ = "users"
     email = sql.Column(sql.Text, primary_key=True, index=True, unique=True)
-    password = sql.Column(sql.Text, index=True)
+    password = sql.Column(sql.LargeBinary, index=True)
     first_name = sql.Column(sql.Text, index=True)
     last_name = sql.Column(sql.Text, index=True)
     wallet_id = sql.Column(sql.Text, index=True)

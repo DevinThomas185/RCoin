@@ -5,4 +5,7 @@ venv
 # Pycache
 __pycache__
 
+# Debugging
+launch.json
+
 node_modules

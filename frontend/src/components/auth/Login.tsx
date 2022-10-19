@@ -23,6 +23,14 @@ const Login = () => {
             onSubmit={(values, actions) => {
               setTimeout(() => {
                 alert(JSON.stringify(values, null, 2))
+                fetch('/api/login', {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(values, null, 2)
+                })
+                  .then(response => alert(response.status))
                 actions.setSubmitting(false)
               }, 1000)
             }}
