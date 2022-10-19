@@ -1,6 +1,8 @@
 import { Flex, Link, Spacer } from "@chakra-ui/react";
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import Login from "./components/auth/Login";
+import SignUp from "./components/auth/SignUp";
 import Issue from "./components/core_functionality/Issue";
 import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
@@ -16,7 +18,7 @@ const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
 }
 
 const App = () => {
-  const [isAuth, setIsAuth] = useState(true);
+  const [isAuth, setIsAuth] = useState(false);
   let navbar;
   if (isAuth) {
     navbar = (
@@ -41,11 +43,9 @@ const App = () => {
         <Spacer></Spacer>
         <Link href="/">Home</Link>
         <Spacer></Spacer>
-        <Link href="/issue">Sign</Link>
+        <Link href="/sign-up">Sign Up</Link>
         <Spacer></Spacer>
-        <Link href="/trade">Trade</Link>
-        <Spacer></Spacer>
-        <Link href="/redeem">Redeem</Link>
+        <Link href="/login">Login</Link>
         <Spacer></Spacer>
       </Flex>
     )
@@ -60,8 +60,8 @@ const App = () => {
         <Route path='/issue' element={RequireAuth(<Issue />, isAuth)}></Route>
         <Route path='/trade' element={RequireAuth(<Trade />, isAuth)}></Route>
         <Route path='/redeem' element={RequireAuth(<Home />, isAuth)}></Route>
-        <Route path='/login' element={<Home />}></Route>
-        <Route path='/sign-up' element={<Home />}></Route>
+        <Route path='/login' element={<Login />}></Route>
+        <Route path='/sign-up' element={<SignUp />}></Route>
       </Routes>
     </Router>
   )
