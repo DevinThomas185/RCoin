@@ -22,7 +22,7 @@ def verify_password(
     password: str,
     hashed_password: bytes
 ) -> bool:
-    return hash_password(password) == hashed_password
+    return bcrypt.checkpw(password.encode("utf8"), hashed_password)
 
 #TODO[Devin]: Add return types for these functions
 
@@ -49,7 +49,7 @@ async def login(
 ) -> None:
     try:
         match = await database_api.get_user(email=login.email, db=db)
-        if match == None or verify_password(login.password, match.password):
+        if match != None and verify_password(login.password, match.password):
             response.status_code = 200
         else:
             response.status_code = 401
