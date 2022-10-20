@@ -7,10 +7,9 @@ from solana_backend.api import (
 import bcrypt
 import sqlalchemy.orm as orm
 from fastapi import Depends, FastAPI, Response
-from backend.data_models import TradeTransaction
+from data_models import TradeTransaction
 
 import database_api
-import stripe_api
 import time
 from data_models import LoginInformation, UserInformation
 
@@ -62,16 +61,6 @@ async def login(
 
     except:  # TODO[devin]: Catch explicit exception
         response.status_code = 500
-
-# REAL TIME AUDITING
-@app.get("/api/audit")
-async def audit():
-    total_balance = stripe_api.get_total_balance()
-    tb = "{:,}".format(total_balance)
-
-    issued_coins = 1 #TODO[Devin] connect with blockchain and get current coins issued (OR WITH DB)
-    
-    return {"message": "There is R{} in reserve. There are {} coins issued. This is R{} per coin".format(tb, issued_coins, total_balance/issued_coins)}
 
 # ISSUE
 @app.post("/api/issue")
