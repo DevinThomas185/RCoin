@@ -104,7 +104,7 @@ async def issue():
 async def trade(
     trade_transaction: TradeTransaction,
 ):
-    
+    pass
 
 
 # REDEEM
