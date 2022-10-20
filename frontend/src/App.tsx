@@ -10,6 +10,7 @@ import {
 import Login from "./components/auth/Login";
 import SignUp from "./components/auth/SignUp";
 import Issue from "./components/core_functionality/Issue";
+import Redeem from "./components/core_functionality/Redeem";
 import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
 import "./main.css";
@@ -69,7 +70,7 @@ const App = () => {
                 ></Route>
                 <Route
                     path="/redeem"
-                    element={RequireAuth(<Home />, isAuth)}
+                    element={RequireAuth(<Redeem />, isAuth)}
                 ></Route>
                 <Route path="/login" element={<Login />}></Route>
                 <Route path="/sign-up" element={<SignUp />}></Route>

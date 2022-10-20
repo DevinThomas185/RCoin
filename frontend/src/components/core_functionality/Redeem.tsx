@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react'
 import { Field, Form, Formik } from 'formik'
 
-const Issue = () => {
+const Redeem = () => {
   return (
     <ChakraProvider theme={theme}>
       <Flex textAlign="center" fontSize="xl">
@@ -40,7 +40,7 @@ const Issue = () => {
                 <Field name='amount'>
                   {({ field, form }: { field: any, form: any }) => (
                     <FormControl>
-                      <FormLabel>Amount of Stablecoin you want to issue</FormLabel>
+                      <FormLabel>Amount of Stablecoin you want to redeem</FormLabel>
                       <Input {...field} placeholder='enter amount here' />
                     </FormControl>
                   )}
@@ -63,4 +63,4 @@ const Issue = () => {
   )
 }
 
-export default Issue;
+export default Redeem;

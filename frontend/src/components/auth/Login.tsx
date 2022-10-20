@@ -11,8 +11,8 @@ import {
   Button
 } from '@chakra-ui/react'
 import { Field, Form, Formik } from 'formik'
-const Login = () => {
 
+const Login = () => {
   return (
     <ChakraProvider theme={theme}>
       <Flex textAlign="center" fontSize="xl">
