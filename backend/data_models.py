@@ -19,3 +19,19 @@ class LoginInformation(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class IssueTransaction(BaseModel):
+    amount_in_rands: float
+
+
+class TradeTransaction(BaseModel):
+    coins_to_transfer: float
+    sender_email: str
+    recipient_email: str
+    # TODO[devin]: Timestamp add to all transactions?
+    # Probably wanted for auditing purposes?
+
+
+class RedeemTransaction(BaseModel):
+    amount_in_coins: float

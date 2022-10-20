@@ -8,4 +8,7 @@ __pycache__
 # Debugging
 launch.json
 
+# Environment Variables
+.env
+
 node_modules

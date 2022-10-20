@@ -5,7 +5,6 @@ import sqlalchemy.orm as orm
 import data_models
 
 
-# DB_URL = "postgresql://stablecoin_database:stablecoin@172.18.0.2:5432/stablecoin_database"
 DB_URL = "postgresql://stablecoin_database:stablecoin@db:5432/stablecoin_database"
 engine = sql.create_engine(DB_URL)
 
@@ -29,6 +28,9 @@ def _add_tables():
     return Base.metadata.create_all(bind=engine)
 
 def connect_to_DB():
+    """
+    Connect to database, adding tables if not already exists
+    """
     db = SessionLocal()
     _add_tables()
     try:
@@ -41,6 +43,13 @@ async def create_user (
     user: data_models.UserInformation,
     db: "Session",
 ) -> data_models.UserInformation:
+    """
+    Create a user for the stablecoin
+    
+    :param user: The information regarding the user to be saved
+    :param db: The database session to utilise
+    :return: The user information
+    """
     user = User(**user.dict())
     db.add(user)
     db.commit()
@@ -52,5 +61,12 @@ async def get_user (
     email: str,
     db: "Session",
 ) -> data_models.UserInformation:
+    """
+    Get a user from the database using their email
+
+    :param email: The email of the user to find
+    :param db: The database session to utilise
+    :return: The user information found
+    """
     user = db.query(User).filter(User.email == email).first()
     return user

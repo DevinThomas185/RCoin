@@ -1,14 +1,16 @@
-from fastapi import FastAPI, Depends, HTTPException, Response
-import stripe
-from data_models import UserInformation, LoginInformation
-import database_api
+import socket
 import bcrypt
 import sqlalchemy.orm as orm
+import stripe
+from fastapi import Depends, FastAPI, Response
+from backend.data_models import TradeTransaction
+
+import database_api
+import stripe_api
+import time
+from data_models import LoginInformation, UserInformation
 
 app = FastAPI()
-stripe.api_key = "sk_test_51LtqDCKxXCYYgE1FyOIt9SDyZyW8qJ3IGU6i0DeAc2k0SLNekbCwVwLpnR74g48SSyBAPADZRZEz8UzCdrzeg145005r6zXxcD"
-
-stripe.Balance.retrieve()
 
 # Password functions
 def hash_password(
@@ -60,21 +62,12 @@ async def login(
 # REAL TIME AUDITING
 @app.get("/api/audit")
 async def audit():
-    balances = stripe.Balance.retrieve()
-    available_balance = balances.available[0].amount / 100
-    pending_balance = balances.pending[0].amount / 100
-    total_balance = available_balance + pending_balance
-
-    ab = "{:,}".format(available_balance)
-    pb = "{:,}".format(pending_balance)
+    total_balance = stripe_api.get_total_balance()
     tb = "{:,}".format(total_balance)
 
-    issued_coins = "0" #TODO[Devin] connect with blockchain and get current coins issued (OR WITH DB)
+    issued_coins = 1 #TODO[Devin] connect with blockchain and get current coins issued (OR WITH DB)
     
-    return {
-        "reserve": tb,
-        "issued": issued_coins
-    }
+    return {"message": "There is R{} in reserve. There are {} coins issued. This is R{} per coin".format(tb, issued_coins, total_balance/issued_coins)}
 
 # ISSUE
 @app.post("/api/issue")
@@ -106,27 +99,42 @@ async def issue():
     return None
 
 
-
 # TRADE
 @app.post("/api/trade")
-async def trade():
-    return None
+async def trade(
+    trade_transaction: TradeTransaction,
+):
+    
+
 
 # REDEEM
-@app.get("/api/testx")
+@app.get("/api/test")
 async def redeem():
     # Check that user has sufficient balance to redeem
 
     amount = 400000
 
     user = stripe.Account.create(
-        type = "standard",
+        type = "custom",
         country = "GB",
         email = "kon@group4.com",
         business_type = "individual",
         individual = {
             "first_name": "Konstantinos",
-            "last_name": "Koupepas"
+            "last_name": "Koupepas",
+            "address": {
+                "line1": "Imperial College London",
+                "line2": "Exhibition Road",
+                "city": "London",
+                "country": "GB",
+                "postal_code": "SW7 2AZ"
+            },
+            "dob": {
+                "day": 1,
+                "month": 1,
+                "year": 2000
+            },
+            "phone": "+44770012345"
         },
         external_account = {
             "object": "bank_account",
@@ -135,21 +143,27 @@ async def redeem():
             "account_holder_name": "Konstantinos Koupepas",
             "routing_number": "108800",
             "account_number": "GB82WEST12345698765432"
+        },
+        tos_acceptance = {
+            "date": int(time.time()),
+            "ip": "0.0.0.0"
+        },
+        capabilities = {
+            "card_payments": {"requested": True},
+            "transfers": {"requested": True}
         }
     )
 
-    # x = stripe.Account.retrieve(user.id)
-
     stripe.Transfer.create(
-        amount = amount,
-        currency = "gbp",
-        destination = user.id
+        amount = amount*100,
+        currency = "zar",
+        destination = user.stripe_account
     )
 
-    # Issue Stripe payment
-    stripe_success = stripe.Payout.create(
-        amount=amount, #TODO[devin]: Get redeem amound from request body
-        currency='gbp'
+    payout = stripe.Payout.create(
+        amount=amount*100, #TODO[devin]: Get redeem amound from request body
+        currency='gbp',
+        description="Redeeming {} coins".format(10)
     )
 
     # Issue blockchain transaction
