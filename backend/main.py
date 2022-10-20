@@ -1,7 +1,11 @@
-import socket
+from solana_backend.api import (
+        new_stablecoin_transaction,
+        request_create_token_account,
+        issue_stablecoins,
+        burn_stablecoins
+)
 import bcrypt
 import sqlalchemy.orm as orm
-import stripe
 from fastapi import Depends, FastAPI, Response
 from backend.data_models import TradeTransaction
 
@@ -109,75 +113,31 @@ async def trade(
 
 # REDEEM
 @app.get("/api/test")
-async def redeem():
-    # Check that user has sufficient balance to redeem
+async def root():
+    return {"message": "Connected to backend!!!"}
 
-    amount = 400000
+@app.get("/api/test_transaction")
+async def test_transaction():
+        return {"transaction_bytes": new_stablecoin_transaction(
+            "6xbNLwyAjTVx3JpUDKu7cuiNacfQdL6XZ1C8FKdQdPaa",
+            3,
+            "31qpi5WRVV2qCqU1UewcVuhG8GCUdoUYHq98J6thTd7f")}
 
-    user = stripe.Account.create(
-        type = "custom",
-        country = "GB",
-        email = "kon@group4.com",
-        business_type = "individual",
-        individual = {
-            "first_name": "Konstantinos",
-            "last_name": "Koupepas",
-            "address": {
-                "line1": "Imperial College London",
-                "line2": "Exhibition Road",
-                "city": "London",
-                "country": "GB",
-                "postal_code": "SW7 2AZ"
-            },
-            "dob": {
-                "day": 1,
-                "month": 1,
-                "year": 2000
-            },
-            "phone": "+44770012345"
-        },
-        external_account = {
-            "object": "bank_account",
-            "country": "GB",
-            "currency": "gbp",
-            "account_holder_name": "Konstantinos Koupepas",
-            "routing_number": "108800",
-            "account_number": "GB82WEST12345698765432"
-        },
-        tos_acceptance = {
-            "date": int(time.time()),
-            "ip": "0.0.0.0"
-        },
-        capabilities = {
-            "card_payments": {"requested": True},
-            "transfers": {"requested": True}
-        }
-    )
+@app.get("/api/request_transaction")
+async def request_transaction(sender_pubkey, amount, recipient_pubkey):
+        return {"transaction_bytes": new_stablecoin_transaction(
+                                    sender_pubkey, amount, recipient_pubkey)}
 
-    stripe.Transfer.create(
-        amount = amount*100,
-        currency = "zar",
-        destination = user.stripe_account
-    )
+@app.get("/api/create_token_account")
+async def create_token_account(owner_pubkey):
+        return {"transaction_bytes": request_create_token_account(owner_pubkey)}
 
-    payout = stripe.Payout.create(
-        amount=amount*100, #TODO[devin]: Get redeem amound from request body
-        currency='gbp',
-        description="Redeeming {} coins".format(10)
-    )
 
-    # Issue blockchain transaction
-    blockchain_success = 0
+@app.get("/api/issue_tokens")
+async def issue_tokens(requestor_pubkey, amount):
+        issue_stablecoins(requestor_pubkey, amount)
 
-    # Alter databases
-    database_success = 0
 
-    if not all([stripe_success, blockchain_success, database_success]):
-        # Revert all
-        # Return FAILURE
-        pass
-    else:
-        # Return SUCCESS
-        pass
-
-    return {"message": "hello"}
+@app.get("/api/redeem_tokens")
+async def redeem_tokens(requestor_pubkey, amount):
+        return {"transaction_bytes": burn_stablecoins(requestor_pubkey, amount)}
