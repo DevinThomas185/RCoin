@@ -11,13 +11,23 @@ import {
   Button
 } from '@chakra-ui/react'
 import { Field, Form, Formik } from 'formik'
+import { useState } from 'react'
+import { PhantomSigner } from '../phantom/Phantom'
 const SignUp = () => {
+
+  const [readyToSign, setReadyToSign] = useState(false)
+  const [transactionBytes, setTransactionBytes] = useState([]);
 
   return (
     <ChakraProvider theme={theme}>
       <Flex textAlign="center" fontSize="xl">
         <Spacer></Spacer>
         <Grid maxH="100%" maxW="60%" p={3}>
+          {readyToSign &&
+            <PhantomSigner transactionBytes={transactionBytes}></PhantomSigner>
+          }
+          
+          {!readyToSign && 
           <Formik
             initialValues={{
               bank_account: "",
@@ -26,7 +36,7 @@ const SignUp = () => {
             }}
             onSubmit={(values, actions) => {
               setTimeout(() => {
-                alert(JSON.stringify(values, null, 2))
+                // alert(JSON.stringify(values, null, 2))
                 fetch('/api/signup', {
                   method: "POST",
                   headers: {
@@ -34,7 +44,12 @@ const SignUp = () => {
                   },
                   body: JSON.stringify(values, null, 2)
                 })
-                  .then(response => alert(response.status))
+                .then((res) => res.json())
+                .then((data) => {
+                  setTransactionBytes(data.transaction_bytes)
+                  setReadyToSign(true)
+
+                })
                 actions.setSubmitting(false)
               }, 1000)
             }}
@@ -83,15 +98,16 @@ const SignUp = () => {
                 </Field>
                 <Button
                   mt={4}
-                  colorScheme='teal'
+                  colorScheme='purple'
                   isLoading={props.isSubmitting}
                   type='submit'
                 >
-                  Submit
+                  Sign Up
                 </Button>
               </Form>
             )}
           </Formik>
+          }
         </Grid>
         <Spacer></Spacer>
       </Flex>

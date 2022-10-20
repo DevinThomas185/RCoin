@@ -23,17 +23,22 @@ class LoginInformation(BaseModel):
 
 class IssueTransaction(BaseModel):
     email: str
+    # wallet: str
     amount_in_rands: float
 
 
 class TradeTransaction(BaseModel):
     coins_to_transfer: float
     sender_email: str
-    recipient_email: str
+    # recipient_email: str
+
+    # sender_wallet: str
+    recipient_wallet: str
     # TODO[devin]: Timestamp add to all transactions?
     # Probably wanted for auditing purposes?
 
 
 class RedeemTransaction(BaseModel):
     email: str
+    # wallet: str
     amount_in_coins: float

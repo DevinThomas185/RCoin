@@ -12,8 +12,10 @@ import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import Login from "./components/auth/Login";
 import SignUp from "./components/auth/SignUp";
 import Issue from "./components/core_functionality/Issue";
+import Redeem from "./components/core_functionality/Redeem";
 import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
+import { PhantomSigner } from "./components/phantom/Phantom";
 import "./main.css";
 
 const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
@@ -27,6 +29,7 @@ const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
 const App = () => {
     const [isAuth, setIsAuth] = useState(false);
     const [isLoadingAuth, setIsLoadingAuth] = useState(true); // we are initially loading
+    const [email, setEmail] = useState("");
 
     let navbar;
     if (isAuth) {
@@ -68,17 +71,17 @@ const App = () => {
                     <Route path="/" element={<Home />}></Route>
                     <Route
                         path="/issue"
-                        element={RequireAuth(<Issue />, isAuth)}
+                        element={RequireAuth(<Issue email={email} />, isAuth)}
                     ></Route>
                     <Route
                         path="/trade"
-                        element={RequireAuth(<Trade />, isAuth)}
+                        element={RequireAuth(<Trade email={email} />, isAuth)}
                     ></Route>
                     <Route
                         path="/redeem"
-                        element={RequireAuth(<Home />, isAuth)}
+                        element={RequireAuth(<Redeem email={email} />, isAuth)}
                     ></Route>
-                    <Route path="/login" element={<Login setIsAuth={setIsAuth} />}></Route>
+                    <Route path="/login" element={<Login setIsAuth={setIsAuth} setEmail={setEmail} />}></Route>
                     <Route path="/sign-up" element={<SignUp />}></Route>
                 </Routes>
             </Router>

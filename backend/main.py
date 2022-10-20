@@ -75,7 +75,7 @@ async def issue(
 
     # 1:1 issuance of Rands to Coins
     coins_to_issue = issue_transaction.amount_in_rands
-    return issue_stablecoins(buyer.email, coins_to_issue)
+    return issue_stablecoins(buyer.wallet_id, coins_to_issue)
 
 # TRADE
 @app.post("/api/trade")
@@ -84,8 +84,8 @@ async def trade(
     db: orm.Session = Depends(database_api.connect_to_DB)
 ) -> None:
     sender = await database_api.get_user(email=trade_transaction.sender_email, db=db)
-    recipient = await database_api.get_user(email=trade_transaction.recipient_email, db=db)
-    return {"transaction_bytes": new_stablecoin_transaction(sender.wallet_id, trade_transaction.coins_to_transfer, recipient.wallet_id)}
+    # recipient = await database_api.get_user(email=trade_transaction.recipient_email, db=db)
+    return {"transaction_bytes": new_stablecoin_transaction(sender.wallet_id, trade_transaction.coins_to_transfer, trade_transaction.recipient_wallet)}
 
 # REDEEM
 @app.post("/api/redeem")

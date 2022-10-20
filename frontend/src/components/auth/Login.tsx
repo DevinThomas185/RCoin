@@ -10,9 +10,12 @@ import {
   FormErrorMessage,
   Button
 } from '@chakra-ui/react'
+import {useNavigate} from "react-router-dom"
 import { Field, Form, Formik } from 'formik'
-const Login = ({setIsAuth}: {setIsAuth: React.Dispatch<React.SetStateAction<boolean>>}) => {
+const Login = ({setIsAuth, setEmail}: {setIsAuth: React.Dispatch<React.SetStateAction<boolean>>, setEmail: React.Dispatch<React.SetStateAction<string>>}) => {
 
+  const navigate = useNavigate();
+  
   return (
     <ChakraProvider theme={theme}>
       <Flex textAlign="center" fontSize="xl">
@@ -32,6 +35,8 @@ const Login = ({setIsAuth}: {setIsAuth: React.Dispatch<React.SetStateAction<bool
                   .then(response => {
                     if (response.status === 200) {
                       setIsAuth(true)
+                      setEmail((values as any).email)
+                      navigate('/')
                     } else {
                       setIsAuth(false)
                     }
@@ -60,11 +65,11 @@ const Login = ({setIsAuth}: {setIsAuth: React.Dispatch<React.SetStateAction<bool
                 </Field>
                 <Button
                   mt={4}
-                  colorScheme='teal'
+                  colorScheme='purple'
                   isLoading={props.isSubmitting}
                   type='submit'
                 >
-                  Submit
+                  Log In
                 </Button>
               </Form>
             )}

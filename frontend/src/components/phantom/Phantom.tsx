@@ -4,10 +4,12 @@ import { usePhantom } from "../../hooks/Phantom";
 import { PhantomProvider } from "../../types/Phantom";
 import { Transaction, Connection } from "@solana/web3.js";
 
-export const PhantomSigner = () => {
+export const PhantomSigner = ({
+    transactionBytes,
+}: {
+    transactionBytes: number[];
+}) => {
     const phantomProvider = usePhantom();
-
-    //   console.log(phantomProvider);
 
     const [walletKey, setWalletKey] = useState<PhantomProvider | undefined>(
         undefined
@@ -39,7 +41,8 @@ export const PhantomSigner = () => {
             setWalletKey(undefined);
         }
     };
-    const signTransaction = async () => {
+
+    const sign = async () => {
         if (phantomProvider) {
             const network = "http://api.devnet.solana.com";
             const connection = new Connection(network);
@@ -49,133 +52,22 @@ export const PhantomSigner = () => {
             // let txhash = await connection.requestAirdrop(provider.publicKey!, 1e9);
             // console.log(`txhash: ${txhash}`);
 
-
             const requestOptions = {
                 method: "GET",
             };
 
-            fetch("/api/test_transaction", requestOptions)
-             .then((res) => res.json())
-                .then((data) => {
-                    var transactionBytes: Uint8Array = new Uint8Array(
-                        data.transaction_bytes
-                    );
-                    console.log(transactionBytes)
-                    const transaction = Transaction.from(transactionBytes);
-                    transaction.recentBlockhash = blockhash;
+            console.log(transactionBytes);
+            const transaction = Transaction.from(new Uint8Array(transactionBytes));
+            transaction.recentBlockhash = blockhash;
 
-                    return phantomProvider.signAndSendTransaction(transaction);
-                })
-                .then((signature) => {
-                    console.log(signature);
-                });
+            const signature = await phantomProvider.signAndSendTransaction(
+                transaction
+            );
+            console.log(signature);
         }
     };
 
-    const  createTokenAccount = async () => {
-        if (phantomProvider) {
-            const network = "http://api.devnet.solana.com";
-            const connection = new Connection(network);
-            let blockhash = (await connection.getLatestBlockhash("finalized"))
-                .blockhash;
-
-            // let txhash = await connection.requestAirdrop(provider.publicKey!, 1e9);
-            // console.log(`txhash: ${txhash}`);
-
-
-            const requestOptions = {
-                method: "GET",
-                // Get this one from frontend
-                owner_pubkey: "8PMmSSiBA8JS1KG37WSRZaLiASW8dqquJi3kmrg1HX6r"
-            };
-
-            fetch("/api/create_token_account", requestOptions)
-             .then((res) => res.json())
-                .then((data) => {
-                  console.log(data)
-                    var transactionBytes: Uint8Array = new Uint8Array(
-                        data.transaction_bytes
-                    );
-                    const transaction = Transaction.from(transactionBytes);
-                    transaction.recentBlockhash = blockhash;
-
-                    return phantomProvider.signAndSendTransaction(transaction);
-                })
-                .then((signature) => {
-                    console.log(signature);
-                });
-        }
-    };
-    const issueTokens = async () => {
-        if (phantomProvider) {
-            const network = "http://api.devnet.solana.com";
-            const connection = new Connection(network);
-            let blockhash = (await connection.getLatestBlockhash("finalized"))
-                .blockhash;
-
-            // let txhash = await connection.requestAirdrop(provider.publicKey!, 1e9);
-            // console.log(`txhash: ${txhash}`);
-
-
-            const requestOptions = {
-                method: "GET",
-                requestor_pubkey: "8PMmSSiBA8JS1KG37WSRZaLiASW8dqquJi3kmrg1HX6r",
-                amount: 3
-            };
-
-            fetch("/api/issue_tokens", requestOptions)
-             .then((res) => res.json())
-                .then((data) => {
-                    var transactionBytes: Uint8Array = new Uint8Array(
-                        data.transaction_bytes
-                    );
-                    const transaction = Transaction.from(transactionBytes);
-                    transaction.recentBlockhash = blockhash;
-
-                    return phantomProvider.signAndSendTransaction(transaction);
-                })
-                .then((signature) => {
-                    console.log(signature);
-                });
-        }
-    };
-
-
-    const redeemTokens = async () => {
-        if (phantomProvider) {
-            const network = "http://api.devnet.solana.com";
-            const connection = new Connection(network);
-            let blockhash = (await connection.getLatestBlockhash("finalized"))
-                .blockhash;
-
-            // let txhash = await connection.requestAirdrop(provider.publicKey!, 1e9);
-            // console.log(`txhash: ${txhash}`);
-
-
-            const requestOptions = {
-                method: "GET",
-                requestor_pubkey: "8PMmSSiBA8JS1KG37WSRZaLiASW8dqquJi3kmrg1HX6r",
-                amount: 3
-            };
-
-            fetch("/api/test_transaction", requestOptions)
-             .then((res) => res.json())
-                .then((data) => {
-                    var transactionBytes: Uint8Array = new Uint8Array(
-                        data.transaction_bytes
-                    );
-                    const transaction = Transaction.from(transactionBytes);
-                    transaction.recentBlockhash = blockhash;
-
-                    return phantomProvider.signAndSendTransaction(transaction);
-                })
-                .then((signature) => {
-                    console.log(signature);
-                });
-        }
-    };
-
-        return (
+    return (
         <>
             {phantomProvider && !walletKey && (
                 <Button onClick={connectWallet}>
@@ -184,21 +76,7 @@ export const PhantomSigner = () => {
             )}
 
             {phantomProvider && walletKey && (
-                <Box>
-                    <>Connected account {walletKey}</>
-                    <Button onClick={signTransaction}>
-                        Sign test transaction
-                    </Button>
-                    <Button onClick={createTokenAccount}>
-                        Create Token Account
-                    </Button>
-                    <Button onClick={redeemTokens}>
-                        Redeem Tokens
-                    </Button>
-                    <Button onClick={issueTokens}>
-                        Issue Tokens
-                    </Button>
-                </Box>
+                <Button onClick={sign}>Sign Transaction</Button>
             )}
 
             {!phantomProvider && (
