@@ -1,4 +1,14 @@
 # Python envs
 env
+venv
+
+# Pycache
+__pycache__
+
+# Debugging
+launch.json
+
+# Environment Variables
+.env
 
 node_modules

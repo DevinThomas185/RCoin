@@ -19,17 +19,29 @@ const SignUp = () => {
         <Spacer></Spacer>
         <Grid maxH="100%" maxW="60%" p={3}>
           <Formik
-            initialValues={{}}
+            initialValues={{
+              bank_account: "",
+              sort_code: "",
+              wallet_id: ""
+            }}
             onSubmit={(values, actions) => {
               setTimeout(() => {
                 alert(JSON.stringify(values, null, 2))
+                fetch('/api/signup', {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(values, null, 2)
+                })
+                  .then(response => alert(response.status))
                 actions.setSubmitting(false)
               }, 1000)
             }}
           >
             {(props) => (
               <Form>
-                <Field name='firstname'>
+                <Field name='first_name'>
                   {({ field, form }: { field: any, form: any }) => (
                     <FormControl>
                       <FormLabel>First name</FormLabel>
@@ -37,7 +49,7 @@ const SignUp = () => {
                     </FormControl>
                   )}
                 </Field>
-                <Field name='lastname'>
+                <Field name='last_name'>
                   {({ field, form }: { field: any, form: any }) => (
                     <FormControl>
                       <FormLabel>Last name</FormLabel>
