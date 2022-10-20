@@ -7,7 +7,7 @@ from solana_backend.api import (
 import bcrypt
 import sqlalchemy.orm as orm
 from fastapi import Depends, FastAPI, Response
-from data_models import TradeTransaction
+from data_models import IssueTransaction, TradeTransaction, RedeemTransaction
 
 import database_api
 import time
@@ -41,9 +41,9 @@ async def signup(
     try:
         user.password=hash_password(user.password)
         await database_api.create_user(user=user, db=db)
-        response.status_code = 200
-    except: # TODO[devin]: Catch the explicit exception
-        response.status_code = 500
+        return {"transaction_bytes": request_create_token_account(user.wallet_id)}
+    except: 
+        return {} # TODO[devin]: Catch the explicit exception
 
 # LOGIN
 @app.post("/api/login")
@@ -64,69 +64,33 @@ async def login(
 
 # ISSUE
 @app.post("/api/issue")
-async def issue():
-    # STRIPE MUST HAVE SUCCEEDED BY NOW
+async def issue(
+    issue_transaction: IssueTransaction,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+    # Get the user from the database #TODO[devin]: Change to session data
+    buyer = await database_api.get_user(email=issue_transaction.email, db=db)
 
-    # Check reserves are enough
-    reserve_empty = 0
-
-    if reserve_empty:
-        # Return FAILURE
-        pass
-
-
-    # Issue blockchain transaction
-    blockchain_success = 0
-
-    # Alter databases
-    database_success = 0
-
-    if not all([blockchain_success, database_success]):
-        # Revert all
-        # Return FAILURE
-        pass
-    else:
-        # Return SUCCESS
-        pass
-
-    return None
-
+    # 1:1 issuance of Rands to Coins
+    coins_to_issue = issue_transaction.amount_in_rands
+    return issue_stablecoins(buyer.email, coins_to_issue)
 
 # TRADE
 @app.post("/api/trade")
 async def trade(
     trade_transaction: TradeTransaction,
-):
-    pass
-
+    db: orm.Session = Depends(database_api.connect_to_DB)
+) -> None:
+    sender = await database_api.get_user(email=trade_transaction.sender_email, db=db)
+    recipient = await database_api.get_user(email=trade_transaction.recipient_email, db=db)
+    return {"transaction_bytes": new_stablecoin_transaction(sender.wallet_id, trade_transaction.coins_to_transfer, recipient.wallet_id)}
 
 # REDEEM
-@app.get("/api/test")
-async def root():
-    return {"message": "Connected to backend!!!"}
-
-@app.get("/api/test_transaction")
-async def test_transaction():
-        return {"transaction_bytes": new_stablecoin_transaction(
-            "6xbNLwyAjTVx3JpUDKu7cuiNacfQdL6XZ1C8FKdQdPaa",
-            3,
-            "31qpi5WRVV2qCqU1UewcVuhG8GCUdoUYHq98J6thTd7f")}
-
-@app.get("/api/request_transaction")
-async def request_transaction(sender_pubkey, amount, recipient_pubkey):
-        return {"transaction_bytes": new_stablecoin_transaction(
-                                    sender_pubkey, amount, recipient_pubkey)}
-
-@app.get("/api/create_token_account")
-async def create_token_account(owner_pubkey):
-        return {"transaction_bytes": request_create_token_account(owner_pubkey)}
-
-
-@app.get("/api/issue_tokens")
-async def issue_tokens(requestor_pubkey, amount):
-        issue_stablecoins(requestor_pubkey, amount)
-
-
-@app.get("/api/redeem_tokens")
-async def redeem_tokens(requestor_pubkey, amount):
-        return {"transaction_bytes": burn_stablecoins(requestor_pubkey, amount)}
+@app.post("/api/redeem")
+async def redeem(
+    redeem_transaction: RedeemTransaction,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+    # Get the user from the database #TODO[devin]: Change to session data
+    redeemer = await database_api.get_user(email=redeem_transaction.email, db=db)
+    return {"transaction_bytes": burn_stablecoins(redeemer.wallet_id, redeem_transaction.amount_in_coins)}

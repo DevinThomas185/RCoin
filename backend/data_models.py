@@ -6,7 +6,7 @@ class UserInformation(BaseModel):
     password: Union[str, bytes]
     first_name: str
     last_name: str
-    wallet_id: str
+    wallet_id: Union[str, bytes]
     bank_account: str
     sort_code: str
     class Config:
@@ -22,6 +22,7 @@ class LoginInformation(BaseModel):
 
 
 class IssueTransaction(BaseModel):
+    email: str
     amount_in_rands: float
 
 
@@ -34,4 +35,5 @@ class TradeTransaction(BaseModel):
 
 
 class RedeemTransaction(BaseModel):
+    email: str
     amount_in_coins: float
