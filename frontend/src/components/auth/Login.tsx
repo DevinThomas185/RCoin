@@ -11,7 +11,7 @@ import {
   Button
 } from '@chakra-ui/react'
 import { Field, Form, Formik } from 'formik'
-const Login = () => {
+const Login = ({setIsAuth}: {setIsAuth: React.Dispatch<React.SetStateAction<boolean>>}) => {
 
   return (
     <ChakraProvider theme={theme}>
@@ -22,7 +22,6 @@ const Login = () => {
             initialValues={{}}
             onSubmit={(values, actions) => {
               setTimeout(() => {
-                alert(JSON.stringify(values, null, 2))
                 fetch('/api/login', {
                   method: "POST",
                   headers: {
@@ -30,7 +29,13 @@ const Login = () => {
                   },
                   body: JSON.stringify(values, null, 2)
                 })
-                  .then(response => alert(response.status))
+                  .then(response => {
+                    if (response.status === 200) {
+                      setIsAuth(true)
+                    } else {
+                      setIsAuth(false)
+                    }
+                  })
                 actions.setSubmitting(false)
               }, 1000)
             }}

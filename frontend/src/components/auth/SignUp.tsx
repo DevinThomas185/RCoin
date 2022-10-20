@@ -57,6 +57,14 @@ const SignUp = () => {
                     </FormControl>
                   )}
                 </Field>
+                <Field name='wallet_id'>
+                  {({ field, form }: { field: any, form: any }) => (
+                    <FormControl>
+                      <FormLabel>Wallet ID</FormLabel>
+                      <Input {...field} placeholder='your wallet ID' />
+                    </FormControl>
+                  )}
+                </Field>
                 <Field name='email'>
                   {({ field, form }: { field: any, form: any }) => (
                     <FormControl>

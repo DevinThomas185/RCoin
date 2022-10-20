@@ -41,8 +41,10 @@ async def signup(
     try:
         user.password=hash_password(user.password)
         await database_api.create_user(user=user, db=db)
+        response.status_code = 200
         return {"transaction_bytes": request_create_token_account(user.wallet_id)}
     except: 
+        response.status_code = 500
         return {} # TODO[devin]: Catch the explicit exception
 
 # LOGIN
