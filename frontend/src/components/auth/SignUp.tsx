@@ -98,7 +98,7 @@ const SignUp = () => {
                 </Field>
                 <Button
                   mt={4}
-                  colorScheme='purple'
+                  colorScheme='red'
                   isLoading={props.isSubmitting}
                   type='submit'
                 >

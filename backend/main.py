@@ -64,6 +64,21 @@ async def login(
     except:  # TODO[devin]: Catch explicit exception
         response.status_code = 500
 
+# AUDIT
+@app.get("/api/audit")
+async def audit() -> None:
+    # Get the amount in reserve
+    rand_in_reserve = 0.0
+    with open("balance.txt", "r") as f:
+        rand_in_reserve = float(f.readline())
+
+    # Get the coins in circulation
+    issued_coins = 10.0
+
+    return {"rand_in_reserve": rand_in_reserve,
+            "issued_coins": issued_coins,
+            "rand_per_coin": round(rand_in_reserve / issued_coins, 2)}
+
 # ISSUE
 @app.post("/api/issue")
 async def issue(
