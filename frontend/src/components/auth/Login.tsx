@@ -8,13 +8,17 @@ import {
   Flex,
   Spacer,
   FormErrorMessage,
-  Button
+  Button,
+  InputGroup,
+  InputRightElement
 } from '@chakra-ui/react'
 import {useNavigate} from "react-router-dom"
 import { Field, Form, Formik } from 'formik'
+import { useState } from 'react';
 const Login = ({setIsAuth, setEmail}: {setIsAuth: React.Dispatch<React.SetStateAction<boolean>>, setEmail: React.Dispatch<React.SetStateAction<string>>}) => {
 
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   
   return (
     <ChakraProvider theme={theme}>
@@ -59,7 +63,14 @@ const Login = ({setIsAuth, setEmail}: {setIsAuth: React.Dispatch<React.SetStateA
                   {({ field, form }: { field: any, form: any }) => (
                     <FormControl>
                       <FormLabel>Password</FormLabel>
-                      <Input {...field} placeholder='your password' type='password' />
+                      <InputGroup>
+                        <Input {...field} placeholder='your password' type={showPassword ? "text" : "password"} />
+                        <InputRightElement>
+                            <Button size='sm' onClick={() => {setShowPassword(!showPassword)}}>
+                              {showPassword ? "Hide" : "Show"}
+                            </Button>
+                          </InputRightElement>
+                      </InputGroup>
                     </FormControl>
                   )}
                 </Field>

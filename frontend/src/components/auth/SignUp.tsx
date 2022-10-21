@@ -8,7 +8,9 @@ import {
   Flex,
   Spacer,
   FormErrorMessage,
-  Button
+  Button,
+  InputRightElement,
+  InputGroup
 } from '@chakra-ui/react'
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react'
@@ -16,7 +18,8 @@ import { PhantomSigner } from '../phantom/Phantom'
 const SignUp = () => {
 
   const [readyToSign, setReadyToSign] = useState(false)
-  const [transactionBytes, setTransactionBytes] = useState([]);
+  const [transactionBytes, setTransactionBytes] = useState([])
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <ChakraProvider theme={theme}>
@@ -58,7 +61,7 @@ const SignUp = () => {
               <Form>
                 <Field name='first_name'>
                   {({ field, form }: { field: any, form: any }) => (
-                    <FormControl>
+                    <FormControl isRequired>
                       <FormLabel>First name</FormLabel>
                       <Input {...field} placeholder='your first name' />
                     </FormControl>
@@ -66,7 +69,7 @@ const SignUp = () => {
                 </Field>
                 <Field name='last_name'>
                   {({ field, form }: { field: any, form: any }) => (
-                    <FormControl>
+                    <FormControl isRequired>
                       <FormLabel>Last name</FormLabel>
                       <Input {...field} placeholder='your last name' />
                     </FormControl>
@@ -74,7 +77,7 @@ const SignUp = () => {
                 </Field>
                 <Field name='wallet_id'>
                   {({ field, form }: { field: any, form: any }) => (
-                    <FormControl>
+                    <FormControl isRequired>
                       <FormLabel>Wallet ID</FormLabel>
                       <Input {...field} placeholder='your wallet ID' />
                     </FormControl>
@@ -82,7 +85,7 @@ const SignUp = () => {
                 </Field>
                 <Field name='email'>
                   {({ field, form }: { field: any, form: any }) => (
-                    <FormControl>
+                    <FormControl isRequired>
                       <FormLabel>Email</FormLabel>
                       <Input {...field} placeholder='your email address' />
                     </FormControl>
@@ -90,9 +93,16 @@ const SignUp = () => {
                 </Field>
                 <Field name='password'>
                   {({ field, form }: { field: any, form: any }) => (
-                    <FormControl>
+                    <FormControl isRequired>
                       <FormLabel>Password</FormLabel>
-                      <Input {...field} placeholder='your password' type='password' />
+                      <InputGroup>
+                        <Input {...field} placeholder='your password' type={showPassword ? 'text' : 'password'} />
+                        <InputRightElement>
+                          <Button size='sm' onClick={() => {setShowPassword(!showPassword)}}>
+                            {showPassword ? "Hide" : "Show"}
+                          </Button>
+                        </InputRightElement>
+                      </InputGroup>
                     </FormControl>
                   )}
                 </Field>
