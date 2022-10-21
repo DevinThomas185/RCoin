@@ -214,8 +214,8 @@ def get_associated_token_account(wallet_address):
 def get_balance(public_key):
     return SOLANA_CLIENT.get_balance(public_key).value
 
-def get_sol_balance(public_key):
-    return get_balance(public_key) / LAMPORTS_PER_SOL
+def get_sol_balance(pubkey_str):
+    return get_balance(PublicKey(pubkey_str)) / LAMPORTS_PER_SOL
 
 def get_token_balance(pubkey_str):
     solana_client = os.getenv("SOLANA_CLIENT")

@@ -7,18 +7,19 @@ import {
   Grid,
   Flex,
   Spacer,
-  FormErrorMessage,
   Button,
   InputGroup,
   InputRightElement
 } from '@chakra-ui/react'
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react';
 const Login = ({setIsAuth, setEmail}: {setIsAuth: React.Dispatch<React.SetStateAction<boolean>>, setEmail: React.Dispatch<React.SetStateAction<string>>}) => {
 
+  setIsAuth(false)
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
   
   return (
     <ChakraProvider theme={theme}>
@@ -39,10 +40,12 @@ const Login = ({setIsAuth, setEmail}: {setIsAuth: React.Dispatch<React.SetStateA
                   .then(response => {
                     if (response.status === 200) {
                       setIsAuth(true)
+                      setIsInvalid(false)
                       setEmail((values as any).email)
                       navigate('/')
                     } else {
                       setIsAuth(false)
+                      setIsInvalid(true)
                     }
                   })
                 actions.setSubmitting(false)
@@ -64,7 +67,7 @@ const Login = ({setIsAuth, setEmail}: {setIsAuth: React.Dispatch<React.SetStateA
                     <FormControl>
                       <FormLabel>Password</FormLabel>
                       <InputGroup>
-                        <Input {...field} placeholder='your password' type={showPassword ? "text" : "password"} />
+                        <Input {...field} placeholder='your password' type={showPassword ? "text" : "password"} isInvalid={isInvalid} />
                         <InputRightElement>
                             <Button size='sm' onClick={() => {setShowPassword(!showPassword)}}>
                               {showPassword ? "Hide" : "Show"}

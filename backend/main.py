@@ -2,16 +2,16 @@ from solana_backend.api import (
         new_stablecoin_transaction,
         request_create_token_account,
         issue_stablecoins,
-        burn_stablecoins
+        burn_stablecoins,
+        get_total_tokens_issued,
+        get_token_balance,
+        get_sol_balance,
 )
 import bcrypt
 import sqlalchemy.orm as orm
 from fastapi import Depends, FastAPI, Response
-from data_models import IssueTransaction, TradeTransaction, RedeemTransaction
-
+from data_models import LoginInformation, UserInformation,IssueTransaction, TradeTransaction, RedeemTransaction, TokenBalance
 import database_api
-import time
-from data_models import LoginInformation, UserInformation
 
 app = FastAPI()
 
@@ -67,17 +67,11 @@ async def login(
 # AUDIT
 @app.get("/api/audit")
 async def audit() -> None:
-    # Get the amount in reserve
-    rand_in_reserve = 0.0
-    with open("balance.txt", "r") as f:
-        rand_in_reserve = float(f.readline())
+    rands_in_reserve = issued_coins = round(get_total_tokens_issued(), 2)
 
-    # Get the coins in circulation
-    issued_coins = 10.0
-
-    return {"rand_in_reserve": rand_in_reserve,
-            "issued_coins": issued_coins,
-            "rand_per_coin": round(rand_in_reserve / issued_coins, 2)}
+    return {"rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
+            "issued_coins": "{:,.2f}".format(issued_coins),
+            "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2))}
 
 # ISSUE
 @app.post("/api/issue")
@@ -111,3 +105,14 @@ async def redeem(
     # Get the user from the database #TODO[devin]: Change to session data
     redeemer = await database_api.get_user(email=redeem_transaction.email, db=db)
     return {"transaction_bytes": burn_stablecoins(redeemer.wallet_id, redeem_transaction.amount_in_coins)}
+
+# GET TOKEN BALANCE
+@app.post("/api/get_token_balance")
+async def token_balance(
+    token_balance: TokenBalance,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+    # Get the user from the database #TODO[devin]: Change to session data
+    user = await database_api.get_user(email=token_balance.email, db=db)
+    return {"token_balance": get_token_balance(user.wallet_id),
+            "sol_balance": get_sol_balance(user.wallet_id)}

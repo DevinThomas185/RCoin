@@ -1,10 +1,9 @@
-import { Flex, Spacer, ChakraProvider, theme, Box} from "@chakra-ui/react";
+import { Flex, Spacer, ChakraProvider, theme, Text} from "@chakra-ui/react";
 import { useState } from "react";
 import {
     BrowserRouter as Router,
     Routes,
     Route,
-    useLocation,
     Navigate,
     Link,
 } from "react-router-dom";
@@ -15,10 +14,16 @@ import Issue from "./components/core_functionality/Issue";
 import Redeem from "./components/core_functionality/Redeem";
 import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
-import { PhantomSigner } from "./components/phantom/Phantom";
 import "./main.css";
 
-const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
+const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean) => {    
+    // This is for when we have an /authenticated endpoint and we can check without having
+    // to log back in
+    if (isLoadingAuth) {
+        return <></>
+    }
+
+    
     if (!isAuth) {
         return <Navigate to="/login" />;
     }
@@ -28,7 +33,7 @@ const RequireAuth = (child: JSX.Element, isAuth: boolean) => {
 
 const App = () => {
     const [isAuth, setIsAuth] = useState(false);
-    const [isLoadingAuth, setIsLoadingAuth] = useState(true); // we are initially loading
+    const [isLoadingAuth, setIsLoadingAuth] = useState(false); // we are initially loading
     const [email, setEmail] = useState("");
 
     let navbar;
@@ -38,6 +43,7 @@ const App = () => {
                 <Spacer></Spacer>
                 <Link to="/">Home</Link>
                 <Spacer></Spacer>
+                <Text onClick={() => setIsAuth(false)} cursor='pointer'>Log out</Text>
                 <Spacer></Spacer>
                 <Spacer></Spacer>
                 <Link to="/issue">Issue</Link>
@@ -68,18 +74,18 @@ const App = () => {
             <Router>
                 <div className="App">{navbar}</div>
                 <Routes>
-                    <Route path="/" element={<Home />}></Route>
+                    <Route path="/" element={<Home email={email} isAuth={isAuth}/>}></Route>
                     <Route
                         path="/issue"
-                        element={RequireAuth(<Issue email={email} />, isAuth)}
+                        element={RequireAuth(<Issue email={email} />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route
                         path="/trade"
-                        element={RequireAuth(<Trade email={email} />, isAuth)}
+                        element={RequireAuth(<Trade email={email} />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route
                         path="/redeem"
-                        element={RequireAuth(<Redeem email={email} />, isAuth)}
+                        element={RequireAuth(<Redeem email={email} />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route path="/login" element={<Login setIsAuth={setIsAuth} setEmail={setEmail} />}></Route>
                     <Route path="/sign-up" element={<SignUp />}></Route>

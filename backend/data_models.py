@@ -42,3 +42,6 @@ class RedeemTransaction(BaseModel):
     email: str
     # wallet: str
     amount_in_coins: float
+
+class TokenBalance(BaseModel):
+    email: str
