@@ -1,5 +1,6 @@
 # Standard imports
 import os
+from requests import post
 from dotenv import load_dotenv
 
 # Solana dependencies
@@ -167,6 +168,9 @@ def issue_stablecoins(recipient_public_key, amount):
         opts=TxOpts(skip_confirmation=False, preflight_commitment=Confirmed))
 
     print("Transaction finished with response: {}".format(resp))
+    if (resp.value.__str__() is not None):
+        return {"success" : True}
+
 
 def get_transaction_for_phantom(sender, amount, recipient):
     ''' Constructs a transaction which can be sent to Phantom for signing and
@@ -210,4 +214,26 @@ def get_balance(public_key):
 
 def get_sol_balance(public_key):
     return get_balance(public_key) / LAMPORTS_PER_SOL
+
+def get_token_balance(pubkey_str):
+    solana_client = os.getenv("SOLANA_CLIENT")
+    token_program_id = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+    assert(solana_client is not None)
+    payload = {
+        'jsonrpc': '2.0',
+        'id': 1,
+        'method': 'getTokenAccountsByOwner',
+        'params': [
+            f'{pubkey_str}',
+            {
+                'programId': f'{token_program_id}'
+            },
+            {
+                'encoding': 'jsonParsed'
+            }
+        ]
+    }
+    r =  post(solana_client, json = payload)
+    j = r.json()
+    return float(j['result']['value'][0]['account']['data']['parsed']['info']['tokenAmount']['amount']) / (10**TOKEN_DECIMALS)
 
