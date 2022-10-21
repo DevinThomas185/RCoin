@@ -168,6 +168,9 @@ def issue_stablecoins(recipient_public_key, amount):
         opts=TxOpts(skip_confirmation=False, preflight_commitment=Confirmed))
 
     print("Transaction finished with response: {}".format(resp))
+    if (resp.value.__str__() is not None):
+        return {"success" : True}
+
 
 def get_transaction_for_phantom(sender, amount, recipient):
     ''' Constructs a transaction which can be sent to Phantom for signing and
