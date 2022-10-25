@@ -1,21 +1,17 @@
 import {
   ChakraProvider,
   Box,
-  Text,
-  Link,
-  VStack,
-  Code,
   Grid,
   theme,
 } from "@chakra-ui/react"
-import Test from "../components/Test"
+import Welcome from "../components/Welcome"
 
-const Home = () => {
+const Home = ({email, isAuth}: {email: string, isAuth: boolean}) => {
   return (
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="xl">
         <Grid minH="100vh" p={3}>
-          <Test></Test>
+          <Welcome email={email} isAuth={isAuth}/>
         </Grid>
       </Box>
     </ChakraProvider>
