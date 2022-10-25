@@ -6,7 +6,7 @@ class UserInformation(BaseModel):
     password: Union[str, bytes]
     first_name: str
     last_name: str
-    wallet_id: str
+    wallet_id: Union[str, bytes]
     bank_account: str
     sort_code: str
     class Config:
@@ -22,16 +22,26 @@ class LoginInformation(BaseModel):
 
 
 class IssueTransaction(BaseModel):
+    email: str
+    # wallet: str
     amount_in_rands: float
 
 
 class TradeTransaction(BaseModel):
     coins_to_transfer: float
     sender_email: str
-    recipient_email: str
+    # recipient_email: str
+
+    # sender_wallet: str
+    recipient_wallet: str
     # TODO[devin]: Timestamp add to all transactions?
     # Probably wanted for auditing purposes?
 
 
 class RedeemTransaction(BaseModel):
+    email: str
+    # wallet: str
     amount_in_coins: float
+
+class TokenBalance(BaseModel):
+    email: str

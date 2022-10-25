@@ -7,12 +7,20 @@ import {
   Grid,
   Flex,
   Spacer,
-  FormErrorMessage,
-  Button
+  Button,
+  InputGroup,
+  InputRightElement
 } from '@chakra-ui/react'
+import { useNavigate } from "react-router-dom"
 import { Field, Form, Formik } from 'formik'
-const Login = () => {
+import { useState } from 'react';
+const Login = ({setIsAuth, setEmail}: {setIsAuth: React.Dispatch<React.SetStateAction<boolean>>, setEmail: React.Dispatch<React.SetStateAction<string>>}) => {
 
+  setIsAuth(false)
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
+  
   return (
     <ChakraProvider theme={theme}>
       <Flex textAlign="center" fontSize="xl">
@@ -22,7 +30,6 @@ const Login = () => {
             initialValues={{}}
             onSubmit={(values, actions) => {
               setTimeout(() => {
-                alert(JSON.stringify(values, null, 2))
                 fetch('/api/login', {
                   method: "POST",
                   headers: {
@@ -30,7 +37,17 @@ const Login = () => {
                   },
                   body: JSON.stringify(values, null, 2)
                 })
-                  .then(response => alert(response.status))
+                  .then(response => {
+                    if (response.status === 200) {
+                      setIsAuth(true)
+                      setIsInvalid(false)
+                      setEmail((values as any).email)
+                      navigate('/')
+                    } else {
+                      setIsAuth(false)
+                      setIsInvalid(true)
+                    }
+                  })
                 actions.setSubmitting(false)
               }, 1000)
             }}
@@ -49,17 +66,24 @@ const Login = () => {
                   {({ field, form }: { field: any, form: any }) => (
                     <FormControl>
                       <FormLabel>Password</FormLabel>
-                      <Input {...field} placeholder='your password' type='password' />
+                      <InputGroup>
+                        <Input {...field} placeholder='your password' type={showPassword ? "text" : "password"} isInvalid={isInvalid} />
+                        <InputRightElement>
+                            <Button size='sm' onClick={() => {setShowPassword(!showPassword)}}>
+                              {showPassword ? "Hide" : "Show"}
+                            </Button>
+                          </InputRightElement>
+                      </InputGroup>
                     </FormControl>
                   )}
                 </Field>
                 <Button
                   mt={4}
-                  colorScheme='teal'
+                  colorScheme='red'
                   isLoading={props.isSubmitting}
                   type='submit'
                 >
-                  Submit
+                  Log In
                 </Button>
               </Form>
             )}

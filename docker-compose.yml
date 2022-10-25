@@ -9,6 +9,11 @@ services:
   
   backend:
     build: ./backend
+    environment:
+      - SOLANA_CLIENT=${SOLANA_CLIENT}
+      - MINT_ACCOUNT=${MINT_ACCOUNT}
+      - RESERVE_ACCOUNT_ADDRESS=${RESERVE_ACCOUNT_ADDRESS}
+      - TOKEN_OWNER=${TOKEN_OWNER}        
     ports:
       - 8000:8000
     depends_on:
@@ -17,6 +22,8 @@ services:
   db:
     image: postgres:alpine
     restart: always
+    # ports:
+      # - 5432:5432
     environment:
       - POSTGRES_USER=stablecoin_database
       - POSTGRES_PASSWORD=stablecoin

@@ -1,5 +1,6 @@
 # Standard imports
 import os
+from requests import post
 from dotenv import load_dotenv
 
 # Solana dependencies
@@ -20,6 +21,8 @@ SOLANA_CLIENT            = Client(str(os.getenv("SOLANA_CLIENT")))
 MINT_ACCOUNT             = PublicKey(str(os.getenv("MINT_ACCOUNT")))
 TOKEN_OWNER              = PublicKey(str(os.getenv("TOKEN_OWNER")))
 RESERVE_ACCOUNT_ADDRESS  = PublicKey(str(os.getenv("RESERVE_ACCOUNT_ADDRESS")))
+
+TOTAL_SUPPLY = 1000000000
 
 # Secret key of the account of the token owner. Used for issuing new tokens
 # for users who have provided equivalent collateral.
@@ -167,6 +170,9 @@ def issue_stablecoins(recipient_public_key, amount):
         opts=TxOpts(skip_confirmation=False, preflight_commitment=Confirmed))
 
     print("Transaction finished with response: {}".format(resp))
+    if (resp.value.__str__() is not None):
+        return {"success" : True}
+
 
 def get_transaction_for_phantom(sender, amount, recipient):
     ''' Constructs a transaction which can be sent to Phantom for signing and
@@ -208,6 +214,30 @@ def get_associated_token_account(wallet_address):
 def get_balance(public_key):
     return SOLANA_CLIENT.get_balance(public_key).value
 
-def get_sol_balance(public_key):
-    return get_balance(public_key) / LAMPORTS_PER_SOL
+def get_sol_balance(pubkey_str):
+    return get_balance(PublicKey(pubkey_str)) / LAMPORTS_PER_SOL
 
+def get_token_balance(pubkey_str):
+    solana_client = os.getenv("SOLANA_CLIENT")
+    token_program_id = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+    assert(solana_client is not None)
+    payload = {
+        'jsonrpc': '2.0',
+        'id': 1,
+        'method': 'getTokenAccountsByOwner',
+        'params': [
+            f'{pubkey_str}',
+            {
+                'programId': f'{token_program_id}'
+            },
+            {
+                'encoding': 'jsonParsed'
+            }
+        ]
+    }
+    r =  post(solana_client, json = payload)
+    j = r.json()
+    return float(j['result']['value'][0]['account']['data']['parsed']['info']['tokenAmount']['amount']) / (10**TOKEN_DECIMALS)
+
+def get_total_tokens_issued():
+    return TOTAL_SUPPLY - get_token_balance(os.getenv("TOKEN_OWNER"))

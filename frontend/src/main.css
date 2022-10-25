@@ -3,5 +3,7 @@ body {
 }
 
 .navbar {
-  background-color: aqua;
+  background-color: rgb(62, 94, 185);
+  font-size: x-large;
+  color: rgb(255, 217, 0);
 }
