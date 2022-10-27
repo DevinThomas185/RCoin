@@ -9,6 +9,8 @@ from solana.keypair import Keypair
 from solana.publickey import PublicKey
 from solana.transaction import Transaction
 
+from solders.signature import Signature
+
 # Spl-token dependencies
 from spl.token.constants import TOKEN_PROGRAM_ID
 from spl.token.instructions import (
@@ -232,3 +234,10 @@ def get_token_balance(pubkey_str):
 
 def get_total_tokens_issued():
     return TOTAL_SUPPLY - get_token_balance(os.getenv("TOKEN_OWNER"))
+
+def get_transaction_details(transaction_signature):
+    return SOLANA_CLIENT.get_transaction(Signature.from_string(transaction_signature))
+
+def get_transactions_for_account(pubkey_str, transaction_number):
+    return SOLANA_CLIENT.get_signatures_for_address(PublicKey(pubkey_str), limit=transaction_number)
+
