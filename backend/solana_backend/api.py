@@ -8,12 +8,16 @@ from solana.rpc.commitment import Confirmed
 from solana.rpc.types import TokenAccountOpts, TxOpts
 from solana.keypair import Keypair
 from solana.publickey import PublicKey
-from solana.rpc.api import Client
 from solana.transaction import Transaction
+from solana.publickey import PublicKey
+from solana.rpc.api import Client
 
 # Spl-token dependencies
 from spl.token.constants import TOKEN_PROGRAM_ID
-from spl.token.instructions import create_associated_token_account, transfer_checked, TransferCheckedParams
+from spl.token.instructions import (
+        create_associated_token_account,
+        transfer_checked,
+        TransferCheckedParams)
 
 load_dotenv()
 
@@ -35,7 +39,6 @@ TOKEN_DECIMALS = 9
 # A fraction of Solana coin (SOL) is called a Lamport, there are 1000000000
 # Lamports in one SOL
 LAMPORTS_PER_SOL = 1000000000
-
 def fund_account(public_key, amount):
     public_key = PublicKey(public_key)
     try:
