@@ -1,7 +1,6 @@
 # Standard imports
 import os
 from requests import post
-from dotenv import load_dotenv
 
 # Solana dependencies
 from solana.rpc.commitment import Confirmed
@@ -9,8 +8,6 @@ from solana.rpc.types import TokenAccountOpts, TxOpts
 from solana.keypair import Keypair
 from solana.publickey import PublicKey
 from solana.transaction import Transaction
-from solana.publickey import PublicKey
-from solana.rpc.api import Client
 
 # Spl-token dependencies
 from spl.token.constants import TOKEN_PROGRAM_ID
@@ -19,26 +16,17 @@ from spl.token.instructions import (
         transfer_checked,
         TransferCheckedParams)
 
-load_dotenv()
+from common import (
+        SOLANA_CLIENT,
+        MINT_ACCOUNT,
+        TOKEN_DECIMALS,
+        TOKEN_OWNER,
+        TOTAL_SUPPLY,
+        RESERVE_ACCOUNT_ADDRESS,
+        SECRET_KEY,
+        LAMPORTS_PER_SOL
+        )
 
-SOLANA_CLIENT            = Client(str(os.getenv("SOLANA_CLIENT")))
-MINT_ACCOUNT             = PublicKey(str(os.getenv("MINT_ACCOUNT")))
-TOKEN_OWNER              = PublicKey(str(os.getenv("TOKEN_OWNER")))
-RESERVE_ACCOUNT_ADDRESS  = PublicKey(str(os.getenv("RESERVE_ACCOUNT_ADDRESS")))
-
-TOTAL_SUPPLY = 1000000000
-
-# Secret key of the account of the token owner. Used for issuing new tokens
-# for users who have provided equivalent collateral.
-SECRET_KEY = bytes([201,177,177,188,30,250,36,198,219,122,244,184,157,71,143,105,203,124,174,14,68,41,225,32,187,118,101,31,0,173,89,33,4,54,216,80,246,76,169,16,88,205,213,99,67,163,133,26,174,194,62,168,113,163,244,82,57,118,41,208,25,202,218,243])
-
-# The precision that we support in transactions involving our stablecoin token
-# is up to 9 decimal places.
-TOKEN_DECIMALS = 9
-
-# A fraction of Solana coin (SOL) is called a Lamport, there are 1000000000
-# Lamports in one SOL
-LAMPORTS_PER_SOL = 1000000000
 def fund_account(public_key, amount):
     public_key = PublicKey(public_key)
     try:
