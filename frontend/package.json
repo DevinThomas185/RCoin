@@ -6,7 +6,6 @@
     "@chakra-ui/react": "^2.3.5",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@faker-js/faker": "^7.6.0",
     "@solana/web3.js": "^1.66.1",
     "@tanstack/react-query": "^4.13.0",
     "@tanstack/react-table": "^8.5.18",
