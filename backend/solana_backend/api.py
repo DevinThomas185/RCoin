@@ -18,9 +18,6 @@ from spl.token.instructions import (
         transfer_checked,
         TransferCheckedParams)
 
-# Query operation dependencies
-from solana_backend.query import does_public_key_have_a_token_account
-
 from solana_backend.common import (
         SOLANA_CLIENT,
         MINT_ACCOUNT,
@@ -219,6 +216,13 @@ def get_balance(public_key):
 def get_sol_balance(pubkey_str):
     return get_balance(PublicKey(pubkey_str)) / LAMPORTS_PER_SOL
 
+def does_public_key_have_a_token_account(public_key) -> bool:
+    resp = SOLANA_CLIENT.get_token_accounts_by_owner(
+            public_key,
+            TokenAccountOpts(mint=MINT_ACCOUNT))
+
+    return resp.value != []
+
 def get_token_balance(pubkey_str):
     solana_client = os.getenv("SOLANA_CLIENT")
     token_program_id = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
@@ -245,8 +249,19 @@ def get_total_tokens_issued():
     return TOTAL_SUPPLY - get_token_balance(os.getenv("TOKEN_OWNER"))
 
 def get_transaction_details(transaction_signature):
-    return SOLANA_CLIENT.get_transaction(Signature.from_string(transaction_signature))
+    return SOLANA_CLIENT.get_transaction(transaction_signature)
 
-def get_transactions_for_account(pubkey_str, transaction_number):
-    return SOLANA_CLIENT.get_signatures_for_address(PublicKey(pubkey_str), limit=transaction_number)
+def get_raw_transactions_for_account(pubkey_str, number_of_transactions):
+    return SOLANA_CLIENT.get_signatures_for_address(PublicKey(pubkey_str), limit=number_of_transactions)
+
+def get_processed_transactions_for_account(pubkey_str, number_of_transactions):
+    resp = SOLANA_CLIENT.get_signatures_for_address(PublicKey(pubkey_str), limit=number_of_transactions)
+    signatures = list(map(lambda status: status.signature, resp.value))
+
+    transactions = []
+    for signature in signatures:
+        details = get_transaction_details(signature)
+        transactions.append(details)
+
+    return transactions
 
