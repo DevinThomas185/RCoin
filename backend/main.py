@@ -153,6 +153,11 @@ async def complete_redeem(
     transaction_bytes = bytes(transaction.transaction_bytes)
     resp = send_transaction_from_bytes(transaction_bytes)
 
+    amount = 10  # get this from blockchain using response
+
+    await database_api.create_redeem_transaction(
+        transaction, database_api.get_dummy_id(), resp.value.__str__(), amount, db
+    )
     # assume was successful until szymon refactors
     return {"success": True}
 

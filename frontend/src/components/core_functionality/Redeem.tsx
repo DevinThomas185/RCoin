@@ -29,7 +29,7 @@ const Redeem = ({ email }: { email: string }) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({'transaction_bytes': Array.from(signedTransaction.serialize())})
+        body: JSON.stringify({'transaction_bytes': Array.from(signedTransaction.serialize()), "email": email})
       })
         .then((res) => res.json())
         .then((data) => {

@@ -51,6 +51,7 @@ class Redeem(Base):
     user_id = sql.Column(sql.Integer, sql.ForeignKey("users.id"))
     bank_transaction_id = sql.Column(sql.Text, unique=True)
     blockchain_transaction_id = sql.Column(sql.Text, unique=True)
+    amount = sql.Column(sql.Float)
 
 
 class Issue(Base):
@@ -138,7 +139,7 @@ async def create_user(
 async def get_user(
     email: str,
     db: "Session",
-) -> data_models.UserInformation:
+) -> User:
     """
     Get a user from the database using their email
 
@@ -188,3 +189,23 @@ async def complete_issue_transaction(
 
 
 # Redeem
+async def create_redeem_transaction(
+    redeem: data_models.CompleteRedeemTransaction,
+    bank_transaction_id: str,
+    blockchain_transaction_id: str,
+    amount: float,
+    db: "Session",
+) -> Redeem:
+    user = await get_user(email=redeem.email, db=db)
+
+    redeem_transaction = Redeem(
+        user_id=user.id,
+        bank_transaction_id=bank_transaction_id,
+        blockchain_transaction_id=blockchain_transaction_id,
+        amount=amount,
+    )
+
+    db.add(redeem_transaction)
+    db.commit()
+
+    return redeem_transaction

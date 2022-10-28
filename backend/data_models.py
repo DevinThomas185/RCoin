@@ -47,6 +47,7 @@ class RedeemTransaction(BaseModel):
 
 
 class CompleteRedeemTransaction(BaseModel):
+    email: str
     transaction_bytes: List[int]
 
 
