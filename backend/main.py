@@ -1,3 +1,4 @@
+from datetime import datetime
 from solana_backend.api import (
     new_stablecoin_transaction,
     request_create_token_account,
@@ -21,6 +22,8 @@ from data_models import (
     TokenBalance,
 )
 import database_api
+
+from datetime import datetime
 
 app = FastAPI()
 
@@ -96,7 +99,7 @@ async def issue(
     buyer = await database_api.get_user(email=issue_transaction.email, db=db)
 
     issue_transac = await database_api.create_issue_transaction(
-        issue_transaction, database_api.get_dummy_id(), db
+        issue_transaction, database_api.get_dummy_id(), datetime.now(), db
     )
 
     # Below should be done in a background job once we verify the bank transaction
@@ -156,7 +159,12 @@ async def complete_redeem(
     amount = 10  # get this from blockchain using response
 
     await database_api.create_redeem_transaction(
-        transaction, database_api.get_dummy_id(), resp.value.__str__(), amount, db
+        transaction,
+        database_api.get_dummy_id(),
+        resp.value.__str__(),
+        datetime.now(),
+        amount,
+        db,
     )
     # assume was successful until szymon refactors
     return {"success": True}
