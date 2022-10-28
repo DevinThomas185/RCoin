@@ -1,6 +1,3 @@
-import solana_backend.common
-import solana_backend.query
-
 from solana_backend.api import (
         new_stablecoin_transaction,
         request_create_token_account,
