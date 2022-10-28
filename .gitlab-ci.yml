@@ -30,8 +30,8 @@ deploy-dev:
     - echo "$KNOWN_HOSTS_DEV" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" MINT_ACCOUNT=$MINT_ACCOUNT SOLANA_CLIENT=$SOLANA_CLIENT RESERVE_ACCOUNT_ADDRESS=$RESERVE_ACCOUNT_ADDRESS TOKEN_OWNER=$TOKEN_OWNER docker-compose up --remove-orphans -d --build
-  # only:
-  #   - master
+  only:
+    - master
 
 deploy-prod:
   image: docker/compose:debian-1.29.2
