@@ -18,6 +18,9 @@ from spl.token.instructions import (
         transfer_checked,
         TransferCheckedParams)
 
+# Query operation dependencies
+from query import does_public_key_have_a_token_account
+
 from common import (
         SOLANA_CLIENT,
         MINT_ACCOUNT,
@@ -54,8 +57,8 @@ def fund_account(public_key, amount):
         print('error:', e)
 
 def request_create_token_account(public_key):
-    ''' Request creation of a new token account for a Solana account with the
-        address equal to public_key.
+    '''Request creation of a new token account for a Solana account with the
+       address equal to public_key.
 
     This function should be used by the backend to get the transaction json.
     It is not suitable for debugging and will not work.
@@ -63,10 +66,16 @@ def request_create_token_account(public_key):
     Args:
         public_key: The public key of the account that will be the owner
         of the new token account.
+
     Returns:
         json object representing a transaction which needs to be signed by
         phantom on the frontent side.
+
     '''
+    if does_public_key_have_a_token_account(public_key):
+        ## failure, TODO: handle appropriately.
+        return []
+
     public_key = PublicKey(public_key)
     transaction = Transaction()
     transaction.add(

@@ -1,32 +1,53 @@
 import os
+from requests import post
 
 # Solana dependencies
-from solana.rpc.commitment import Confirmed
-from solana.rpc.types import TokenAccountOpts, TxOpts
-from solana.keypair import Keypair
 from solana.publickey import PublicKey
+from solana.rpc.types import TokenAccountOpts
 from solana.rpc.api import Client
-from solana.transaction import Transaction
 
 SOLANA_CLIENT            = Client(str(os.getenv("SOLANA_CLIENT")))
 MINT_ACCOUNT             = PublicKey(str(os.getenv("MINT_ACCOUNT")))
 TOKEN_OWNER              = PublicKey(str(os.getenv("TOKEN_OWNER")))
 RESERVE_ACCOUNT_ADDRESS  = PublicKey(str(os.getenv("RESERVE_ACCOUNT_ADDRESS")))
 
-TOTAL_SUPPLY = 1000000000
+TOTAL_SUPPLY = 1_000_000_000
+
+from common import (
+        SOLANA_CLIENT,
+        MINT_ACCOUNT,
+        TOKEN_DECIMALS,
+        TOKEN_OWNER,
+        TOTAL_SUPPLY,
+        RESERVE_ACCOUNT_ADDRESS,
+        LAMPORTS_PER_SOL
+        )
+
+def does_public_key_have_a_token_account(public_key) -> bool:
+    resp = SOLANA_CLIENT.get_token_accounts_by_owner(
+            public_key,
+            TokenAccountOpts(mint=MINT_ACCOUNT))
+
+    return resp.value != []
+
 
 def get_associated_token_account(wallet_address):
+    wallet_address = PublicKey(wallet_address)
+
     if wallet_address == TOKEN_OWNER:
         # When issuing coins the token account associated with the owner is the
         # reserve account.
         return RESERVE_ACCOUNT_ADDRESS
 
-    wallet_address = PublicKey(wallet_address)
-    resp = SOLANA_CLIENT.get_token_accounts_by_owner(wallet_address, TokenAccountOpts(mint=MINT_ACCOUNT))
+    resp = SOLANA_CLIENT.get_token_accounts_by_owner(
+            wallet_address,
+            TokenAccountOpts(mint=MINT_ACCOUNT))
+
     # It is possible that there is more than one Stablecoin token account
-    # associated with the user's wallet, in such case we need to do something
-    # about it. Right now we always pick the first account in the list.
-    # TODO: prevent creation of multiple stablecoin accounts for one wallet.
+    # associated with the user's wallet. However, here in the implementation
+    # we assume that there is just one token account associated with
+    # each wallet. That is because our function for creating token accounts
+    # doesn't allow creating multiple token account for each user.
     token_account = PublicKey.from_solders(resp.value[0].pubkey)
 
     if token_account is None:
@@ -39,8 +60,8 @@ def get_associated_token_account(wallet_address):
 def get_balance(public_key):
     return SOLANA_CLIENT.get_balance(public_key).value
 
-def get_sol_balance(public_key):
-    return get_balance(public_key) / LAMPORTS_PER_SOL
+def get_sol_balance(pubkey_str):
+    return get_balance(PublicKey(pubkey_str)) / LAMPORTS_PER_SOL
 
 def get_token_balance(pubkey_str):
     solana_client = os.getenv("SOLANA_CLIENT")
@@ -66,3 +87,10 @@ def get_token_balance(pubkey_str):
 
 def get_total_tokens_issued():
     return TOTAL_SUPPLY - get_token_balance(os.getenv("TOKEN_OWNER"))
+
+def get_transaction_details(transaction_signature):
+    return SOLANA_CLIENT.get_transaction(Signature.from_string(transaction_signature))
+
+def get_transactions_for_account(pubkey_str, transaction_number):
+    return SOLANA_CLIENT.get_signatures_for_address(PublicKey(pubkey_str), limit=transaction_number)
+
