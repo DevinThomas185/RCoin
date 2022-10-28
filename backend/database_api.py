@@ -1,10 +1,12 @@
 # Database
+from datetime import datetime
 import sqlalchemy as sql
 from sqlalchemy.schema import Sequence
 import sqlalchemy.ext.declarative as declarative
 import sqlalchemy.orm as orm
 import data_models
 import uuid
+from typing import List, Tuple
 
 
 def get_dummy_id() -> str:
@@ -51,6 +53,7 @@ class Redeem(Base):
     user_id = sql.Column(sql.Integer, sql.ForeignKey("users.id"))
     bank_transaction_id = sql.Column(sql.Text, unique=True)
     blockchain_transaction_id = sql.Column(sql.Text, unique=True)
+    date = sql.Column(sql.DateTime)
     amount = sql.Column(sql.Float)
 
 
@@ -67,7 +70,7 @@ class Issue(Base):
     bank_transaction_id = sql.Column(sql.Text, unique=True)
     blockchain_transaction_id = sql.Column(sql.Text, unique=True)
     amount = sql.Column(sql.Float)
-    start_date = None
+    date = sql.Column(sql.DateTime)
     end_date = None
 
 
@@ -153,7 +156,10 @@ async def get_user(
 
 # Issue
 async def create_issue_transaction(
-    issue: data_models.IssueTransaction, bank_transaction_id: str, db: "Session"
+    issue: data_models.IssueTransaction,
+    bank_transaction_id: str,
+    date: datetime,
+    db: "Session",
 ) -> Issue:
     user = await get_user(email=issue.email, db=db)
     # bank_transaction_id = sql.Column(sql.Text, unique=True)
@@ -169,6 +175,7 @@ async def create_issue_transaction(
     issue_transaction = Issue(
         user_id=user.id,
         bank_transaction_id=bank_transaction_id,
+        date=date,
         amount=issue.amount_in_rands,
     )
 
@@ -193,6 +200,7 @@ async def create_redeem_transaction(
     redeem: data_models.CompleteRedeemTransaction,
     bank_transaction_id: str,
     blockchain_transaction_id: str,
+    date: datetime,
     amount: float,
     db: "Session",
 ) -> Redeem:
@@ -202,6 +210,7 @@ async def create_redeem_transaction(
         user_id=user.id,
         bank_transaction_id=bank_transaction_id,
         blockchain_transaction_id=blockchain_transaction_id,
+        date=date,
         amount=amount,
     )
 
@@ -209,3 +218,36 @@ async def create_redeem_transaction(
     db.commit()
 
     return redeem_transaction
+
+
+async def get_audit_transactions(
+    offset: int, limit: int, query_date: datetime, db: "Session"
+) -> List[Tuple]:
+    """Gets sorted (descending) issue and redeem transactions
+
+    Args:
+        offset (int): skip the first n rows
+        limit (int): maximum number of rows
+        query_date (datetime): the date from the initial query,
+            ensuring that offset works (if new rows are added later)
+        db (Session): db session
+
+    Returns:
+        List[Tuple]: [(type, bank_transaction_id, blockchain_transaction_id, amount, date)]
+    """
+
+    QUERY = """
+    SELECT 'redeem' AS type, bank_transaction_id, blockchain_transaction_id, amount, date 
+    FROM redeem
+    UNION
+    SELECT 'issue' AS type, bank_transaction_id, blockchain_transaction_id, amount, date 
+    FROM issue
+    WHERE date <= :query_date
+    ORDER BY date DESC
+    LIMIT :limit OFFSET :offset;
+    """
+
+    res = db.execute(
+        QUERY, {"query_date": query_date, "limit": limit, "offset": offset}
+    )
+    return list(res)
