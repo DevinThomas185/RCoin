@@ -6,11 +6,13 @@ from solana_backend.api import (
     get_total_tokens_issued,
     get_token_balance,
     get_sol_balance,
+    send_transaction_from_bytes,
 )
 import bcrypt
 import sqlalchemy.orm as orm
 from fastapi import Depends, FastAPI, Response
 from data_models import (
+    CompleteRedeemTransaction,
     LoginInformation,
     UserInformation,
     IssueTransaction,
@@ -93,9 +95,22 @@ async def issue(
     # Get the user from the database #TODO[devin]: Change to session data
     buyer = await database_api.get_user(email=issue_transaction.email, db=db)
 
+    issue_transac = await database_api.create_issue_transaction(
+        issue_transaction, database_api.get_dummy_id(), db
+    )
+
+    # Below should be done in a background job once we verify the bank transaction
+    # has gone through - not pending
+
     # 1:1 issuance of Rands to Coins
     coins_to_issue = issue_transaction.amount_in_rands
-    return issue_stablecoins(buyer.wallet_id, coins_to_issue)
+    issue_stablecoins(buyer.wallet_id, coins_to_issue)
+
+    await database_api.complete_issue_transaction(
+        issue_transac.id, database_api.get_dummy_id(), db
+    )
+
+    return None
 
 
 # TRADE
@@ -128,6 +143,18 @@ async def redeem(
             redeemer.wallet_id, redeem_transaction.amount_in_coins
         )
     }
+
+
+@app.post("/api/complete-redeem")
+async def complete_redeem(
+    transaction: CompleteRedeemTransaction,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+    transaction_bytes = bytes(transaction.transaction_bytes)
+    resp = send_transaction_from_bytes(transaction_bytes)
+
+    # assume was successful until szymon refactors
+    return {"success": True}
 
 
 # GET TOKEN BALANCE

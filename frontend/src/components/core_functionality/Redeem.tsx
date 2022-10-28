@@ -11,13 +11,34 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { PhantomSigner } from "../phantom/Phantom";
+import { Transaction } from "@solana/web3.js";
+
 
 const Redeem = ({ email }: { email: string }) => {
 
   const [readyToSign, setReadyToSign] = useState(false)
   const [transactionBytes, setTransactionBytes] = useState([]);
+  const [signedTransaction, setSignedTransaction] = useState<Transaction | null>(null);
+
+  useEffect(() => {
+    if (signedTransaction) {
+      fetch('/api/complete-redeem', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'transaction_bytes': Array.from(signedTransaction.serialize())})
+      })
+        .then((res) => res.json())
+        .then((data) => {
+            console.log(data);
+        })
+    }
+
+  }, [signedTransaction]);
+
 
   return (
     <ChakraProvider theme={theme}>
@@ -25,7 +46,7 @@ const Redeem = ({ email }: { email: string }) => {
         <Spacer></Spacer>
         <Grid maxH="100%" maxW="60%" p={3}>
           {readyToSign &&
-            <PhantomSigner transactionBytes={transactionBytes}></PhantomSigner>
+            <PhantomSigner transactionBytes={transactionBytes} setSignedTransaction={setSignedTransaction}></PhantomSigner>
           }
 
           {!readyToSign &&

@@ -4,9 +4,16 @@ from sqlalchemy.schema import Sequence
 import sqlalchemy.ext.declarative as declarative
 import sqlalchemy.orm as orm
 import data_models
+import uuid
 
 
-DB_URL = "postgresql://stablecoin_database:stablecoin@db:5432/stablecoin_database"
+def get_dummy_id() -> str:
+    # returns dummy id used for mocking things like transactions
+    return str(uuid.uuid4())
+
+
+# DB_URL = "postgresql://stablecoin_database:stablecoin@db:5432/stablecoin_database"
+DB_URL = "postgresql://karim:password@127.0.0.1:5432/stablecoin_database"
 
 engine = sql.create_engine(DB_URL)
 
@@ -16,26 +23,44 @@ Base = declarative.declarative_base()
 # Tables
 class User(Base):
     __tablename__ = "users"
-    id = sql.Column(sql.Integer, Sequence("user_id_seq", start=1001, increment=1), primary_key=True, index=True, unique=True)
+    id = sql.Column(
+        sql.Integer,
+        Sequence("user_id_seq", start=1001, increment=1),
+        primary_key=True,
+        index=True,
+        unique=True,
+    )
     email = sql.Column(sql.Text, index=True, unique=True)
     # user_name = sql.Column(sql.Text, index=True, unique=True)
     password = sql.Column(sql.LargeBinary, index=True)
     first_name = sql.Column(sql.Text, index=True)
     last_name = sql.Column(sql.Text, index=True)
-    wallet_id = sql.Column(sql.Text, index=True)#, unique=True)
+    wallet_id = sql.Column(sql.Text, index=True)  # , unique=True)
     bank_account = sql.Column(sql.Text, index=True)
     sort_code = sql.Column(sql.Text, index=True)
 
+
 class Redeem(Base):
     __tablename__ = "redeem"
-    id = sql.Column(sql.Integer, Sequence("redeem_id_seq", start=1001, increment=1), primary_key=True, unique=True)
+    id = sql.Column(
+        sql.Integer,
+        Sequence("redeem_id_seq", start=1001, increment=1),
+        primary_key=True,
+        unique=True,
+    )
     user_id = sql.Column(sql.Integer, sql.ForeignKey("users.id"))
     bank_transaction_id = sql.Column(sql.Text, unique=True)
     blockchain_transaction_id = sql.Column(sql.Text, unique=True)
 
+
 class Issue(Base):
     __tablename__ = "issue"
-    id = sql.Column(sql.Integer, Sequence("issue_id_seq", start=1001, increment=1), primary_key=True, unique=True)
+    id = sql.Column(
+        sql.Integer,
+        Sequence("issue_id_seq", start=1001, increment=1),
+        primary_key=True,
+        unique=True,
+    )
     user_id = sql.Column(sql.Integer, sql.ForeignKey("users.id"))
     fraud_id = sql.Column(sql.Integer, sql.ForeignKey("fraud.id"))
     bank_transaction_id = sql.Column(sql.Text, unique=True)
@@ -47,7 +72,12 @@ class Issue(Base):
 
 class Fraud(Base):
     __tablename__ = "fraud"
-    id = sql.Column(sql.Integer, Sequence("fraud_id_seq", start=1001, increment=1), primary_key=True, unique=True)
+    id = sql.Column(
+        sql.Integer,
+        Sequence("fraud_id_seq", start=1001, increment=1),
+        primary_key=True,
+        unique=True,
+    )
     bank_transaction_id = sql.Column(sql.Text, unique=True)
     amount_lost = sql.Column(sql.Float)
     date_chargeback = None
@@ -61,6 +91,7 @@ class RedeemFee(Base):
     blockchain_fee = sql.Column(sql.Float)
     fee_charged = sql.Column(sql.Float)
 
+
 class IssueFee(Base):
     __tablename__ = "issue_fee"
     issue_id = sql.Column(sql.Integer, sql.ForeignKey("issue.id"), primary_key=True)
@@ -72,6 +103,7 @@ class IssueFee(Base):
 # API Functions
 def _add_tables():
     return Base.metadata.create_all(bind=engine)
+
 
 def connect_to_DB():
     """
@@ -85,13 +117,13 @@ def connect_to_DB():
         db.close()
 
 
-async def create_user (
+async def create_user(
     user: data_models.UserInformation,
     db: "Session",
 ) -> data_models.UserInformation:
     """
     Create a user for the stablecoin
-    
+
     :param user: The information regarding the user to be saved
     :param db: The database session to utilise
     :return: The user information
@@ -103,7 +135,7 @@ async def create_user (
     return data_models.UserInformation.from_orm(user)
 
 
-async def get_user (
+async def get_user(
     email: str,
     db: "Session",
 ) -> data_models.UserInformation:
@@ -116,3 +148,43 @@ async def get_user (
     """
     user = db.query(User).filter(User.email == email).first()
     return user
+
+
+# Issue
+async def create_issue_transaction(
+    issue: data_models.IssueTransaction, bank_transaction_id: str, db: "Session"
+) -> Issue:
+    user = await get_user(email=issue.email, db=db)
+    # bank_transaction_id = sql.Column(sql.Text, unique=True)
+    # blockchain_transaction_id = sql.Column(sql.Text, unique=True)
+    # amount = sql.Column(sql.Float)
+    # start_date = None
+    # end_date = None
+
+    # start date is today
+    # end date should be later on
+    # we should not take blockchain_transaction as we do not add it immediately.
+
+    issue_transaction = Issue(
+        user_id=user.id,
+        bank_transaction_id=bank_transaction_id,
+        amount=issue.amount_in_rands,
+    )
+
+    db.add(issue_transaction)
+    db.commit()
+    db.refresh(issue_transaction)
+    return issue_transaction
+
+
+async def complete_issue_transaction(
+    issue_id: int, blockchain_transaction_id: str, db: "Session"
+):
+    # We have now issued the coins so should update the corresponding row
+    db.query(Issue).filter(Issue.id == issue_id).update(
+        {"blockchain_transaction_id": blockchain_transaction_id}
+    )
+    db.commit()
+
+
+# Redeem

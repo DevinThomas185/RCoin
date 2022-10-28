@@ -1,5 +1,6 @@
-from typing import Union
+from typing import List, Union
 from pydantic import BaseModel
+
 
 class UserInformation(BaseModel):
     email: str
@@ -9,6 +10,7 @@ class UserInformation(BaseModel):
     wallet_id: Union[str, bytes]
     bank_account: str
     sort_code: str
+
     class Config:
         orm_mode = True
 
@@ -42,6 +44,11 @@ class RedeemTransaction(BaseModel):
     email: str
     # wallet: str
     amount_in_coins: float
+
+
+class CompleteRedeemTransaction(BaseModel):
+    transaction_bytes: List[int]
+
 
 class TokenBalance(BaseModel):
     email: str
