@@ -19,9 +19,9 @@ from spl.token.instructions import (
         TransferCheckedParams)
 
 # Query operation dependencies
-from query import does_public_key_have_a_token_account
+from solana_backend.query import does_public_key_have_a_token_account
 
-from common import (
+from solana_backend.common import (
         SOLANA_CLIENT,
         MINT_ACCOUNT,
         TOKEN_DECIMALS,
