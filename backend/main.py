@@ -1,3 +1,6 @@
+import solana_backend.common
+import solana_backend.query
+
 from solana_backend.api import (
         new_stablecoin_transaction,
         request_create_token_account,
@@ -43,7 +46,7 @@ async def signup(
         await database_api.create_user(user=user, db=db)
         response.status_code = 200
         return {"transaction_bytes": request_create_token_account(user.wallet_id)}
-    except: 
+    except:
         response.status_code = 500
         return {} # TODO[devin]: Catch the explicit exception
 
