@@ -15,9 +15,6 @@ const Home = ({email, isAuth}: {email: string, isAuth: boolean}) => {
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="xl">
         <Grid minH="100vh" p={3}>
-
-          <Welcome email={email} isAuth={isAuth}/>
-          
           <IssuePage pageName={"Issue"} title={"From ZAR to our Stablecoin"} colour={'red'} link={"issue"}
             image="https://images.pexels.com/photos/4482896/pexels-photo-4482896.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
             message={"Safely purchase Stablecoin with your bank card using stripe. Your balance will update liveThe transaction will then be on the blockchain updating your balance live."} />

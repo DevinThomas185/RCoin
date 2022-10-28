@@ -14,6 +14,7 @@ import Issue from "./components/core_functionality/Issue";
 import Redeem from "./components/core_functionality/Redeem";
 import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
+import Audit from "./components/AuditPage";
 import "./main.css";
 
 const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean) => {    
@@ -43,6 +44,8 @@ const App = () => {
                 <Spacer></Spacer>
                 <Link to="/">Home</Link>
                 <Spacer></Spacer>
+                <Link to="/audit">Audit</Link>
+                <Spacer></Spacer>
                 <Text onClick={() => setIsAuth(false)} cursor='pointer'>Log out</Text>
                 <Spacer></Spacer>
                 <Spacer></Spacer>
@@ -60,6 +63,8 @@ const App = () => {
             <Flex className="navbar">
                 <Spacer></Spacer>
                 <Link to="/">Home</Link>
+                <Spacer></Spacer>
+                <Link to="/audit">Audit</Link>
                 <Spacer></Spacer>
                 <Link to="/sign-up">Sign Up</Link>
                 <Spacer></Spacer>
@@ -89,6 +94,7 @@ const App = () => {
                     ></Route>
                     <Route path="/login" element={<Login setIsAuth={setIsAuth} setEmail={setEmail} />}></Route>
                     <Route path="/sign-up" element={<SignUp />}></Route>
+                    <Route path='/audit' element={<Audit email={email} isAuth={isAuth} />}> </Route>
                 </Routes>
             </Router>
         </ChakraProvider>

@@ -37,7 +37,9 @@ const SignUp = () => {
                 last_name: "",
                 wallet_id: "",
                 email: "",
-                password: ""
+                password: "",
+                bank_account: "",
+                sort_code: "",
               }}
               onSubmit={(values, actions) => {
                 setTimeout(() => {
