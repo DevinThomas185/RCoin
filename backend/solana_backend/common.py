@@ -8,8 +8,7 @@ from solana.publickey import PublicKey
 from solana.rpc.api import Client
 
 SOLANA_CLIENT            = Client(str(os.getenv("SOLANA_CLIENT")))
-MINT_ACCOUNT_STRING      = str(os.getenv("MINT_ACCOUNT"))
-MINT_ACCOUNT             = PublicKey(MINT_ACCOUNT_STRING)
+MINT_ACCOUNT      = PublicKey(str(os.getenv("MINT_ACCOUNT")))
 TOKEN_OWNER              = PublicKey(str(os.getenv("TOKEN_OWNER")))
 RESERVE_ACCOUNT_ADDRESS  = PublicKey(str(os.getenv("RESERVE_ACCOUNT_ADDRESS")))
 
