@@ -12,6 +12,7 @@ MINT_ACCOUNT      = PublicKey(str(os.getenv("MINT_ACCOUNT")))
 TOKEN_OWNER              = PublicKey(str(os.getenv("TOKEN_OWNER")))
 RESERVE_ACCOUNT_ADDRESS  = PublicKey(str(os.getenv("RESERVE_ACCOUNT_ADDRESS")))
 
+TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 TOTAL_SUPPLY = 1000000000
 
 def read_the_secret_key() -> list[int]:
