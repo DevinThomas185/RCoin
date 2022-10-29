@@ -24,8 +24,8 @@ from solana_backend.exceptions import (
 )
 
 
-def construct_stablecoin_transaction(
-    sender: str, amount: float, recipient: str
+def construct_stablecoin_transfer(
+    sender: PublicKey, amount: float, recipient: PublicKey
 ) -> Transaction:
     """Creates a transfer transaction to move stablecoin tokens from one
     account to the other.
@@ -62,7 +62,7 @@ def construct_stablecoin_transaction(
                 source=source_account,
                 mint=MINT_ACCOUNT,
                 dest=dest_account,
-                owner=PublicKey(sender),
+                owner=sender,
                 amount=int(amount * (10**TOKEN_DECIMALS)),
                 decimals=TOKEN_DECIMALS,
                 signers=[],
@@ -73,7 +73,7 @@ def construct_stablecoin_transaction(
     return transaction
 
 
-def get_associated_token_account(wallet_address: str) -> PublicKey:
+def get_associated_token_account(public_key: PublicKey) -> PublicKey:
     """Get the token account associated with a given wallet
 
     Args:
@@ -84,14 +84,14 @@ def get_associated_token_account(wallet_address: str) -> PublicKey:
         token_account_key: PublicKey
 
     """
-    wallet_key = PublicKey(wallet_address)
-    if wallet_key == TOKEN_OWNER:
+
+    if public_key == TOKEN_OWNER:
         # When issuing coins the token account associated with the owner is the
         # reserve account which holds all of the minted tokens.
         return RESERVE_ACCOUNT_ADDRESS
 
     resp = SOLANA_CLIENT.get_token_accounts_by_owner(
-        wallet_key, TokenAccountOpts(mint=MINT_ACCOUNT)
+        public_key, TokenAccountOpts(mint=MINT_ACCOUNT)
     )
 
     # It is possible that there is more than one Stablecoin token account
@@ -104,15 +104,13 @@ def get_associated_token_account(wallet_address: str) -> PublicKey:
     if token_account_key is None:
         print(
             "There are no token accounts associated with the wallet: {}".format(
-                wallet_address
+                public_key
             )
         )
-        raise NoTokenAccountException(str(wallet_address))
+        raise NoTokenAccountException(str(public_key))
 
     print(
-        "Token account: {} found for wallet: {}".format(
-            token_account_key, wallet_address
-        )
+        "Token account: {} found for wallet: {}".format(token_account_key, public_key)
     )
 
     return token_account_key
