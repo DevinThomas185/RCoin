@@ -13,71 +13,49 @@ from solders.signature import Signature
 
 from solders.rpc.responses import GetTransactionResp, GetSignaturesForAddressResp
 
-from solders.transaction_status import EncodedTransactionWithStatusMeta
+from solders.transaction_status import (
+    EncodedTransactionWithStatusMeta,
+)
 
 # Spl-token dependencies
-from spl.token.constants import TOKEN_PROGRAM_ID
 from spl.token.instructions import (
     create_associated_token_account,
-    transfer_checked,
-    TransferCheckedParams,
 )
 
 from solana_backend.common import (
-    MINT_ACCOUNT_STRING,
     SOLANA_CLIENT,
     MINT_ACCOUNT,
     TOKEN_DECIMALS,
     TOKEN_OWNER,
     TOTAL_SUPPLY,
-    RESERVE_ACCOUNT_ADDRESS,
     SECRET_KEY,
     LAMPORTS_PER_SOL,
 )
 
-
-def fund_account(public_key, amount):
-    public_key = PublicKey(public_key)
-    try:
-        if amount > 2:
-            print("The maximum amount allowed is 2 SOL")
-            return
-
-        print("Requesting {} SOL to the Solana account: {}".format(amount, public_key))
-
-        resp = SOLANA_CLIENT.request_airdrop(public_key, amount)
-        transaction_id = str(resp.value)
-
-        if transaction_id is None:
-            print("Failed to fund your Solana account")
-            return
-
-        print(resp)
-
-        print("The transaction: {} was executed.".format(transaction_id))
-        print("You requested funding your account with {} SOL.".format(amount))
-
-    except Exception as e:
-        print("error:", e)
+from solana_backend.transaction import (
+    construct_stablecoin_transfer,
+    transaction_to_bytes,
+)
 
 
 def request_create_token_account(public_key):
     """Request creation of a new token account for a Solana account with the
        address equal to public_key.
 
-    This function should be used by the backend to get the transaction json.
-    It is not suitable for debugging and will not work.
+    This function should be used by the backend to get the transaction bytes,
+    which can then be sent to phantom for signing and received back at the
+    backend and sent to the blockchain.
 
     Args:
         public_key: The public key of the account that will be the owner
         of the new token account.
 
     Returns:
-        json object representing a transaction which needs to be signed by
-        phantom on the frontent side.
+        byte array which can then be reconstructed into a solders transaction
+        on the frontend side and sent to phantom.
 
     """
-    if does_public_key_have_a_token_account(public_key):
+    if has_token_account(public_key):
         ## failure, TODO: handle appropriately.
         return []
 
@@ -94,89 +72,33 @@ def request_create_token_account(public_key):
         )
     )
 
-    bytes = transaction.to_solders().__bytes__()
-    return transaction_bytes_to_array(bytes)
+    return transaction_to_bytes(transaction)
 
 
-def transaction_bytes_to_array(transaction_bytes):
-    byte_array = []
-    for byte in transaction_bytes:
-        byte_array.append(byte)
-
-    return byte_array
-
-
-def burn_stablecoins(user_pubkey_str, amount):
-    bytes = (
-        construct_stablecoin_transaction(
-            PublicKey(user_pubkey_str), amount, TOKEN_OWNER
-        )
-        .to_solders()
-        .__bytes__()
-    )
-
-    return transaction_bytes_to_array(bytes)
+def burn_stablecoins(pubkey_str, amount):
+    transaction = construct_stablecoin_transfer(pubkey_str, amount, str(TOKEN_OWNER))
+    return transaction_to_bytes(transaction)
 
 
 def new_stablecoin_transaction(sender, amount, recipient):
-    bytes = (
-        construct_stablecoin_transaction(
-            PublicKey(sender), amount, PublicKey(recipient)
-        )
-        .to_solders()
-        .__bytes__()
-    )
-
-    return transaction_bytes_to_array(bytes)
-
-
-def construct_stablecoin_transaction(sender, amount, recipient):
-    """Creates a transfer transaction to move stablecoin tokens from one
-    account to the other.
-
-    Args:
-        from: PublicKey of the sender
-        amount: Number of stablecoins to transfer
-        to: PublicKey of the recipient
-    """
-    transaction = Transaction()
-
-    source_account = get_associated_token_account(sender)
-    dest_acount = get_associated_token_account(recipient)
-
-    assert source_account is not None
-    assert dest_acount is not None
-
-    transaction.add(
-        transfer_checked(
-            TransferCheckedParams(
-                program_id=TOKEN_PROGRAM_ID,
-                source=source_account,
-                mint=MINT_ACCOUNT,
-                dest=dest_acount,
-                owner=sender,
-                amount=int(amount * (10**TOKEN_DECIMALS)),
-                decimals=TOKEN_DECIMALS,
-                signers=[],
-            )
-        )
-    )
-    return transaction
+    transaction = construct_stablecoin_transfer(sender, amount, recipient)
+    return transaction_to_bytes(transaction)
 
 
 def issue_stablecoins(recipient_public_key, amount):
-    """Given the public key of the TOKEN account (not the wallet address)
-    issues the requested amount of stablecoins to that account.
-    Prior to executing it should be ensured that the user has provided
-    equivalent collateral in exchange for the coins.
-    """
-    recipient_public_key = PublicKey(recipient_public_key)
+    """Constructs a transaction to issue stablecoins and sends it directly
+    to the blockchain.
 
-    transaction = construct_stablecoin_transaction(
-        sender=TOKEN_OWNER, amount=amount, recipient=recipient_public_key
+    Args:
+        recipient_public_key: string identifying the wallet address of the
+        recipient
+        amount: number of stablecoins to be issues.
+    """
+
+    transaction = construct_stablecoin_transfer(
+        str(TOKEN_OWNER), amount, recipient_public_key
     )
 
-    # TODO: find a secure way to store the private key of the token account.
     owner = Keypair.from_secret_key(SECRET_KEY)
 
     print(
@@ -192,57 +114,9 @@ def issue_stablecoins(recipient_public_key, amount):
     )
 
     print("Transaction finished with response: {}".format(resp))
+    ## TODO[szymon] add check for transaction success.
     if resp.value.__str__() is not None:
         return {"success": True}
-
-
-def get_transaction_for_phantom(sender, amount, recipient):
-    """Constructs a transaction which can be sent to Phantom for signing and
-    then sent to the network.
-
-    Args:
-        sender: A string representing the public key of the sender.
-        amount: The amount of stablecoins to be transferred.
-        recipient: A string representing the public key of the recipient.
-    """
-    sender_key = PublicKey(sender)
-    recipient_key = PublicKey(recipient)
-
-    return (
-        construct_stablecoin_transaction(sender_key, amount, recipient_key)
-        .to_solders()
-        .__bytes__()
-    )
-
-
-def get_associated_token_account(wallet_address):
-    if wallet_address == TOKEN_OWNER:
-        # When issuing coins the token account associated with the owner is the
-        # reserve account.
-        return RESERVE_ACCOUNT_ADDRESS
-
-    wallet_address = PublicKey(wallet_address)
-    resp = SOLANA_CLIENT.get_token_accounts_by_owner(
-        wallet_address, TokenAccountOpts(mint=MINT_ACCOUNT)
-    )
-    # It is possible that there is more than one Stablecoin token account
-    # associated with the user's wallet, in such case we need to do something
-    # about it. Right now we always pick the first account in the list.
-    # TODO: prevent creation of multiple stablecoin accounts for one wallet.
-    token_account = PublicKey.from_solders(resp.value[0].pubkey)
-
-    if token_account is None:
-        print(
-            "There are no token accounts associated with the wallet: {}".format(
-                wallet_address
-            )
-        )
-        return
-
-    print(
-        "Token account: {} found for wallet: {}".format(token_account, wallet_address)
-    )
-    return token_account
 
 
 def get_balance(public_key):
@@ -253,7 +127,7 @@ def get_sol_balance(pubkey_str):
     return get_balance(PublicKey(pubkey_str)) / LAMPORTS_PER_SOL
 
 
-def does_public_key_have_a_token_account(public_key) -> bool:
+def has_token_account(public_key) -> bool:
     resp = SOLANA_CLIENT.get_token_accounts_by_owner(
         public_key, TokenAccountOpts(mint=MINT_ACCOUNT)
     )
@@ -261,7 +135,7 @@ def does_public_key_have_a_token_account(public_key) -> bool:
     return resp.value != []
 
 
-def get_token_balance(pubkey_str):
+def get_token_balance(pubkey: str) -> float:
     solana_client = os.getenv("SOLANA_CLIENT")
     token_program_id = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
     assert solana_client is not None
@@ -270,7 +144,7 @@ def get_token_balance(pubkey_str):
         "id": 1,
         "method": "getTokenAccountsByOwner",
         "params": [
-            f"{pubkey_str}",
+            f"{pubkey}",
             {"programId": f"{token_program_id}"},
             {"encoding": "jsonParsed"},
         ],
@@ -284,38 +158,47 @@ def get_token_balance(pubkey_str):
     ) / (10**TOKEN_DECIMALS)
 
 
-def get_total_tokens_issued():
-    return TOTAL_SUPPLY - get_token_balance(os.getenv("TOKEN_OWNER"))
+def get_total_tokens_issued() -> float:
+    token_owner_key = os.getenv("TOKEN_OWNER")
+    assert token_owner_key is not None
+    return TOTAL_SUPPLY - get_token_balance(token_owner_key)
 
 
-def get_transaction_details(transaction_signature) -> GetTransactionResp:
+def get_transaction_details(transaction_signature: Signature) -> GetTransactionResp:
     return SOLANA_CLIENT.get_transaction(transaction_signature)
 
 
 def get_raw_transactions_for_account(
-    pubkey_str, number_of_transactions
+    pubkey: str, number_of_transactions: int
 ) -> GetSignaturesForAddressResp:
 
     return SOLANA_CLIENT.get_signatures_for_address(
-        PublicKey(pubkey_str), limit=number_of_transactions
+        PublicKey(pubkey), limit=number_of_transactions
     )
 
 
 # Takes in a public key, and returns a list of tuples (source, target, amount)
 # The amounts can be negative or positive, and the source is always the public key
-def get_processed_transactions_for_account(pubkey_str, limit):
-    resp = get_raw_transactions_for_account(pubkey_str, limit)
+def get_processed_transactions_for_account(pubkey: str, limit: int):
+    resp = get_raw_transactions_for_account(pubkey, limit)
+
     transactions = list(
         map(lambda status: get_transaction_details(status.signature), resp.value)
     )
+
+    transactions: list[GetTransactionResp] = [
+        get_transaction_details(status.signature) for status in resp.value
+    ]
 
     confirmed_transactions: list[EncodedTransactionWithStatusMeta] = [
         transaction.value.transaction
         for transaction in transactions
         if transaction.value
     ]
+
     processed_transactions = []
     for confirmed_transaction in confirmed_transactions:
+        # Skip the transaction if it doesn't have the metadata for some reason.
         if confirmed_transaction.meta is None:
             continue
 
@@ -344,12 +227,12 @@ def get_processed_transactions_for_account(pubkey_str, limit):
         # we skip the transaction.
 
         for pre_token_balance in pre_token_balances:
-            if str(pre_token_balance.mint) != MINT_ACCOUNT_STRING:
+            if str(pre_token_balance.mint) != str(MINT_ACCOUNT):
                 is_relevant = False
                 break
 
         for post_token_balance in post_token_balances:
-            if str(post_token_balance.mint) != MINT_ACCOUNT_STRING:
+            if str(post_token_balance.mint) != str(MINT_ACCOUNT):
                 is_relevant = False
                 break
 
@@ -375,6 +258,7 @@ def get_processed_transactions_for_account(pubkey_str, limit):
             amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
                 post_token_balances[1].ui_token_amount.amount
             )
+
         processed_transactions.append((sender, recipient, amount))
 
     return processed_transactions
