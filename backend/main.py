@@ -1,10 +1,10 @@
 from solana_backend.api import (
-        new_stablecoin_transaction,
+        new_stablecoin_transfer,
         request_create_token_account,
         issue_stablecoins,
         burn_stablecoins,
         get_total_tokens_issued,
-        get_token_balance,
+        get_user_balance,
         get_sol_balance,
 )
 import bcrypt
@@ -94,7 +94,7 @@ async def trade(
 ) -> None:
     sender = await database_api.get_user(email=trade_transaction.sender_email, db=db)
     # recipient = await database_api.get_user(email=trade_transaction.recipient_email, db=db)
-    return {"transaction_bytes": new_stablecoin_transaction(sender.wallet_id, trade_transaction.coins_to_transfer, trade_transaction.recipient_wallet)}
+    return {"transaction_bytes": new_stablecoin_transfer(sender.wallet_id, trade_transaction.coins_to_transfer, trade_transaction.recipient_wallet)}
 
 # REDEEM
 @app.post("/api/redeem")
@@ -114,5 +114,5 @@ async def token_balance(
 ) -> None:
     # Get the user from the database #TODO[devin]: Change to session data
     user = await database_api.get_user(email=token_balance.email, db=db)
-    return {"token_balance": get_token_balance(user.wallet_id),
+    return {"token_balance": get_user_balance(user.wallet_id),
             "sol_balance": get_sol_balance(user.wallet_id)}
