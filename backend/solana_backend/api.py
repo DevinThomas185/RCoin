@@ -11,6 +11,10 @@ from solana.transaction import Transaction
 
 from solders.signature import Signature
 
+from solders.rpc.responses import GetTransactionResp, GetSignaturesForAddressResp
+
+from solders.transaction_status import EncodedTransactionWithStatusMeta
+
 # Spl-token dependencies
 from spl.token.constants import TOKEN_PROGRAM_ID
 from spl.token.instructions import (
@@ -20,6 +24,7 @@ from spl.token.instructions import (
 )
 
 from solana_backend.common import (
+    MINT_ACCOUNT_STRING,
     SOLANA_CLIENT,
     MINT_ACCOUNT,
     TOKEN_DECIMALS,
@@ -283,48 +288,93 @@ def get_total_tokens_issued():
     return TOTAL_SUPPLY - get_token_balance(os.getenv("TOKEN_OWNER"))
 
 
-def get_transaction_details(transaction_signature):
+def get_transaction_details(transaction_signature) -> GetTransactionResp:
     return SOLANA_CLIENT.get_transaction(transaction_signature)
 
 
-def get_raw_transactions_for_account(pubkey_str, number_of_transactions):
+def get_raw_transactions_for_account(
+    pubkey_str, number_of_transactions
+) -> GetSignaturesForAddressResp:
+
     return SOLANA_CLIENT.get_signatures_for_address(
         PublicKey(pubkey_str), limit=number_of_transactions
     )
 
+
 # Takes in a public key, and returns a list of tuples (source, target, amount)
 # The amounts can be negative or positive, and the source is always the public key
 def get_processed_transactions_for_account(pubkey_str, limit):
-    mint = "6aFw36vy5FrnT7s6fuepnFie9H95bGMCxsSjXyEBZt4Q"
-    resp = SOLANA_CLIENT.get_signatures_for_address(PublicKey(pubkey_str))
-    signatures = list(map(lambda status: status.signature, resp.value))
-    transaction_details = list(map(get_transaction_details, signatures))
-    confirmed_transactions = [
-        transaction_detail.value.transaction
-        for transaction_detail in transaction_details
-        if transaction_detail.value
+    resp = get_raw_transactions_for_account(pubkey_str, limit)
+    transactions = list(
+        map(lambda status: get_transaction_details(status.signature), resp.value)
+    )
+
+    confirmed_transactions: list[EncodedTransactionWithStatusMeta] = [
+        transaction.value.transaction
+        for transaction in transactions
+        if transaction.value
     ]
     processed_transactions = []
     for confirmed_transaction in confirmed_transactions:
-        pre_token_balances = confirmed_transaction.meta.pre_token_balances
-        post_token_balances = confirmed_transaction.meta.post_token_balances
-        isUseful = True
-        if len(pre_token_balances) != 2 or len(post_token_balances) != 2:
-            isUseful = False
-        for pre_token_balance in pre_token_balances:
-            if str(pre_token_balance.mint) != mint:
-                isUseful = False
-        for post_token_balance in post_token_balances:
-            if str(post_token_balance.mint) != mint:
-                isUseful = False
-        if not isUseful:
+        if confirmed_transaction.meta is None:
             continue
 
-        source = str(pre_token_balances[0].owner)
-        target = str(pre_token_balances[1].owner)
-        amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
-            pre_token_balances[1].ui_token_amount.amount
-        )
-        processed_transactions.append((source, target, amount))
+        pre_token_balances = confirmed_transaction.meta.pre_token_balances
+        post_token_balances = confirmed_transaction.meta.post_token_balances
 
-    return processed_transactions[:limit]
+        if pre_token_balances is None or post_token_balances is None:
+            continue
+
+        # We are looking for transactions involving the transfer of tokens,
+        # hence we expect that there are precisely 2 accounts involved
+        # in the transaction and hence we expect that the list indicating
+        # the balances of the accounts involved after the transaction has the
+        # length of 2. We don't consider the list of pre_token_balances,
+        # because there is an edge case when we send to an account which doesn't
+        # have an associated token account and then the token account is created
+        # but not included in pre_token_balances as it doesn't exist at that
+        # point.
+        if len(post_token_balances) != 2:
+            continue
+
+        is_relevant = True
+        # We are searching only for transactions which involved some transfer
+        # of our stablecoin tokens. Hence, if the mint associated with either
+        # of the two accounts is not equal to the address of our mint account,
+        # we skip the transaction.
+
+        for pre_token_balance in pre_token_balances:
+            if str(pre_token_balance.mint) != MINT_ACCOUNT_STRING:
+                is_relevant = False
+                break
+
+        for post_token_balance in post_token_balances:
+            if str(post_token_balance.mint) != MINT_ACCOUNT_STRING:
+                is_relevant = False
+                break
+
+        if not is_relevant:
+            continue
+
+        if (
+            pre_token_balances[0].account_index == post_token_balances[0].account_index
+            and len(pre_token_balances) == 2
+        ):
+            # Both sender's and recipient's token accounts existed before
+            # the transaction (usual scenario)
+            sender = str(post_token_balances[0].owner)
+            recipient = str(post_token_balances[1].owner)
+            amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
+                post_token_balances[0].ui_token_amount.amount
+            )
+        else:
+            # Edge case when the recipient didn't have a token account before
+            # transaction and it was created on request.
+            sender = str(pre_token_balances[0].owner)
+            recipient = str(post_token_balances[0].owner)
+            amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
+                post_token_balances[1].ui_token_amount.amount
+            )
+        processed_transactions.append((sender, recipient, amount))
+
+    return processed_transactions
