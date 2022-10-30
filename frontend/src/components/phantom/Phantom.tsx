@@ -6,8 +6,10 @@ import { Transaction, Connection } from "@solana/web3.js";
 
 export const PhantomSigner = ({
     transactionBytes,
+    setSignedTransaction
 }: {
     transactionBytes: number[];
+    setSignedTransaction?: React.Dispatch<React.SetStateAction<Transaction | null>>;
 }) => {
     const phantomProvider = usePhantom();
 
@@ -56,9 +58,22 @@ export const PhantomSigner = ({
                 method: "GET",
             };
 
-            console.log(transactionBytes);
             const transaction = Transaction.from(new Uint8Array(transactionBytes));
+           
+            blockhash = (await connection.getLatestBlockhash("finalized"))
+            .blockhash;
+
             transaction.recentBlockhash = blockhash;
+
+            // We do not want to sign and send so set state and return
+            if (setSignedTransaction) {
+                const signedTransaction = await phantomProvider.signTransaction(
+                    transaction
+                );
+                
+                setSignedTransaction(signedTransaction);
+                return;
+            }
 
             const signature = await phantomProvider.signAndSendTransaction(
                 transaction
