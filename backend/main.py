@@ -86,7 +86,21 @@ async def audit() -> None:
         "rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
         "issued_coins": "{:,.2f}".format(issued_coins),
         "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2)),
-    }
+    }  # type: ignore
+
+
+# AUDIT TRANSACTIONS
+@app.get("/api/audit/transactions")
+async def auditTransactions(
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> dict:
+    transactions = await database_api.get_audit_transactions(
+        0, 1000, datetime.now(), db
+    )
+
+    print(transactions)
+    print("\n")
+    return {"transactions": transactions}
 
 
 # ISSUE

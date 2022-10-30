@@ -1,7 +1,7 @@
 import { Flex, Heading, Skeleton, Stat, StatLabel, StatNumber } from '@chakra-ui/react';
 import { useEffect, useState } from "react";
 
-const Welcome = ({email, isAuth}: {email: string, isAuth: boolean}) => {
+const Welcome = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
 
     const [rand_in_reserve, setRandInReserve] = useState(0.0);
     const [issued_coins, setIssuedCoins] = useState(0.0);
@@ -15,39 +15,39 @@ const Welcome = ({email, isAuth}: {email: string, isAuth: boolean}) => {
     useEffect(() => {
         const requestOptions = {
             method: "GET"
-          }
-      
+        }
+
         fetch("/api/audit", requestOptions)
-        .then(res => res.json())
-        .then(data => {
-            setRandInReserve(data["rand_in_reserve"])
-            setIssuedCoins(data["issued_coins"])
-            setRatio(data["rand_per_coin"])
-            var today = new Date()
-            var date = today.toLocaleDateString()
-            var time = today.toLocaleTimeString()
-            setDateTime(time + " on " + date)
-            setIsLoaded(true)
-        })
+            .then(res => res.json())
+            .then(data => {
+                setRandInReserve(data["rand_in_reserve"])
+                setIssuedCoins(data["issued_coins"])
+                setRatio(data["rand_per_coin"])
+                var today = new Date()
+                var date = today.toLocaleDateString()
+                var time = today.toLocaleTimeString()
+                setDateTime(time + " on " + date)
+                setIsLoaded(true)
+            })
 
         if (isAuth) {
             fetch("/api/get_token_balance", {
                 method: "POST",
                 headers: {
-                'Content-Type': 'application/json'
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"email": email}, null, 2)
+                body: JSON.stringify({ "email": email }, null, 2)
             })
-            .then(res => res.json())
-            .then(data => {
-                setTokenBalance(data["token_balance"])
-                setSolBalance(data["sol_balance"])
-                setBalanceLoaded(true)
-            })
+                .then(res => res.json())
+                .then(data => {
+                    setTokenBalance(data["token_balance"])
+                    setSolBalance(data["sol_balance"])
+                    setBalanceLoaded(true)
+                })
         }
     }, [email, isAuth])
 
-    
+
     return <div>
         <Flex>
             <Stat>
@@ -63,7 +63,7 @@ const Welcome = ({email, isAuth}: {email: string, isAuth: boolean}) => {
                 <StatNumber fontSize='6xl'>
                     <Skeleton isLoaded={isLoaded}>
                         {issued_coins}
-                    </Skeleton>    
+                    </Skeleton>
                 </StatNumber>
             </Stat>
             <Stat>
@@ -81,18 +81,18 @@ const Welcome = ({email, isAuth}: {email: string, isAuth: boolean}) => {
             </Skeleton>
         </Heading>
         {
-            isAuth ? 
-            <Skeleton isLoaded={balanceLoaded} marginTop="20">
-                <Heading>
-                    RCoin Balance: {token_balance}
-                </Heading>
-                <Heading>
-                    Solana Balance: {sol_balance}
-                </Heading>
-            </Skeleton>
-            : 
-            <>
-            </>
+            isAuth ?
+                <Skeleton isLoaded={balanceLoaded} marginTop="20">
+                    <Heading>
+                        RCoin Balance: {token_balance}
+                    </Heading>
+                    <Heading>
+                        Solana Balance: {sol_balance}
+                    </Heading>
+                </Skeleton>
+                :
+                <>
+                </>
         }
     </div>
 }
