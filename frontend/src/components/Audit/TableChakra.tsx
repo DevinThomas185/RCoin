@@ -23,98 +23,77 @@ const theme = extendTheme({
 
 const TableChakra = () => {
     return (
-        <TableContainer overflowY="auto" maxHeight="250px" margin={10}>
-            <Table variant='striped' colorScheme='red'>
+        <TableContainer overflowY="auto" maxHeight="400px" margin={10}>
+            <Table variant='striped' colorScheme='pink'>
                 <TableCaption>Click on each transaction ID</TableCaption>
                 <Thead>
                     <Tr>
-                        <Th>To convert</Th>
-                        <Th>into</Th>
-                        <Th isNumeric>multiply by</Th>
+                        <Th>Wallet ID</Th>
+                        <Th>Stablecoin</Th>
+                        <Th isNumeric>Rand</Th>
+                        <Th>Transaction ID</Th>
+                        <Th isNumeric>Rcoin</Th>
+                        <Th>fd</Th>
                     </Tr>
                 </Thead>
                 <Tbody>
-                    <Tr>
-                        <Td>inches</Td>
-                        <Td>millimetres (mm)</Td>
+                    <Tr onClick={() => { console.log("yo s") }}>
+                        <Td>fjq349rjfaskd</Td>
+                        <Td>issued</Td>
                         <Td isNumeric>25.4</Td>
+                        <Td>12aidfjh3uda</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>created</Td>
                     </Tr>
-                    <Tr>
-                        <Td>feet</Td>
-                        <Td>centimetres (cm)</Td>
-                        <Td isNumeric>30.48</Td>
+                    <Tr onClick={() => { console.log("yo s") }}>
+                        <Td>fjq3439rjfaskd</Td>
+                        <Td>issued</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>12aidfjh3uda</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>created</Td>
                     </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
+                    <Tr onClick={() => { console.log("yo s") }}>
+                        <Td>fjq3493rjfaskd</Td>
+                        <Td>issued</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>12aidfjh3uda</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>created</Td>
                     </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
+                    <Tr onClick={() => { console.log("yo s") }}>
+                        <Td>fjq349frjfaskd</Td>
+                        <Td>issued</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>12aidfjh3uda</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>created</Td>
                     </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
+                    <Tr onClick={() => { console.log("yo s") }}>
+                        <Td>fjq34f9rjfaskd</Td>
+                        <Td>issued</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>12aidfjh3uda</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>created</Td>
                     </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
-                    </Tr>
-                    <Tr>
-                        <Td>yards</Td>
-                        <Td>metres (m)</Td>
-                        <Td isNumeric>0.91444</Td>
+                    <Tr onClick={() => { console.log("yo s") }}>
+                        <Td>fjq34d9rjfaskd</Td>
+                        <Td>issued</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>12aidfjh3uda</Td>
+                        <Td isNumeric>25.4</Td>
+                        <Td>created</Td>
                     </Tr>
                 </Tbody>
                 <Tfoot>
                     <Tr>
-                        <Th>To convert</Th>
-                        <Th>into</Th>
-                        <Th isNumeric>multiply by</Th>
+                        <Th>Wallet ID</Th>
+                        <Th>Stablecoin</Th>
+                        <Th isNumeric>Rand</Th>
+                        <Th>Transaction ID</Th>
+                        <Th isNumeric>Rcoin</Th>
+                        <Th>fd</Th>
                     </Tr>
                 </Tfoot>
             </Table>

@@ -1,4 +1,4 @@
-import { Flex, Heading, Skeleton, Stat, StatLabel, Center, Box, Spacer } from '@chakra-ui/react';
+import { Flex, Heading, Skeleton, Stat, StatLabel, Center, Box, Spacer, ChakraProvider } from '@chakra-ui/react';
 import { useEffect, useState } from "react";
 import AuditTransactions from './Audit/AuditTransactions';
 
@@ -63,11 +63,8 @@ const Welcome = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
             </Heading>
 
             <Flex margin="10">
-                <AuditTransactions isLoaded={isLoaded} text={`${rand_in_reserve} ZAR`} title="Rand In Reserve" />
-                <Spacer />
-                <AuditTransactions isLoaded={isLoaded} text={`${ratio}`} title="Ratio" />
-                <Spacer />
-                <AuditTransactions isLoaded={isLoaded} text={`${issued_coins} Rcoin`} title="Coins Issued" />
+                <AuditTransactions isLoaded={isLoaded} amount={`${rand_in_reserve}`} unit="ZAR" title="Rand In Reserve" />
+                <AuditTransactions isLoaded={isLoaded} amount={`${issued_coins}`} unit="Rcoin" title="Coins Issued" />
             </Flex>
             {
                 isAuth ?
