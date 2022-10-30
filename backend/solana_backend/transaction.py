@@ -23,7 +23,6 @@ from solana_backend.exceptions import (
     TransactionCreationFailedException,
 )
 
-
 def construct_stablecoin_transfer(
     sender: PublicKey, amount: float, recipient: PublicKey
 ) -> Transaction:
@@ -85,9 +84,9 @@ def get_associated_token_account(public_key: PublicKey) -> PublicKey:
 
     """
 
+    # When issuing coins, the token account associated with the owner is the
+    # reserve account which holds all of the minted tokens.
     if public_key == TOKEN_OWNER:
-        # When issuing coins the token account associated with the owner is the
-        # reserve account which holds all of the minted tokens.
         return RESERVE_ACCOUNT_ADDRESS
 
     resp = SOLANA_CLIENT.get_token_accounts_by_owner(
