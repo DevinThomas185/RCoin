@@ -10,8 +10,11 @@ import {
   FormErrorMessage,
   Button,
   InputRightElement,
-  InputGroup
+  InputGroup,
+  Text
 } from '@chakra-ui/react'
+
+import { Link } from 'react-router-dom'
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react'
 import { PhantomSigner } from '../phantom/Phantom'
@@ -122,6 +125,14 @@ const SignUp = () => {
               )}
             </Formik>
           }
+          <Text marginTop={10}>
+            {'Already have an account? '}
+            <Text display='inline' as='u' color='#A5315B'>
+              <Link to='/login' >
+                Log in
+              </Link>
+            </Text>
+          </Text>
         </Grid>
         <Spacer></Spacer>
       </Flex>

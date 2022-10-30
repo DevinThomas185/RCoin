@@ -3,7 +3,15 @@ body {
 }
 
 .navbar {
-  background-color: rgb(62, 94, 185);
+  background-color: #A5315B;
   font-size: x-large;
-  color: rgb(255, 217, 0);
+  color: rgb(255, 255, 255);
+}
+
+p {
+  font-size: 20px;
+}
+
+span {
+  font-size: 50px;
 }

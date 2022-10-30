@@ -103,6 +103,16 @@ async def auditTransactions(
     return {"transactions": transactions}
 
 
+# AUDIT TABLE
+@app.get("/api/transactions")
+async def transactions() -> None:
+    rands_in_reserve = issued_coins = round(get_total_tokens_issued(), 2)
+
+    return {"rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
+            "issued_coins": "{:,.2f}".format(issued_coins),
+            "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2))}
+
+
 # ISSUE
 @app.post("/api/issue")
 async def issue(
