@@ -9,9 +9,11 @@ import {
   Spacer,
   Button,
   InputGroup,
-  InputRightElement
+  Text,
+  InputRightElement,
+  Box
 } from '@chakra-ui/react'
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react';
 const Login = ({ setIsAuth, setEmail }: { setIsAuth: React.Dispatch<React.SetStateAction<boolean>>, setEmail: React.Dispatch<React.SetStateAction<string>> }) => {
@@ -88,6 +90,14 @@ const Login = ({ setIsAuth, setEmail }: { setIsAuth: React.Dispatch<React.SetSta
               </Form>
             )}
           </Formik>
+          <Text marginTop={10}>
+            {'No account? '}
+            <Text display='inline' as='u' color='#A5315B'>
+              <Link to='/sign-up' >
+                Sign up
+              </Link>
+            </Text>
+          </Text>
         </Grid>
         <Spacer></Spacer>
       </Flex>

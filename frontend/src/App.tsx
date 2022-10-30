@@ -16,6 +16,7 @@ import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
 import Audit from "./components/AuditPage";
 import "./main.css";
+import NavBar from "./components/Nav/NavBar";
 
 const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean) => {    
     // This is for when we have an /authenticated endpoint and we can check without having
@@ -37,47 +38,12 @@ const App = () => {
     const [isLoadingAuth, setIsLoadingAuth] = useState(false); // we are initially loading
     const [email, setEmail] = useState("");
 
-    let navbar;
-    if (isAuth) {
-        navbar = (
-            <Flex className="navbar">
-                <Spacer></Spacer>
-                <Link to="/">Home</Link>
-                <Spacer></Spacer>
-                <Link to="/audit">Audit</Link>
-                <Spacer></Spacer>
-                <Text onClick={() => setIsAuth(false)} cursor='pointer'>Log out</Text>
-                <Spacer></Spacer>
-                <Spacer></Spacer>
-                <Link to="/issue">Issue</Link>
-                <Spacer></Spacer>
-                <Link to="/trade">Send Money</Link>
-                <Spacer></Spacer>
-                <Link to="/redeem">Redeem</Link>
-                <Spacer></Spacer>
-                <ColorModeSwitcher/>
-            </Flex>
-        );
-    } else {
-        navbar = (
-            <Flex className="navbar">
-                <Spacer></Spacer>
-                <Link to="/">Home</Link>
-                <Spacer></Spacer>
-                <Link to="/audit">Audit</Link>
-                <Spacer></Spacer>
-                <Link to="/sign-up">Sign Up</Link>
-                <Spacer></Spacer>
-                <Link to="/login">Login</Link>
-                <Spacer></Spacer>
-                <ColorModeSwitcher/>
-            </Flex>
-        );
-    }
     return (
         <ChakraProvider theme={theme}>
             <Router>
-                <div className="App">{navbar}</div>
+                <div className="App">
+                    <NavBar isAuth={isAuth} setIsAuth={setIsAuth}/>    
+                </div>
                 <Routes>
                     <Route path="/" element={<Home email={email} isAuth={isAuth}/>}></Route>
                     <Route
