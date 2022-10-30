@@ -21,10 +21,14 @@ from solana_backend.common import (
     TOKEN_PROGRAM_ID,
     TOKEN_DECIMALS,
 )
+from solana_backend.exceptions import BlockchainQueryFailedException
 
 
 def get_balance(public_key: PublicKey) -> int:
-    return SOLANA_CLIENT.get_balance(public_key).value
+    try:
+        return SOLANA_CLIENT.get_balance(public_key).value
+    except Exception:
+        raise BlockchainQueryFailedException
 
 
 def get_sol_balance(public_key: PublicKey) -> float:
@@ -32,9 +36,12 @@ def get_sol_balance(public_key: PublicKey) -> float:
 
 
 def has_token_account(public_key: PublicKey) -> bool:
-    accounts: list[RpcKeyedAccount] = SOLANA_CLIENT.get_token_accounts_by_owner(
-        public_key, TokenAccountOpts(mint=MINT_ACCOUNT)
-    ).value
+    try:
+        accounts: list[RpcKeyedAccount] = SOLANA_CLIENT.get_token_accounts_by_owner(
+            public_key, TokenAccountOpts(mint=MINT_ACCOUNT)
+        ).value
+    except Exception:
+        raise BlockchainQueryFailedException
 
     return accounts != []
 
@@ -42,6 +49,7 @@ def has_token_account(public_key: PublicKey) -> bool:
 def get_token_balance(public_key: PublicKey) -> float:
     solana_client = os.getenv("SOLANA_CLIENT")
     assert solana_client is not None
+
     payload = {
         "jsonrpc": "2.0",
         "id": 1,
@@ -52,14 +60,19 @@ def get_token_balance(public_key: PublicKey) -> float:
             {"encoding": "jsonParsed"},
         ],
     }
-    r = post(solana_client, json=payload)
-    j = r.json()
-    return float(
-        j["result"]["value"][0]["account"]["data"]["parsed"]["info"]["tokenAmount"][
-            "amount"
-        ]
-    ) / (10**TOKEN_DECIMALS)
 
+    try:
+
+        r = post(solana_client, json=payload)
+        j = r.json()
+        amount = float(j["result"]["value"][0]["account"]["data"]["parsed"]["info"]["tokenAmount"][
+                "amount"
+            ]) / (10**TOKEN_DECIMALS)
+
+    except Exception:
+        raise BlockchainQueryFailedException
+
+    return amount
 
 def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
     resp = get_raw_transactions_for_account(public_key, limit)
@@ -143,13 +156,22 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
 
 
 def get_transaction_details(transaction_signature: Signature) -> GetTransactionResp:
-    return SOLANA_CLIENT.get_transaction(transaction_signature)
+    try:
+
+        return SOLANA_CLIENT.get_transaction(transaction_signature)
+
+    except Exception:
+        raise BlockchainQueryFailedException
 
 
 def get_raw_transactions_for_account(
     public_key: PublicKey, number_of_transactions: int
 ) -> GetSignaturesForAddressResp:
+    try:
 
-    return SOLANA_CLIENT.get_signatures_for_address(
-        public_key, limit=number_of_transactions
-    )
+        return SOLANA_CLIENT.get_signatures_for_address(
+            public_key, limit=number_of_transactions
+        )
+
+    except Exception:
+        raise BlockchainQueryFailedException
