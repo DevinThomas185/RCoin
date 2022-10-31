@@ -1,7 +1,7 @@
 # Standard imports
 import os
 from requests import post
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 # Solana dependencies
 from solana.rpc.commitment import Confirmed
@@ -15,7 +15,7 @@ from solana.transaction import Transaction
 from spl.token.constants import TOKEN_PROGRAM_ID
 from spl.token.instructions import create_associated_token_account, transfer_checked, TransferCheckedParams
 
-load_dotenv()
+load_dotenv(find_dotenv())
 
 SOLANA_CLIENT            = Client(str(os.getenv("SOLANA_CLIENT")))
 MINT_ACCOUNT             = PublicKey(str(os.getenv("MINT_ACCOUNT")))
