@@ -39,6 +39,8 @@ class User(Base):
     wallet_id = sql.Column(sql.Text, index=True)  # , unique=True)
     bank_account = sql.Column(sql.Text, index=True)
     sort_code = sql.Column(sql.Text, index=True)
+    document_number = sql.Column(sql.Text, index=True)
+    recipient_code = sql.Column(sql.Text, index=True)
 
 
 class Redeem(Base):

@@ -11,7 +11,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { PhantomSigner } from "../phantom/Phantom";
 import { Transaction } from "@solana/web3.js";
 
@@ -29,11 +29,15 @@ const Redeem = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({'transaction_bytes': Array.from(signedTransaction.serialize())})
+        body: JSON.stringify(
+          {
+            "transaction_bytes": Array.from(signedTransaction.serialize()),
+          }
+        )
       })
         .then((res) => res.json())
         .then((data) => {
-            console.log(data);
+          console.log(data);
         })
     }
 

@@ -43,10 +43,11 @@ const SignUp = () => {
                 password: "",
                 bank_account: "",
                 sort_code: "",
+                document_number: "",
+                recipient_code: "",
               }}
               onSubmit={(values, actions) => {
                 setTimeout(() => {
-                  // alert(JSON.stringify(values, null, 2))
                   fetch('/api/signup', {
                     method: "POST",
                     headers: {
@@ -67,6 +68,14 @@ const SignUp = () => {
             >
               {(props) => (
                 <Form>
+                  <Field name='email'>
+                    {({ field, form }: { field: any, form: any }) => (
+                      <FormControl isRequired>
+                        <FormLabel>Email</FormLabel>
+                        <Input {...field} placeholder='your email address' />
+                      </FormControl>
+                    )}
+                  </Field>
                   <Field name='first_name'>
                     {({ field, form }: { field: any, form: any }) => (
                       <FormControl isRequired>
@@ -91,11 +100,27 @@ const SignUp = () => {
                       </FormControl>
                     )}
                   </Field>
-                  <Field name='email'>
+                  <Field name='bank_account'>
                     {({ field, form }: { field: any, form: any }) => (
                       <FormControl isRequired>
-                        <FormLabel>Email</FormLabel>
-                        <Input {...field} placeholder='your email address' />
+                        <FormLabel>Bank Account Number</FormLabel>
+                        <Input {...field} placeholder='your bank account number' />
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Field name='sort_code'>
+                    {({ field, form }: { field: any, form: any }) => (
+                      <FormControl isRequired>
+                        <FormLabel>Bank Code</FormLabel>
+                        <Input {...field} placeholder='your bank code' />
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Field name='document_number'>
+                    {({ field, form }: { field: any, form: any }) => (
+                      <FormControl isRequired>
+                        <FormLabel>ID Number</FormLabel>
+                        <Input {...field} placeholder='your id number' />
                       </FormControl>
                     )}
                   </Field>

@@ -29,6 +29,7 @@ from data_models import (
     TokenBalance,
 )
 import database_api
+import paystack_api
 
 
 app = FastAPI()
@@ -74,6 +75,20 @@ async def signup(
 ) -> dict[str, Any]:
     try:
         user.password = hash_password(user.password)
+        # verify = paystack_api.verify_account_ZA(
+        #     bank_code=user.sort_code,
+        #     account_number=user.bank_account, 
+        #     account_name=user.first_name + " " + user.last_name,
+        #     document_number=user.document_number
+        # )
+        recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
+            bank_type="basa",
+            name=user.first_name + " " + user.last_name,
+            account_number=user.bank_account,
+            bank_code=user.sort_code,
+            currency="ZAR"
+        )
+        user.recipient_code = recipient_code
         await database_api.create_user(user=user, db=db)
         response.status_code = 200
         return request_create_token_account(user.wallet_id).to_json()
@@ -130,7 +145,8 @@ async def audit() -> dict[str, Any]:
     if isinstance(resp, Failure):
         return resp.to_json()
 
-    rands_in_reserve = issued_coins = round(resp.contents, 2)
+    issued_coins = round(resp.contents, 2)
+    rands_in_reserve = paystack_api.check_balance()
 
     return {
         "rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
@@ -238,6 +254,7 @@ async def redeem(
     ).to_json()
 
 
+
 # [sk4520]: Do we want to wait for the transaction to appear on the blockchain
 # and check its health before returning?
 @app.post("/api/complete-redeem")
@@ -251,6 +268,7 @@ async def complete_redeem(
 
     email = request.session["logged_in_email"]
     transaction_bytes = bytes(transaction.transaction_bytes)
+    redeemer = await database_api.get_user(email=email, db=db)
     resp = send_transaction_from_bytes(transaction_bytes)
 
     # TODO[szymon] add more robust error handling.
@@ -262,14 +280,19 @@ async def complete_redeem(
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()
 
+    reference = paystack_api.initiate_transfer(amount_resp.contents, redeemer.recipient_code, redeemer.wallet_id)
+    if reference == -1:
+        # TODO[devin]: WHAT TO DO WHEN PAYSTACK FAILS - SEND TO FRONTEND
+        return {"success": False} 
+
     await database_api.create_redeem_transaction(
-        transaction,
-        email,
-        database_api.get_dummy_id(),
-        resp.contents.value.__str__(),
-        datetime.now(),
-        amount_resp.contents,
-        db,
+        redeem=transaction,
+        email=email,
+        bank_transaction_id=reference,
+        blockchain_transaction_id=resp.contents.value.__str__(),
+        date=datetime.now(),
+        amount=amount_resp.contents,
+        db=db,
     )
 
     return amount_resp.to_json()
