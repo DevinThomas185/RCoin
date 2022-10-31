@@ -1,5 +1,5 @@
 import { Flex, Spacer, ChakraProvider, theme, Text} from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import {
     BrowserRouter as Router,
     Routes,
@@ -35,8 +35,25 @@ const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean
 
 const App = () => {
     const [isAuth, setIsAuth] = useState(false);
-    const [isLoadingAuth, setIsLoadingAuth] = useState(false); // we are initially loading
+    const [isLoadingAuth, setIsLoadingAuth] = useState(true); // we are initially loading
     const [email, setEmail] = useState("");
+
+    // Checks whether we are still authenticated
+    useEffect(() => {
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+        fetch("/api/authenticated", requestOptions)
+          .then(res => res.json())
+          .then(data => {
+            if (data["authenticated"]) {
+              setIsAuth(true);
+            }
+            setIsLoadingAuth(false);
+          })
+      }, [])
+        
 
     return (
         <ChakraProvider theme={theme}>
@@ -45,18 +62,18 @@ const App = () => {
                     <NavBar isAuth={isAuth} setIsAuth={setIsAuth}/>    
                 </div>
                 <Routes>
-                    <Route path="/" element={<Home email={email} isAuth={isAuth}/>}></Route>
+                    <Route path="/" element={<Home />}></Route>
                     <Route
                         path="/issue"
-                        element={RequireAuth(<Issue email={email} />, isAuth, isLoadingAuth)}
+                        element={RequireAuth(<Issue />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route
                         path="/trade"
-                        element={RequireAuth(<Trade email={email} />, isAuth, isLoadingAuth)}
+                        element={RequireAuth(<Trade />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route
                         path="/redeem"
-                        element={RequireAuth(<Redeem email={email} />, isAuth, isLoadingAuth)}
+                        element={RequireAuth(<Redeem />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route path="/login" element={<Login setIsAuth={setIsAuth} setEmail={setEmail} />}></Route>
                     <Route path="/sign-up" element={<SignUp />}></Route>

@@ -10,7 +10,7 @@ import TradePage from "./TradePage"
 import Welcome from "../components/Welcome"
 
 
-const Home = ({email, isAuth}: {email: string, isAuth: boolean}) => {
+const Home = () => {
   return (
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="xl">

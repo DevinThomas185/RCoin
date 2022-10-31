@@ -15,7 +15,7 @@ import {
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react';
 
-const Issue = ({ email }: { email: string }) => {
+const Issue = () => {
 
   const [issueSuccess, setIssueSuccess] = useState(false)
   const [dataReturned, setDataReturned] = useState(false)
@@ -47,7 +47,7 @@ const Issue = ({ email }: { email: string }) => {
           <Spacer></Spacer>
           <Grid maxH="100%" maxW="60%" p={3}>
             <Formik
-              initialValues={{ email: email, amount_in_rands: "" }}
+              initialValues={{ amount_in_rands: "" }}
               onSubmit={(values, actions) => {
                 setTimeout(() => {
                   fetch('/api/issue', {

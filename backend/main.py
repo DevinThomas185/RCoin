@@ -1,3 +1,4 @@
+import functools
 from typing import Any
 import bcrypt
 from datetime import datetime
@@ -16,7 +17,8 @@ from solana_backend.api import (
 
 from solana_backend.response import Success, Failure
 import sqlalchemy.orm as orm
-from fastapi import Depends, FastAPI, Response
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi import Depends, FastAPI, Response, Request
 from data_models import (
     CompleteRedeemTransaction,
     LoginInformation,
@@ -44,6 +46,23 @@ def verify_password(password: str, hashed_password: bytes) -> bool:
     return bcrypt.checkpw(password.encode("utf8"), hashed_password)
 
 
+def login_required(func):
+    """Decorator for api endpoints to require login.
+    Returns 401 if user is not logged in.
+    Requires request: Request and response: Response in the decorated function.
+    """
+
+    @functools.wraps(func)
+    async def secure_function(*args, **kwargs):
+        if "logged_in_email" not in kwargs["request"].session:
+            kwargs["response"].status_code = 401
+
+            return {"error": "unauthorised"}
+        return await func(*args, **kwargs)
+
+    return secure_function
+
+
 # TODO[Devin]: Add return types for these functions
 
 # SIGNUP
@@ -67,18 +86,40 @@ async def signup(
 @app.post("/api/login")
 async def login(
     login: LoginInformation,
+    request: Request,
     response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     try:
         match = await database_api.get_user(email=login.email, db=db)
         if match != None and verify_password(login.password, match.password):
+            request.session["logged_in_email"] = match.email
             response.status_code = 200
         else:
             response.status_code = 401
 
     except:  # TODO[devin]: Catch explicit exception
         response.status_code = 500
+
+
+# LOGOUT
+@app.post("/api/logout")
+async def logout(request: Request, response: Response):
+    if request.session.get("logged_in_email", None):
+        request.session.pop("logged_in_email")
+        return {"success": True}
+    else:
+        response.status_code = 401
+        return {"error": "not logged in"}
+
+
+# Auth
+@app.post("/api/authenticated")
+async def check_authenticated(request: Request):
+    if request.session.get("logged_in_email") is None:
+        return {"authenticated": False}
+    else:
+        return {"authenticated": True}
 
 
 # AUDIT
@@ -132,15 +173,19 @@ async def transactions() -> dict[str, Any]:
 
 # ISSUE
 @app.post("/api/issue")
+@login_required
 async def issue(
     issue_transaction: IssueTransaction,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
     # Get the user from the database #TODO[devin]: Change to session data
-    buyer = await database_api.get_user(email=issue_transaction.email, db=db)
+    email = request.session["logged_in_email"]
+    buyer = await database_api.get_user(email=email, db=db)
 
     issue_transac = await database_api.create_issue_transaction(
-        issue_transaction, database_api.get_dummy_id(), datetime.now(), db
+        issue_transaction, email, database_api.get_dummy_id(), datetime.now(), db
     )
 
     # Below should be done in a background job once we verify the bank transaction
@@ -159,11 +204,15 @@ async def issue(
 
 # TRADE
 @app.post("/api/trade")
+@login_required
 async def trade(
     trade_transaction: TradeTransaction,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    sender = await database_api.get_user(email=trade_transaction.sender_email, db=db)
+    sender_email = request.session["logged_in_email"]
+    sender = await database_api.get_user(email=sender_email, db=db)
     # recipient = await database_api.get_user(email=trade_transaction.recipient_email, db=db)
     return new_stablecoin_transfer(
         sender.wallet_id,
@@ -174,12 +223,16 @@ async def trade(
 
 # REDEEM
 @app.post("/api/redeem")
+@login_required
 async def redeem(
     redeem_transaction: RedeemTransaction,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
     # Get the user from the database #TODO[devin]: Change to session data
-    redeemer = await database_api.get_user(email=redeem_transaction.email, db=db)
+    email = request.session["logged_in_email"]
+    redeemer = await database_api.get_user(email=email, db=db)
     return burn_stablecoins(
         redeemer.wallet_id, redeem_transaction.amount_in_coins
     ).to_json()
@@ -188,12 +241,18 @@ async def redeem(
 # [sk4520]: Do we want to wait for the transaction to appear on the blockchain
 # and check its health before returning?
 @app.post("/api/complete-redeem")
+@login_required
 async def complete_redeem(
     transaction: CompleteRedeemTransaction,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
+
+    email = request.session["logged_in_email"]
     transaction_bytes = bytes(transaction.transaction_bytes)
     resp = send_transaction_from_bytes(transaction_bytes)
+
     # TODO[szymon] add more robust error handling.
     if isinstance(resp, Failure):
         return resp.to_json()
@@ -205,6 +264,7 @@ async def complete_redeem(
 
     await database_api.create_redeem_transaction(
         transaction,
+        email,
         database_api.get_dummy_id(),
         resp.contents.value.__str__(),
         datetime.now(),
@@ -213,6 +273,7 @@ async def complete_redeem(
     )
 
     return amount_resp.to_json()
+
 
 # GET TOKEN BALANCE
 @app.post("/api/get_token_balance")
@@ -235,3 +296,6 @@ async def token_balance(
         "token_balance": token_balance_resp.contents,
         "sol_balance": sol_balance_resp.contents,
     }
+
+
+app.add_middleware(SessionMiddleware, secret_key="random-string")
