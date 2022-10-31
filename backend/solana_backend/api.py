@@ -1,3 +1,5 @@
+from time import sleep
+
 # Solana dependencies
 from solana.rpc.commitment import Confirmed
 from solana.rpc.types import TxOpts
@@ -5,27 +7,32 @@ from solana.keypair import Keypair
 from solana.publickey import PublicKey
 from solana.transaction import Transaction
 
-from time import sleep
-
-from solders.rpc.responses import (
-    GetTransactionResp,
-)
+from solders.rpc.responses import GetTokenSupplyResp, GetTransactionResp
+from solders.signature import Signature
+from solders.transaction_status import EncodedTransactionWithStatusMeta
 
 # Spl-token dependencies
+from spl.token.instructions import create_associated_token_account
+
 from spl.token.instructions import (
     create_associated_token_account,
+    transfer_checked,
+    TransferCheckedParams,
 )
 
 # Module dependencies
 from solana_backend.common import (
     SOLANA_CLIENT,
     MINT_ACCOUNT,
+    TOKEN_DECIMALS,
     TOKEN_OWNER,
     TOTAL_SUPPLY,
     SECRET_KEY,
 )
+
 from solana_backend.exceptions import (
     BlockchainQueryFailedException,
+    InvalidGetTransactionRespException,
     TokenAccountAlreadyExists,
     TransactionCreationFailedException,
     TransactionTimeoutException,
@@ -48,11 +55,16 @@ from solana_backend.response import (
     Response,
     Success,
     Failure,
-    TransactionFailure,
-    TransactionSuccess,
+    CreateTransactionFailure,
+    CreateTransactionSuccess,
 )
 
-ISSUE_RESPONSE_TIMEOUT = 30
+BLOCKCHAIN_RESPONSE_TIMEOUT = 30
+
+
+def send_transaction_from_bytes(txn: bytes):
+    resp = SOLANA_CLIENT.send_raw_transaction(txn)
+    return Success("response", resp)
 
 
 def request_create_token_account(public_key: str) -> Response:
@@ -73,7 +85,7 @@ def request_create_token_account(public_key: str) -> Response:
 
     """
     if has_token_account(PublicKey(public_key)):
-        return TransactionFailure(TokenAccountAlreadyExists(public_key))
+        return CreateTransactionFailure(TokenAccountAlreadyExists(public_key))
 
     owner_key = PublicKey(public_key)
     transaction = Transaction()
@@ -90,11 +102,11 @@ def request_create_token_account(public_key: str) -> Response:
         )
     )
 
-    return TransactionSuccess(transaction_to_bytes(transaction))
+    return CreateTransactionSuccess(transaction_to_bytes(transaction))
 
 
 ### Issue ###
-def issue_stablecoins(recipient_public_key: str, amount: int) -> Response:
+def issue_stablecoins(recipient_public_key: str, amount: float) -> Response:
     """Constructs a transaction to issue stablecoins and sends it directly
     to the blockchain.
 
@@ -103,14 +115,13 @@ def issue_stablecoins(recipient_public_key: str, amount: int) -> Response:
         recipient
         amount: number of stablecoins to be issues.
     """
-
     key = PublicKey(recipient_public_key)
 
     try:
         transaction = construct_stablecoin_transfer(TOKEN_OWNER, amount, key)
     except TransactionCreationFailedException as exception:
         print(exception)
-        return TransactionFailure(exception)
+        return CreateTransactionFailure(exception)
 
     token_owner = Keypair.from_secret_key(SECRET_KEY)
 
@@ -128,20 +139,25 @@ def issue_stablecoins(recipient_public_key: str, amount: int) -> Response:
 
     signature = resp.value
 
-    print("Transaction finished with response: {}".format(resp))
+    print(
+        "Transaction submitted to the blockchain with signature: {}".format(signature)
+    )
+
+    print("Waiting for it to appear on the blockchain...")
     count = 0
     while (
         get_transaction_details(signature) == GetTransactionResp(None)
-        and count < ISSUE_RESPONSE_TIMEOUT
+        and count < BLOCKCHAIN_RESPONSE_TIMEOUT
     ):
         count += 1
         sleep(1)
 
     # Fail f the transaction is still not on the blockchain after over 30 seconds
     if get_transaction_details(resp.value) == GetTransactionResp(None):
-        return TransactionFailure(TransactionTimeoutException())
+        return CreateTransactionFailure(TransactionTimeoutException())
 
     return Success("transaction_signature", str(signature))
+
 
 ### Trade ###
 def new_stablecoin_transfer(sender: str, amount: float, recipient: str) -> Response:
@@ -152,9 +168,9 @@ def new_stablecoin_transfer(sender: str, amount: float, recipient: str) -> Respo
         transaction = construct_stablecoin_transfer(sender_key, amount, recipient_key)
     except TransactionCreationFailedException as exception:
         print(exception)
-        return TransactionFailure(exception)
+        return CreateTransactionFailure(exception)
 
-    return TransactionSuccess(transaction_to_bytes(transaction))
+    return CreateTransactionSuccess(transaction_to_bytes(transaction))
 
 
 ### Redeem ###
@@ -165,9 +181,9 @@ def burn_stablecoins(public_key: str, amount: float) -> Response:
         transaction = construct_stablecoin_transfer(key, amount, TOKEN_OWNER)
     except TransactionCreationFailedException as exception:
         print(exception)
-        return TransactionFailure(exception)
+        return CreateTransactionFailure(exception)
 
-    return TransactionSuccess(transaction_to_bytes(transaction))
+    return CreateTransactionSuccess(transaction_to_bytes(transaction))
 
 
 ### Query the Blockchain ###
@@ -182,7 +198,7 @@ def get_total_tokens_issued() -> Response:
         return Failure("exception", exception)
 
 
-def get_user_balance(public_key: str) -> Response:
+def get_user_token_balance(public_key: str) -> Response:
     try:
 
         return Success("account_balance", get_token_balance(PublicKey(public_key)))
@@ -191,9 +207,16 @@ def get_user_balance(public_key: str) -> Response:
         return Failure("exception", exception)
 
 
-# Takes in a public key, and returns a list of tuples (source, target, amount)
-# The amounts can be negative or positive, and the source is always the public key
-def get_stablecoin_transactions(public_key: str, limit: int):
+def get_user_sol_balance(public_key: str) -> Response:
+    try:
+
+        return Success("account_balance", get_sol_balance(PublicKey(public_key)))
+
+    except BlockchainQueryFailedException as exception:
+        return Failure("exception", exception)
+
+
+def get_stablecoin_transactions(public_key: str, limit: int) -> Response:
     try:
 
         return Success(
@@ -203,3 +226,58 @@ def get_stablecoin_transactions(public_key: str, limit: int):
 
     except BlockchainQueryFailedException as exception:
         return Failure("exception", exception)
+
+
+def get_transfer_amount_for_transaction(signature: str) -> Response:
+    resp = GetTransactionResp(None)
+    counter = 0
+    try:
+
+        while (
+            resp == GetTransactionResp(None) and counter < BLOCKCHAIN_RESPONSE_TIMEOUT
+        ):
+            resp = get_transaction_details(Signature.from_string(signature))
+            counter += 1
+            sleep(1)
+
+    except BlockchainQueryFailedException as exception:
+        return Failure("exception", exception)
+
+    if resp == GetTransactionResp(None):
+        return Failure("exception", TransactionTimeoutException())
+
+    if resp.value is None:
+        return Failure("exception", InvalidGetTransactionRespException())
+
+    confirmed_transaction: EncodedTransactionWithStatusMeta = resp.value.transaction
+
+    if confirmed_transaction.meta is None:
+        return Failure("exception", InvalidGetTransactionRespException())
+
+    pre_token_balances = confirmed_transaction.meta.pre_token_balances
+    post_token_balances = confirmed_transaction.meta.post_token_balances
+
+    if (
+        pre_token_balances is None
+        or post_token_balances is None
+        or len(post_token_balances) != 2
+    ):
+        return Failure("exception", InvalidGetTransactionRespException())
+
+    if (
+        pre_token_balances[0].account_index == post_token_balances[0].account_index
+        and len(pre_token_balances) == 2
+    ):
+        # Both sender's and recipient's token accounts existed before
+        # the transaction (usual scenario)
+        amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
+            post_token_balances[0].ui_token_amount.amount
+        )
+    else:
+        # Edge case when the recipient didn't have a token account before
+        # transaction and it was created on request.
+        amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
+            post_token_balances[1].ui_token_amount.amount
+        )
+
+    return Success("amount", amount / 10**TOKEN_DECIMALS)

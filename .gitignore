@@ -12,3 +12,4 @@ launch.json
 .env
 
 node_modules
+stablecoin_env
