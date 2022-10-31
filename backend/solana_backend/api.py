@@ -1,7 +1,7 @@
 # Standard imports
 import os
 from requests import post
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 # Solana dependencies
 from solana.rpc.commitment import Confirmed
@@ -19,12 +19,14 @@ from spl.token.instructions import (
     TransferCheckedParams,
 )
 
-load_dotenv()
+load_dotenv(find_dotenv())
 
 SOLANA_CLIENT = Client(str(os.getenv("SOLANA_CLIENT")))
 MINT_ACCOUNT = PublicKey(str(os.getenv("MINT_ACCOUNT")))
 TOKEN_OWNER = PublicKey(str(os.getenv("TOKEN_OWNER")))
 RESERVE_ACCOUNT_ADDRESS = PublicKey(str(os.getenv("RESERVE_ACCOUNT_ADDRESS")))
+
+TOTAL_SUPPLY = 1000000000
 
 TOTAL_SUPPLY = 1000000000
 
