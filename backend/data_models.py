@@ -10,6 +10,8 @@ class UserInformation(BaseModel):
     wallet_id: Union[str, bytes]
     bank_account: str
     sort_code: str
+    document_number: str
+    recipient_code: str
 
     class Config:
         orm_mode = True
@@ -49,6 +51,7 @@ class RedeemTransaction(BaseModel):
 class CompleteRedeemTransaction(BaseModel):
     email: str
     transaction_bytes: List[int]
+    amount: float
 
 
 class TokenBalance(BaseModel):

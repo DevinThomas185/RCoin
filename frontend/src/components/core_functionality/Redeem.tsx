@@ -11,7 +11,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { PhantomSigner } from "../phantom/Phantom";
 import { Transaction } from "@solana/web3.js";
 
@@ -20,6 +20,7 @@ const Redeem = ({ email }: { email: string }) => {
 
   const [readyToSign, setReadyToSign] = useState(false)
   const [transactionBytes, setTransactionBytes] = useState([]);
+  const [amount, setAmount] = useState(0.0);
   const [signedTransaction, setSignedTransaction] = useState<Transaction | null>(null);
 
   useEffect(() => {
@@ -29,15 +30,21 @@ const Redeem = ({ email }: { email: string }) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({'transaction_bytes': Array.from(signedTransaction.serialize()), "email": email})
+        body: JSON.stringify(
+          {
+            "transaction_bytes": Array.from(signedTransaction.serialize()),
+            "email": email,
+            "amount": amount
+          }
+        )
       })
         .then((res) => res.json())
         .then((data) => {
-            console.log(data);
+          console.log(data);
         })
     }
 
-  }, [signedTransaction]);
+  }, [signedTransaction, transactionBytes, email]);
 
 
   return (
@@ -66,6 +73,7 @@ const Redeem = ({ email }: { email: string }) => {
                   })
                     .then((res) => res.json())
                     .then((data) => {
+                      setAmount(data.amount)
                       setTransactionBytes(data.transaction_bytes);
                       setReadyToSign(true);
                     });

@@ -22,6 +22,7 @@ from data_models import (
     TokenBalance,
 )
 import database_api
+import paystack_api
 
 from datetime import datetime
 
@@ -51,6 +52,20 @@ async def signup(
 ) -> None:
     try:
         user.password = hash_password(user.password)
+        # verify = paystack_api.verify_account_ZA(
+        #     bank_code=user.sort_code,
+        #     account_number=user.bank_account, 
+        #     account_name=user.first_name + " " + user.last_name,
+        #     document_number=user.document_number
+        # )
+        recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
+            bank_type="basa",
+            name=user.first_name + " " + user.last_name,
+            account_number=user.bank_account,
+            bank_code=user.sort_code,
+            currency="ZAR"
+        )
+        user.recipient_code = recipient_code
         await database_api.create_user(user=user, db=db)
         response.status_code = 200
         return {"transaction_bytes": request_create_token_account(user.wallet_id)}
@@ -80,7 +95,8 @@ async def login(
 # AUDIT
 @app.get("/api/audit")
 async def audit() -> None:
-    rands_in_reserve = issued_coins = round(get_total_tokens_issued(), 2)
+    rands_in_reserve = paystack_api.check_balance()
+    issued_coins = round(get_total_tokens_issued(), 2)
 
     return {
         "rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
@@ -168,7 +184,8 @@ async def redeem(
     return {
         "transaction_bytes": burn_stablecoins(
             redeemer.wallet_id, redeem_transaction.amount_in_coins
-        )
+        ),
+        "amount": redeem_transaction.amount_in_coins
     }
 
 
@@ -178,17 +195,19 @@ async def complete_redeem(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     transaction_bytes = bytes(transaction.transaction_bytes)
+    redeemer = await database_api.get_user(email=transaction.email, db=db)
     resp = send_transaction_from_bytes(transaction_bytes)
-
-    amount = 10  # get this from blockchain using response
-
+    reference = paystack_api.initiate_transfer(transaction.amount, redeemer.recipient_code, redeemer.wallet_id)
+    if reference == -1:
+        # TODO[devin]: WHAT TO DO WHEN PAYSTACK FAILS - SEND TO FRONTEND
+        return {"success": False} 
     await database_api.create_redeem_transaction(
-        transaction,
-        database_api.get_dummy_id(),
-        resp.value.__str__(),
-        datetime.now(),
-        amount,
-        db,
+        redeem=transaction,
+        bank_transaction_id=reference,
+        blockchain_transaction_id=resp.value.__str__(),
+        date=datetime.now(),
+        amount=transaction.amount,
+        db=db,
     )
     # assume was successful until szymon refactors
     return {"success": True}
