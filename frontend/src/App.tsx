@@ -35,7 +35,7 @@ const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean
 
 const App = () => {
     const [isAuth, setIsAuth] = useState(false);
-    const [isLoadingAuth, setIsLoadingAuth] = useState(false); // we are initially loading
+    const [isLoadingAuth, setIsLoadingAuth] = useState(true); // we are initially loading
     const [email, setEmail] = useState("");
 
     // Checks whether we are still authenticated
