@@ -26,7 +26,7 @@ class Success(Response):
 
 class Failure(Response):
     def to_json(self) -> dict[str, Any]:
-        return {"status": Failure, self.contents_name: self.contents}
+        return {"status": FAILURE, self.contents_name: self.contents}
 
     def __str__(self):
         return str(self.to_json())
