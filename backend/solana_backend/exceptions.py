@@ -33,6 +33,14 @@ class TransactionTimeoutException(Exception):
     def __str__(self):
         return "Transaction timed out."
 
+class InvalidGetTransactionRespException(Exception):
+    """Raised when we try to access GetTransactionResp and at some point
+       some value that we expect to be present is None.
+       """
+
+    def __str__(self):
+        return "Malformed GetTransactionResp object."
+
 class BlockchainQueryFailedException(Exception):
     """Raised when a query sent to the blockchain fails."""
 
