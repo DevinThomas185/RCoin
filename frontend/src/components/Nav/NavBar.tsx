@@ -77,7 +77,7 @@ export default function NavBar({isAuth, setIsAuth}: {isAuth: boolean, setIsAuth:
             </HStack>
           </HStack>
           <Flex alignItems={'center'}>
-            {true ? 
+            {isAuth ? 
             <Menu>
               <MenuButton
                 marginTop='5'
