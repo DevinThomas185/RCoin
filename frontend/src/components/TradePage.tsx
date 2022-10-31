@@ -33,6 +33,7 @@ export default function InfoPage({ title, pageName, message, colour, link }: { t
                         fontWeight={600}
                         fontSize={{ base: '3xl', sm: '4xl', lg: '6xl' }}>
                         <Text
+                            className={'home-title'}
                             as={'span'}
                             position={'relative'}
                             _after={{
@@ -48,7 +49,7 @@ export default function InfoPage({ title, pageName, message, colour, link }: { t
                             {pageName}
                         </Text>
                         <br />
-                        <Text as={'span'} color={colour + '.400'}>
+                        <Text className={'home-title'} as={'span'} color={colour + '.400'}>
                             {title}
                         </Text>
                     </Heading>
