@@ -59,7 +59,7 @@ const Issue = ({ email }: { email: string }) => {
                   })
                     .then((res) => res.json())
                     .then((data) => {
-                      if (data["success"]) {
+                      if (data["status"] === "success") {
                         setIssueSuccess(true)
                       }
                       setDataReturned(true)
