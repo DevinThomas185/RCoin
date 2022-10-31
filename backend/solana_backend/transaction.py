@@ -98,15 +98,16 @@ def get_associated_token_account(public_key: PublicKey) -> PublicKey:
     # of creating token accounts will not allow for creating multiple token
     # accounts per user. Here we assume that only one such account exists and
     # therefore we access the fist item in the list.
-    token_account_key = PublicKey.from_solders(resp.value[0].pubkey)
 
-    if token_account_key is None:
+    if resp.value == []:
         print(
             "There are no token accounts associated with the wallet: {}".format(
                 public_key
             )
         )
         raise NoTokenAccountException(str(public_key))
+
+    token_account_key = PublicKey.from_solders(resp.value[0].pubkey)
 
     print(
         "Token account: {} found for wallet: {}".format(token_account_key, public_key)
@@ -115,11 +116,7 @@ def get_associated_token_account(public_key: PublicKey) -> PublicKey:
     return token_account_key
 
 
-def transaction_to_bytes(transaction: Transaction) -> list[bytes]:
-    transaction_bytes = transaction.to_solders().__bytes__()
+def transaction_to_bytes(transaction: Transaction) -> list[int]:
+    return list(transaction.to_solders().__bytes__())
 
-    byte_array = []
-    for byte in transaction_bytes:
-        byte_array.append(byte)
 
-    return byte_array
