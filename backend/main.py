@@ -11,7 +11,8 @@ from solana_backend.api import (
 )
 import bcrypt
 import sqlalchemy.orm as orm
-from fastapi import Depends, FastAPI, Response
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi import Depends, FastAPI, Response, Request
 from data_models import (
     CompleteRedeemTransaction,
     LoginInformation,
@@ -24,6 +25,7 @@ from data_models import (
 import database_api
 
 from datetime import datetime
+
 
 app = FastAPI()
 
@@ -63,18 +65,42 @@ async def signup(
 @app.post("/api/login")
 async def login(
     login: LoginInformation,
+    request: Request,
     response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     try:
         match = await database_api.get_user(email=login.email, db=db)
         if match != None and verify_password(login.password, match.password):
+            request.session["logged_in_email"] = match.email
+            print(request.session)
             response.status_code = 200
         else:
             response.status_code = 401
 
     except:  # TODO[devin]: Catch explicit exception
         response.status_code = 500
+
+
+# LOGOUT
+@app.post("/api/logout")
+async def logout(request: Request, response: Response):
+    if request.session.get("logged_in_email", None):
+        request.session.pop("logged_in_email")
+        return {"success": True}
+    else:
+        response.status_code = 401
+        return {"error": "not logged in"}
+
+
+# Auth
+@app.post("/api/authenticated")
+async def check_authenticated(request: Request):
+    print(request.session)
+    if request.session.get("logged_in_email") is None:
+        return {"authenticated": False}
+    else:
+        return {"authenticated": True}
 
 
 # AUDIT
@@ -108,9 +134,11 @@ async def auditTransactions(
 async def transactions() -> None:
     rands_in_reserve = issued_coins = round(get_total_tokens_issued(), 2)
 
-    return {"rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
-            "issued_coins": "{:,.2f}".format(issued_coins),
-            "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2))}
+    return {
+        "rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
+        "issued_coins": "{:,.2f}".format(issued_coins),
+        "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2)),
+    }
 
 
 # ISSUE
@@ -206,3 +234,6 @@ async def token_balance(
         "token_balance": get_token_balance(user.wallet_id),
         "sol_balance": get_sol_balance(user.wallet_id),
     }
+
+
+app.add_middleware(SessionMiddleware, secret_key="random-string")

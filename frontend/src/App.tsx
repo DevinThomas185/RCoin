@@ -1,5 +1,5 @@
 import { Flex, Spacer, ChakraProvider, theme, Text} from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import {
     BrowserRouter as Router,
     Routes,
@@ -37,6 +37,23 @@ const App = () => {
     const [isAuth, setIsAuth] = useState(false);
     const [isLoadingAuth, setIsLoadingAuth] = useState(false); // we are initially loading
     const [email, setEmail] = useState("");
+
+    // Checks whether we are still authenticated
+    useEffect(() => {
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+        fetch("/api/authenticated", requestOptions)
+          .then(res => res.json())
+          .then(data => {
+            if (data["authenticated"]) {
+              setIsAuth(true);
+            }
+            setIsLoadingAuth(false);
+          })
+      }, [])
+        
 
     return (
         <ChakraProvider theme={theme}>

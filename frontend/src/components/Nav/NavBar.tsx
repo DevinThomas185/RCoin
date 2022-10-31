@@ -19,7 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import DrawerComponent from './DrawerComponent';
 
 const Links = ['Dashboard', 'Projects', 'Team'];
@@ -42,6 +42,26 @@ const Links = ['Dashboard', 'Projects', 'Team'];
 export default function NavBar({isAuth, setIsAuth}: {isAuth: boolean, setIsAuth: React.Dispatch<React.SetStateAction<boolean>>}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [ isDrawerOpen, setIsDrawerOpen ] = useState(false);
+
+  let navigate = useNavigate();
+
+  const handleSignOut = () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+    fetch("/api/logout", requestOptions)
+    .then(res => res.json())
+    .then(data => {
+        if (data["success"]) {
+          setIsAuth(false);
+        }
+        // what to do when fails
+        navigate("/");
+    })
+
+
+  }
 
   return (
     <>
@@ -97,7 +117,7 @@ export default function NavBar({isAuth, setIsAuth}: {isAuth: boolean, setIsAuth:
                 <MenuItem>Account Settings</MenuItem>
                 <MenuItem>TODO</MenuItem>
                 <MenuDivider />
-                <MenuItem onClick={() => setIsAuth(false)}>Sign out</MenuItem>
+                <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
               </MenuList>
             </Menu>
             :
