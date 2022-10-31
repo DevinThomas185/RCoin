@@ -14,29 +14,31 @@ class Response:
     def __init__(self, contents_name: str, contents: Any):
         self.contents_name = contents_name
         self.contents = contents
+    def to_json(self) -> dict[str, Any]:
+        return {} # To be overridden
 
 class Success(Response):
-    def to_json(self):
+    def to_json(self) -> dict[str, Any]:
         return {"status": SUCCESS, self.contents_name: self.contents}
 
     def __str__(self):
         return str(self.to_json())
 
 class Failure(Response):
-    def to_json(self):
+    def to_json(self) -> dict[str, Any]:
         return {"status": Failure, self.contents_name: self.contents}
 
     def __str__(self):
         return str(self.to_json())
 
-class TransactionSuccess(Success):
+class CreateTransactionSuccess(Success):
     def __init__(self, contents):
         super().__init__("transaction_bytes", contents)
 
     def __str__(self):
         return str(self.to_json())
 
-class TransactionFailure(Failure):
+class CreateTransactionFailure(Failure):
     def __init__(self, contents):
         super().__init__("exception", contents)
 
