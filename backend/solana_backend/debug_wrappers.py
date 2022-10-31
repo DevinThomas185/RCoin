@@ -9,7 +9,7 @@ from solana.rpc.commitment import Confirmed
 
 from spl.token.instructions import create_associated_token_account
 
-from api import fund_account, get_balance, issue_stablecoins, get_associated_token_account, construct_stablecoin_transaction
+from api import fund_account, get_balance, issue_stablecoins, get_associated_token_account, construct_stablecoin_transfer
 from api import SOLANA_CLIENT, MINT_ACCOUNT
 
 def fund_user(username, amount):
@@ -156,7 +156,7 @@ def transfer_stablecoins(sender, amount, recipient):
     sender_public_key = PublicKey(sender_wallet['public_key'])
     recipient_public_key = PublicKey(recipient_wallet['public_key'])
 
-    transaction = construct_stablecoin_transaction(
+    transaction = construct_stablecoin_transfer(
             sender_public_key,
             amount,
             recipient_public_key)
