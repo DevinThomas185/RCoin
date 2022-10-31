@@ -198,7 +198,7 @@ async def complete_redeem(
     if isinstance(resp, Failure):
         return resp.to_json()
 
-    amount_resp = get_transfer_amount_for_transaction(resp.contents.value)
+    amount_resp = get_transfer_amount_for_transaction(resp.contents.value.__str__())
 
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()
