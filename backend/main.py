@@ -42,9 +42,12 @@ def verify_password(password: str, hashed_password: bytes) -> bool:
     return bcrypt.checkpw(password.encode("utf8"), hashed_password)
 
 
-# Decorator to ensurer a user is logged in
-# Must have "request" and "response "as argument in function
 def login_required(func):
+    """Decorator for api endpoints to require login.
+    Returns 401 if user is not logged in.
+    Requires request: Request and response: Response in the decorated function.
+    """
+
     @functools.wraps(func)
     async def secure_function(*args, **kwargs):
         if "logged_in_email" not in kwargs["request"].session:
