@@ -62,18 +62,18 @@ const App = () => {
                     <NavBar isAuth={isAuth} setIsAuth={setIsAuth}/>    
                 </div>
                 <Routes>
-                    <Route path="/" element={<Home email={email} isAuth={isAuth}/>}></Route>
+                    <Route path="/" element={<Home />}></Route>
                     <Route
                         path="/issue"
-                        element={RequireAuth(<Issue email={email} />, isAuth, isLoadingAuth)}
+                        element={RequireAuth(<Issue />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route
                         path="/trade"
-                        element={RequireAuth(<Trade email={email} />, isAuth, isLoadingAuth)}
+                        element={RequireAuth(<Trade />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route
                         path="/redeem"
-                        element={RequireAuth(<Redeem email={email} />, isAuth, isLoadingAuth)}
+                        element={RequireAuth(<Redeem />, isAuth, isLoadingAuth)}
                     ></Route>
                     <Route path="/login" element={<Login setIsAuth={setIsAuth} setEmail={setEmail} />}></Route>
                     <Route path="/sign-up" element={<SignUp />}></Route>

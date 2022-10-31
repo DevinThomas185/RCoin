@@ -156,11 +156,12 @@ async def get_user(
 # Issue
 async def create_issue_transaction(
     issue: data_models.IssueTransaction,
+    user_email: str,
     bank_transaction_id: str,
     date: datetime,
     db: "Session",
 ) -> Issue:
-    user = await get_user(email=issue.email, db=db)
+    user = await get_user(email=user_email, db=db)
     # bank_transaction_id = sql.Column(sql.Text, unique=True)
     # blockchain_transaction_id = sql.Column(sql.Text, unique=True)
     # amount = sql.Column(sql.Float)
@@ -197,13 +198,14 @@ async def complete_issue_transaction(
 # Redeem
 async def create_redeem_transaction(
     redeem: data_models.CompleteRedeemTransaction,
+    email: str,
     bank_transaction_id: str,
     blockchain_transaction_id: str,
     date: datetime,
     amount: float,
     db: "Session",
 ) -> Redeem:
-    user = await get_user(email=redeem.email, db=db)
+    user = await get_user(email=email, db=db)
 
     redeem_transaction = Redeem(
         user_id=user.id,

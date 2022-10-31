@@ -14,7 +14,7 @@ import { Field, Form, Formik } from 'formik'
 import { useState } from 'react';
 import { PhantomSigner } from '../phantom/Phantom';
 
-const Trade = ({ email }: { email: string }) => {
+const Trade = () => {
 
   const [readyToSign, setReadyToSign] = useState(false)
   const [transactionBytes, setTransactionBytes] = useState([]);
@@ -30,7 +30,7 @@ const Trade = ({ email }: { email: string }) => {
 
           {!readyToSign &&
             <Formik
-              initialValues={{ sender_email: email, recipient_wallet: "", coins_to_transfer: "" }}
+              initialValues={{recipient_wallet: "", coins_to_transfer: "" }}
               onSubmit={(values, actions) => {
                 setTimeout(() => {
                   // alert(JSON.stringify(values, null, 2))

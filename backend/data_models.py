@@ -24,14 +24,14 @@ class LoginInformation(BaseModel):
 
 
 class IssueTransaction(BaseModel):
-    email: str
+    # email: str
     # wallet: str
     amount_in_rands: float
 
 
 class TradeTransaction(BaseModel):
     coins_to_transfer: float
-    sender_email: str
+    # sender_email: str
     # recipient_email: str
 
     # sender_wallet: str
@@ -41,13 +41,13 @@ class TradeTransaction(BaseModel):
 
 
 class RedeemTransaction(BaseModel):
-    email: str
+    # email: str
     # wallet: str
     amount_in_coins: float
 
 
 class CompleteRedeemTransaction(BaseModel):
-    email: str
+    # email: str
     transaction_bytes: List[int]
 
 

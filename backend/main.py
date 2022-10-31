@@ -155,15 +155,19 @@ async def transactions() -> None:
 
 # ISSUE
 @app.post("/api/issue")
+@login_required
 async def issue(
     issue_transaction: IssueTransaction,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     # Get the user from the database #TODO[devin]: Change to session data
-    buyer = await database_api.get_user(email=issue_transaction.email, db=db)
+    email = request.session["logged_in_email"]
+    buyer = await database_api.get_user(email=email, db=db)
 
     issue_transac = await database_api.create_issue_transaction(
-        issue_transaction, database_api.get_dummy_id(), datetime.now(), db
+        issue_transaction, email, database_api.get_dummy_id(), datetime.now(), db
     )
 
     # Below should be done in a background job once we verify the bank transaction
@@ -182,11 +186,15 @@ async def issue(
 
 # TRADE
 @app.post("/api/trade")
+@login_required
 async def trade(
     trade_transaction: TradeTransaction,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
-    sender = await database_api.get_user(email=trade_transaction.sender_email, db=db)
+    sender_email = request.session["logged_in_email"]
+    sender = await database_api.get_user(email=sender_email, db=db)
     # recipient = await database_api.get_user(email=trade_transaction.recipient_email, db=db)
     return {
         "transaction_bytes": new_stablecoin_transaction(
@@ -199,12 +207,16 @@ async def trade(
 
 # REDEEM
 @app.post("/api/redeem")
+@login_required
 async def redeem(
     redeem_transaction: RedeemTransaction,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     # Get the user from the database #TODO[devin]: Change to session data
-    redeemer = await database_api.get_user(email=redeem_transaction.email, db=db)
+    email = request.session["logged_in_email"]
+    redeemer = await database_api.get_user(email=email, db=db)
     return {
         "transaction_bytes": burn_stablecoins(
             redeemer.wallet_id, redeem_transaction.amount_in_coins
@@ -213,10 +225,15 @@ async def redeem(
 
 
 @app.post("/api/complete-redeem")
+@login_required
 async def complete_redeem(
     transaction: CompleteRedeemTransaction,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
+    email = request.session["logged_in_email"]
+
     transaction_bytes = bytes(transaction.transaction_bytes)
     resp = send_transaction_from_bytes(transaction_bytes)
 
@@ -224,6 +241,7 @@ async def complete_redeem(
 
     await database_api.create_redeem_transaction(
         transaction,
+        email,
         database_api.get_dummy_id(),
         resp.value.__str__(),
         datetime.now(),

@@ -16,7 +16,7 @@ import { PhantomSigner } from "../phantom/Phantom";
 import { Transaction } from "@solana/web3.js";
 
 
-const Redeem = ({ email }: { email: string }) => {
+const Redeem = () => {
 
   const [readyToSign, setReadyToSign] = useState(false)
   const [transactionBytes, setTransactionBytes] = useState([]);
@@ -29,7 +29,7 @@ const Redeem = ({ email }: { email: string }) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({'transaction_bytes': Array.from(signedTransaction.serialize()), "email": email})
+        body: JSON.stringify({'transaction_bytes': Array.from(signedTransaction.serialize())})
       })
         .then((res) => res.json())
         .then((data) => {
@@ -52,8 +52,7 @@ const Redeem = ({ email }: { email: string }) => {
           {!readyToSign &&
             <Formik
               initialValues={{
-                email: email,
-                amount_in_rands: ""
+                amount_in_coins: ""
               }}
               onSubmit={(values, actions) => {
                 setTimeout(() => {
