@@ -1,19 +1,19 @@
 import React from "react"
-import { 
-    Button, 
-    DrawerCloseButton, 
-    Drawer, 
-    DrawerOverlay, 
-    DrawerContent, 
-    DrawerHeader, 
-    DrawerBody, 
+import {
+    Button,
+    DrawerCloseButton,
+    Drawer,
+    DrawerOverlay,
+    DrawerContent,
+    DrawerHeader,
+    DrawerBody,
     Stack,
     Spacer,
 } from "@chakra-ui/react"
 
 import { Link } from "react-router-dom"
 
-function DrawerComponent({isOpen, setIsOpen}: {isOpen: boolean, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>}) {
+function DrawerComponent({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
     return (
         <>
             <Drawer
@@ -24,11 +24,11 @@ function DrawerComponent({isOpen, setIsOpen}: {isOpen: boolean, setIsOpen: React
                 <DrawerOverlay />
                 <DrawerContent>
                     <DrawerCloseButton />
-                    <DrawerHeader>Rcoin</DrawerHeader>
+                    <DrawerHeader>RCoin</DrawerHeader>
 
                     <DrawerBody>
                         <Stack height='50%' spacing='6'>
-                            <Spacer/>
+                            <Spacer />
                             <Link to='/audit'>
                                 <Button width='100%'>Audit</Button>
                             </Link>

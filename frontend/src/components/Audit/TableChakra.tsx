@@ -32,7 +32,7 @@ const TableChakra = () => {
                         <Th>Stablecoin</Th>
                         <Th isNumeric>Rand</Th>
                         <Th>Transaction ID</Th>
-                        <Th isNumeric>Rcoin</Th>
+                        <Th isNumeric>RCoin</Th>
                         <Th>fd</Th>
                     </Tr>
                 </Thead>
@@ -92,7 +92,7 @@ const TableChakra = () => {
                         <Th>Stablecoin</Th>
                         <Th isNumeric>Rand</Th>
                         <Th>Transaction ID</Th>
-                        <Th isNumeric>Rcoin</Th>
+                        <Th isNumeric>RCoin</Th>
                         <Th>fd</Th>
                     </Tr>
                 </Tfoot>

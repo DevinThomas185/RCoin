@@ -64,7 +64,7 @@ const Welcome = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
 
             <Flex margin="10">
                 <AuditTransactions isLoaded={isLoaded} amount={`${rand_in_reserve}`} unit="ZAR" title="Rand In Reserve" />
-                <AuditTransactions isLoaded={isLoaded} amount={`${issued_coins}`} unit="Rcoin" title="Coins Issued" />
+                <AuditTransactions isLoaded={isLoaded} amount={`${issued_coins}`} unit="RCoin" title="Coins Issued" />
             </Flex>
             {
                 isAuth ?
