@@ -14,13 +14,15 @@ from solders.transaction_status import (
     EncodedTransactionWithStatusMeta,
 )
 
+from spl.token.constants import TOKEN_PROGRAM_ID
+
 from solana_backend.common import (
     SOLANA_CLIENT,
     LAMPORTS_PER_SOL,
     MINT_ACCOUNT,
-    TOKEN_PROGRAM_ID,
     TOKEN_DECIMALS,
 )
+
 from solana_backend.exceptions import BlockchainQueryFailedException
 
 
