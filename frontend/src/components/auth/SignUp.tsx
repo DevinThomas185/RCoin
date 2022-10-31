@@ -56,6 +56,7 @@ const SignUp = () => {
                   })
                     .then((res) => res.json())
                     .then((data) => {
+                      console.log(data)
                       setTransactionBytes(data.transaction_bytes)
                       setReadyToSign(true)
 
