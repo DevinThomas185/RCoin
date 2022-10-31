@@ -1,3 +1,4 @@
+import functools
 from datetime import datetime
 from solana_backend.api import (
     new_stablecoin_transaction,
@@ -26,7 +27,6 @@ import database_api
 
 from datetime import datetime
 
-
 app = FastAPI()
 
 # Password functions
@@ -40,6 +40,20 @@ def hash_password(
 
 def verify_password(password: str, hashed_password: bytes) -> bool:
     return bcrypt.checkpw(password.encode("utf8"), hashed_password)
+
+
+# Decorator to ensurer a user is logged in
+# Must have "request" and "response "as argument in function
+def login_required(func):
+    @functools.wraps(func)
+    async def secure_function(*args, **kwargs):
+        if "logged_in_email" not in kwargs["request"].session:
+            kwargs["response"].status_code = 401
+
+            return {"error": "unauthorised"}
+        return await func(*args, **kwargs)
+
+    return secure_function
 
 
 # TODO[Devin]: Add return types for these functions
@@ -73,7 +87,6 @@ async def login(
         match = await database_api.get_user(email=login.email, db=db)
         if match != None and verify_password(login.password, match.password):
             request.session["logged_in_email"] = match.email
-            print(request.session)
             response.status_code = 200
         else:
             response.status_code = 401
@@ -96,7 +109,6 @@ async def logout(request: Request, response: Response):
 # Auth
 @app.post("/api/authenticated")
 async def check_authenticated(request: Request):
-    print(request.session)
     if request.session.get("logged_in_email") is None:
         return {"authenticated": False}
     else:
