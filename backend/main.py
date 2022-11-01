@@ -20,6 +20,7 @@ from fastapi import Depends, FastAPI, Response
 from data_models import (
     CompleteRedeemTransaction,
     LoginInformation,
+    TransactionHistoryInformation,
     UserInformation,
     IssueTransaction,
     TradeTransaction,
@@ -128,6 +129,21 @@ async def transactions() -> dict[str, Any]:
         "issued_coins": "{:,.2f}".format(issued_coins),
         "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2)),
     }
+
+
+# TRANSACTION HISTORY
+@app.get("/api/transaction_history")
+async def transactionHistory(
+    transactionHistoryInformation: TransactionHistoryInformation,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> dict:
+    transactions = await database_api.get_audit_transactions(
+        0, 1000, datetime.now(), db
+    )
+
+    print(transactions)
+    print("\n")
+    return {"transactions": transactions}
 
 
 # ISSUE

@@ -6,22 +6,25 @@ import React from 'react';
 const TransactionHistoryPage = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
 
   const initArr: any[] = []
-  const [transactions, setTransactions] = React.useState<any[]>(initArr)
+  const [transactionHistory, setTransactionHistory] = React.useState<any[]>(initArr)
 
-  useEffect(() => {
-    fetch("/api/audit/transactions", { method: "GET" })
+  if (isAuth) {
+    fetch("/api/transaction_history", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ "email": email }, null, 2)
+    })
       .then(res => res.json())
       .then(data => {
-        setTransactions(data["transactions"])
-        console.log(data["transactions"])
+        setTransactionHistory(data["transactionHistory"])
       })
-
-  }, [])
-
+  }
 
   return (
     <Box>
-      <Heading textAlign={"center"}>Real Time Audit </Heading>
+      <Heading textAlign={"center"}>Your Transaction History</Heading>
 
       <Welcome email={email} isAuth={isAuth} />
 
