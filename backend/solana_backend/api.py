@@ -217,7 +217,7 @@ def get_user_sol_balance(public_key: str) -> Response:
         return Failure("exception", exception)
 
 
-def get_stablecoin_transactions(public_key: str, limit: int) -> Response:
+def get_stablecoin_transactions(public_key: str, limit: int = 10) -> Response:
     try:
 
         return Success(

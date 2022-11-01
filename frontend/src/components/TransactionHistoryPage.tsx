@@ -14,19 +14,23 @@ const TransactionHistoryPage = ({ email, isAuth }: { email: string, isAuth: bool
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ "email": email }, null, 2)
+      body: JSON.stringify({ "email": email })
     })
       .then(res => res.json())
       .then(data => {
         setTransactionHistory(data["transactionHistory"])
       })
   }
+  if (transactionHistory.length > 0) {
+    alert(transactionHistory)
+  }
 
   return (
     <Box>
       <Heading textAlign={"center"}>Your Transaction History</Heading>
+      <Heading textAlign={"center"}>{transactionHistory}</Heading>
 
-      <Welcome email={email} isAuth={isAuth} />
+      {/* <Welcome email={email} isAuth={isAuth} />
 
 
       <TableContainer overflowY="auto" maxHeight="400px" margin={10}>
@@ -62,7 +66,7 @@ const TransactionHistoryPage = ({ email, isAuth }: { email: string, isAuth: bool
             </Tr>
           </Tfoot>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
 
 
 
