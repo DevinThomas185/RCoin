@@ -1,6 +1,7 @@
-import { Flex, Heading, Skeleton, Stat, StatLabel, Center, Box, Spacer, ChakraProvider } from '@chakra-ui/react';
+import { Flex, Heading, Skeleton, Stat, StatLabel, Center, Box, Spacer, ChakraProvider, Button, VStack } from '@chakra-ui/react';
 import { useEffect, useState } from "react";
 import AuditTransactions from './Audit/AuditTransactions';
+import CodeModal from './Audit/CodeModal';
 
 const Welcome = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
 
@@ -13,6 +14,7 @@ const Welcome = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
     const [token_balance, setTokenBalance] = useState(0.0)
     const [sol_balance, setSolBalance] = useState(0.0)
     const [balanceLoaded, setBalanceLoaded] = useState(false)
+    const [codeModalOpen, setCodeModalOpen] = useState(false)
 
     useEffect(() => {
         const requestOptions = {
@@ -53,6 +55,8 @@ const Welcome = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
 
     return (
         <div>
+            <CodeModal isOpen={codeModalOpen} setOpen={setCodeModalOpen} />
+            
             <Heading textAlign={"center"}>
                 <Skeleton isLoaded={isLoaded} marginTop={10}>
                     {date}
@@ -62,9 +66,20 @@ const Welcome = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
                 </Skeleton>
             </Heading>
 
-            <Flex margin="10">
-                <AuditTransactions isLoaded={isLoaded} amount={`${rand_in_reserve}`} unit="ZAR" title="Rand In Reserve" />
+            <Flex margin="10">                  
+                <Box>
+                    <AuditTransactions isLoaded={isLoaded} amount={`${rand_in_reserve}`} unit="ZAR" title="Rand In Reserve" />
+                    <Center>
+                        <Button size='xs' onClick={()=> setCodeModalOpen(true)}>Verify</Button>
+                    </Center>
+                </Box>
+                
+                <Spacer />
+                
+                <Box>
                 <AuditTransactions isLoaded={isLoaded} amount={`${issued_coins}`} unit="Rcoin" title="Coins Issued" />
+                </Box>
+
             </Flex>
             {
                 isAuth ?
