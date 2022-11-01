@@ -15,7 +15,9 @@ services:
       - SOLANA_CLIENT=${SOLANA_CLIENT}
       - MINT_ACCOUNT=${MINT_ACCOUNT}
       - RESERVE_ACCOUNT_ADDRESS=${RESERVE_ACCOUNT_ADDRESS}
-      - TOKEN_OWNER=${TOKEN_OWNER}        
+      - TOKEN_OWNER=${TOKEN_OWNER}
+      - SECRET_KEY=${SECRET_KEY}
+      - PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY}        
     ports:
       - 8000:8000
     depends_on:
