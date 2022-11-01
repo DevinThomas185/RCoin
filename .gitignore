@@ -4,6 +4,7 @@ venv
 
 # Pycache
 __pycache__
+.vscode
 
 # Debugging
 launch.json
