@@ -17,6 +17,7 @@ import Home from "./components/Home";
 import Audit from "./components/AuditPage";
 import "./main.css";
 import NavBar from "./components/Nav/NavBar";
+import TransactionHistoryPage from "./components/TransactionHistoryPage";
 
 const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean) => {    
     // This is for when we have an /authenticated endpoint and we can check without having
@@ -61,6 +62,7 @@ const App = () => {
                     <Route path="/login" element={<Login setIsAuth={setIsAuth} setEmail={setEmail} />}></Route>
                     <Route path="/sign-up" element={<SignUp />}></Route>
                     <Route path='/audit' element={<Audit email={email} isAuth={isAuth} />}> </Route>
+                    <Route path='/transaction-history' element={<TransactionHistoryPage email={email} isAuth={isAuth} />}> </Route>
                 </Routes>
             </Router>
         </ChakraProvider>
