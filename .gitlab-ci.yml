@@ -32,7 +32,7 @@ deploy-dev:
     # Docker Compose
     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" MINT_ACCOUNT=$MINT_ACCOUNT SOLANA_CLIENT=$SOLANA_CLIENT RESERVE_ACCOUNT_ADDRESS=$RESERVE_ACCOUNT_ADDRESS TOKEN_OWNER=$TOKEN_OWNER SECRET_KEY=${SECRET_KEY} PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY} docker-compose up --remove-orphans -d --build 
     # Remove old images
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" docker rmi $(docker images -q)
+    - yes y | COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" docker system prune --all || true
     # Ensure all containers running
     - INFO=$(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" docker ps)
     - if [[ $(echo $INFO | grep stablecoin_frontend_1 | wc -l) -ne 1 ]]; then echo "frontend container not running" && exit 1; else echo "frontend container check successful"; fi
@@ -55,7 +55,7 @@ deploy-prod:
     # Docker Compose
     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" MINT_ACCOUNT=$MINT_ACCOUNT SOLANA_CLIENT=$SOLANA_CLIENT RESERVE_ACCOUNT_ADDRESS=$RESERVE_ACCOUNT_ADDRESS TOKEN_OWNER=$TOKEN_OWNER SECRET_KEY=${SECRET_KEY} PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY} docker-compose up --remove-orphans -d --build 
     # Remove old images
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker rmi $(docker images -q)
+    - yes y | COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker system prune --all || true
     # Ensure all containers running
     - INFO=$(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker ps)
     - if [[ $(echo $INFO | grep stablecoin_frontend_1 | wc -l) -ne 1 ]]; then echo "frontend container not running" && exit 1; else echo "frontend container check successful"; fi
