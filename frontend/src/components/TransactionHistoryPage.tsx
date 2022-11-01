@@ -3,24 +3,22 @@ import Welcome from './Welcome';
 import { useState, useEffect } from "react";
 import React from 'react';
 
-const TransactionHistoryPage = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
+const TransactionHistoryPage = ({ email }: { email: string }) => {
 
   const initArr: any[] = []
   const [transactionHistory, setTransactionHistory] = React.useState<any[]>(initArr)
 
-  if (isAuth) {
-    fetch("/api/transaction_history", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ "email": email })
+  fetch("/api/transaction_history", {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ "email": email })
+  })
+    .then(res => res.json())
+    .then(data => {
+      setTransactionHistory(data["transaction_history"])
     })
-      .then(res => res.json())
-      .then(data => {
-        setTransactionHistory(data["transactionHistory"])
-      })
-  }
   if (transactionHistory.length > 0) {
     alert(transactionHistory)
   }
@@ -28,7 +26,7 @@ const TransactionHistoryPage = ({ email, isAuth }: { email: string, isAuth: bool
   return (
     <Box>
       <Heading textAlign={"center"}>Your Transaction History</Heading>
-      <Heading textAlign={"center"}>{transactionHistory}</Heading>
+      <Heading textAlign={"center"}>Transaction history: {transactionHistory}</Heading>
 
       {/* <Welcome email={email} isAuth={isAuth} />
 

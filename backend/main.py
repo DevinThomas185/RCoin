@@ -133,26 +133,26 @@ async def transactions() -> dict[str, Any]:
 
 
 # TRANSACTION HISTORY
-@app.get("/api/transaction_history")
+@app.post("/api/transaction_history")
 async def transactionHistory(
     transactionHistoryInformation: TransactionHistoryInformation,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     user = await database_api.get_user(email=transactionHistoryInformation.email, db=db)
     wallet_id = user.wallet_id
-    transactions = get_stablecoin_transactions(wallet_id).to_json()["transaction_history"]
-    print(transactions)
+    return get_stablecoin_transactions(wallet_id).to_json()
+    # transactions = get_stablecoin_transactions(wallet_id).to_json()["transaction_history"]
 
-    return {
-        "transactions": [
-            {
-                "source": transaction[0],
-                "target": transaction[1],
-                "amount": transaction[2]
-            }
-            for transaction in transactions
-        ]
-    }
+    # return {
+    #     "transactions": [
+    #         {
+    #             "source": transaction[0],
+    #             "target": transaction[1],
+    #             "amount": transaction[2]
+    #         }
+    #         for transaction in transactions
+    #     ]
+    # }
 
 
 # ISSUE

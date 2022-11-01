@@ -1,4 +1,4 @@
-import { Flex, Spacer, ChakraProvider, theme, Text} from "@chakra-ui/react";
+import { Flex, Spacer, ChakraProvider, theme, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import {
     BrowserRouter as Router,
@@ -19,14 +19,14 @@ import "./main.css";
 import NavBar from "./components/Nav/NavBar";
 import TransactionHistoryPage from "./components/TransactionHistoryPage";
 
-const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean) => {    
+const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean) => {
     // This is for when we have an /authenticated endpoint and we can check without having
     // to log back in
     if (isLoadingAuth) {
         return <></>
     }
 
-    
+
     if (!isAuth) {
         return <Navigate to="/login" />;
     }
@@ -43,10 +43,10 @@ const App = () => {
         <ChakraProvider theme={theme}>
             <Router>
                 <div className="App">
-                    <NavBar isAuth={isAuth} setIsAuth={setIsAuth}/>    
+                    <NavBar isAuth={isAuth} setIsAuth={setIsAuth} />
                 </div>
                 <Routes>
-                    <Route path="/" element={<Home email={email} isAuth={isAuth}/>}></Route>
+                    <Route path="/" element={<Home email={email} isAuth={isAuth} />}></Route>
                     <Route
                         path="/issue"
                         element={RequireAuth(<Issue email={email} />, isAuth, isLoadingAuth)}
@@ -62,7 +62,7 @@ const App = () => {
                     <Route path="/login" element={<Login setIsAuth={setIsAuth} setEmail={setEmail} />}></Route>
                     <Route path="/sign-up" element={<SignUp />}></Route>
                     <Route path='/audit' element={<Audit email={email} isAuth={isAuth} />}> </Route>
-                    <Route path='/transaction-history' element={<TransactionHistoryPage email={email} isAuth={isAuth} />}> </Route>
+                    <Route path='/transaction-history' element={RequireAuth(<TransactionHistoryPage email={email} />, isAuth, isLoadingAuth)}> </Route>
                 </Routes>
             </Router>
         </ChakraProvider>
