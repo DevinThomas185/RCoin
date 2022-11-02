@@ -1,4 +1,4 @@
-import { Flex, Spacer, ChakraProvider, theme, Text} from "@chakra-ui/react";
+import { ChakraProvider, theme } from "@chakra-ui/react";
 import { useState, useEffect} from "react";
 import {
     BrowserRouter as Router,
@@ -10,7 +10,7 @@ import {
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import Login from "./components/auth/Login";
 import SignUp from "./components/auth/SignUp";
-import Issue from "./components/core_functionality/Issue";
+import Issue from "./components/Issue/Issue";
 import Redeem from "./components/core_functionality/Redeem";
 import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
@@ -18,14 +18,14 @@ import Audit from "./components/AuditPage";
 import "./main.css";
 import NavBar from "./components/Nav/NavBar";
 
-const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean) => {    
+const RequireAuth = (child: JSX.Element, isAuth: boolean, isLoadingAuth: boolean) => {
     // This is for when we have an /authenticated endpoint and we can check without having
     // to log back in
     if (isLoadingAuth) {
         return <></>
     }
 
-    
+
     if (!isAuth) {
         return <Navigate to="/login" />;
     }
@@ -59,7 +59,7 @@ const App = () => {
         <ChakraProvider theme={theme}>
             <Router>
                 <div className="App">
-                    <NavBar isAuth={isAuth} setIsAuth={setIsAuth}/>    
+                    <NavBar isAuth={isAuth} setIsAuth={setIsAuth} />
                 </div>
                 <Routes>
                     <Route path="/" element={<Home />}></Route>
