@@ -80,17 +80,17 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
     resp = get_raw_transactions_for_account(public_key, limit)
 
     transactions: list[GetTransactionResp] = [
-        get_transaction_details(status.signature) for status in resp.value
+        (status.signature, get_transaction_details(status.signature)) for status in resp.value
     ]
 
     confirmed_transactions: list[EncodedTransactionWithStatusMeta] = [
-        transaction.value.transaction
-        for transaction in transactions
+        (signature, transaction.value.transaction)
+        for signature, transaction in transactions
         if transaction.value
     ]
 
     processed_transactions = []
-    for confirmed_transaction in confirmed_transactions:
+    for signature, confirmed_transaction in confirmed_transactions:
         # Skip the transaction if it doesn't have the metadata for some reason.
         if confirmed_transaction.meta is None:
             continue
@@ -152,7 +152,7 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
                 post_token_balances[1].ui_token_amount.amount
             )
 
-        processed_transactions.append((sender, recipient, amount))
+        processed_transactions.append((signature, sender, recipient, amount))
 
     return processed_transactions
 
