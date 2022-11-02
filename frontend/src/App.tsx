@@ -63,7 +63,7 @@ const App = () => {
                     <NavBar isAuth={isAuth} setIsAuth={setIsAuth} />
                 </div>
                 <Routes>
-                    <Route path="/" element={<Home email={email} isAuth={isAuth} />}></Route>
+                    <Route path="/" element={<Home />}></Route>
                     <Route
                         path="/issue"
                         element={RequireAuth(<Issue />, isAuth, isLoadingAuth)}
