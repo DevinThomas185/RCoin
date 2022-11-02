@@ -10,45 +10,35 @@ import {
   Button,
   InputGroup,
   InputLeftElement,
-  Heading
 } from '@chakra-ui/react'
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react';
+import { PopupAlert } from '../Alerts/PopupAlert';
 
 const Issue = () => {
 
   const [issueSuccess, setIssueSuccess] = useState(false)
-  const [dataReturned, setDataReturned] = useState(false)
+  const [isPopupVisible, setPopupVisible] = useState(false)
+  const [popupMessage, setPopupMessage] = useState("")
+  //Add ability to view the successful transaction on the blockchain
+  const [transactionSignature, setTransactionSignature] = useState("")
 
-  if (dataReturned && issueSuccess) {
-    return (
-      <ChakraProvider theme={theme}>
-        <Flex textAlign="center" fontSize="xl">
-          <Heading textAlign='center'>
-            Success!
-          </Heading>
-        </Flex>
-      </ChakraProvider>
-    )
-  } else if (dataReturned && !issueSuccess) {
-    return (
-      <ChakraProvider theme={theme}>
-        <Flex textAlign="center" fontSize="xl">
-          <Heading textAlign='center'>
-            Failure!
-          </Heading>
-        </Flex>
-      </ChakraProvider>
-    )
-  } else {
-    return (
-      <ChakraProvider theme={theme}>
-        <Flex textAlign="center" fontSize="xl">
-          <Spacer></Spacer>
+  return (
+    <ChakraProvider theme={theme}>
+      <Flex textAlign="center" fontSize="xl">
+        <Spacer></Spacer>
           <Grid maxH="100%" maxW="60%" p={3}>
+          {isPopupVisible &&
+            <PopupAlert
+              isVisible={isPopupVisible}
+              setVisible={setPopupVisible}
+              isSuccessful={issueSuccess}
+              alertMessage={popupMessage}
+            ></PopupAlert>}
             <Formik
               initialValues={{ amount_in_rands: "" }}
               onSubmit={(values, actions) => {
+                setPopupVisible(false)
                 setTimeout(() => {
                   fetch('/api/issue', {
                     method: "POST",
@@ -59,10 +49,15 @@ const Issue = () => {
                   })
                     .then((res) => res.json())
                     .then((data) => {
-                      if (data["status"] === "success") {
+                      if (data["success"]) {
                         setIssueSuccess(true)
+                        setTransactionSignature(data["transaction_signature"])
+                        setPopupMessage("Transaction completed successfully")
+                      } else {
+                        setIssueSuccess(false)
+                        setPopupMessage(data["exception"])
                       }
-                      setDataReturned(true)
+                      setPopupVisible(true)
                     })
                   actions.setSubmitting(false)
                 }, 1000)
@@ -99,10 +94,9 @@ const Issue = () => {
             </Formik>
           </Grid>
           <Spacer></Spacer>
-        </Flex>
-      </ChakraProvider>
-    )
-  }
+      </Flex>
+    </ChakraProvider>
+  )
 }
 
 export default Issue;
