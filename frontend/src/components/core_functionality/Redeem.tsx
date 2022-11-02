@@ -14,6 +14,7 @@ import { Field, Form, Formik } from "formik";
 import { useState, useEffect } from "react";
 import { PhantomSigner } from "../phantom/Phantom";
 import { Transaction } from "@solana/web3.js";
+import { PopupAlert } from "../Alerts/PopupAlert";
 
 
 const Redeem = () => {
@@ -21,9 +22,15 @@ const Redeem = () => {
   const [readyToSign, setReadyToSign] = useState(false)
   const [transactionBytes, setTransactionBytes] = useState([]);
   const [signedTransaction, setSignedTransaction] = useState<Transaction | null>(null);
+  const [redeemSuccess, setRedeemSuccess] = useState(false)
+  const [isPopupVisible, setPopupVisible] = useState(false)
+  const [popupMessage, setPopupMessage] = useState("")
+  //Add ability to view the successful transaction on the blockchain
+  const [transactionSignature, setTransactionSignature] = useState("")
 
   useEffect(() => {
     if (signedTransaction) {
+      setPopupVisible(false)
       fetch('/api/complete-redeem', {
         method: "POST",
         headers: {
@@ -37,7 +44,14 @@ const Redeem = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
+          if(data.success) {
+            setRedeemSuccess(true)
+            setPopupMessage("Transaction completed successfully!")
+          } else {
+            setRedeemSuccess(false)
+            setPopupMessage(data["exception"])
+          }
+          setPopupVisible(true)
         })
     }
 
@@ -49,6 +63,14 @@ const Redeem = () => {
       <Flex textAlign="center" fontSize="xl">
         <Spacer></Spacer>
         <Grid maxH="100%" maxW="60%" p={3}>
+          {isPopupVisible &&
+            <PopupAlert
+              isVisible={isPopupVisible}
+              setVisible={setPopupVisible}
+              isSuccessful={redeemSuccess}
+              alertMessage={popupMessage}
+            ></PopupAlert>}
+
           {readyToSign &&
             <PhantomSigner transactionBytes={transactionBytes} setSignedTransaction={setSignedTransaction}></PhantomSigner>
           }
@@ -59,6 +81,7 @@ const Redeem = () => {
                 amount_in_coins: ""
               }}
               onSubmit={(values, actions) => {
+                setPopupVisible(false)
                 setTimeout(() => {
                   fetch("/api/redeem", {
                     method: "POST",
@@ -69,8 +92,16 @@ const Redeem = () => {
                   })
                     .then((res) => res.json())
                     .then((data) => {
-                      setTransactionBytes(data.transaction_bytes);
-                      setReadyToSign(true);
+                      if(data.success) {
+                        setRedeemSuccess(true)
+                        setTransactionBytes(data.transaction_bytes);
+                        setPopupMessage("Transaction request created successfully, please sign the transaction now.")
+                        setReadyToSign(true);
+                      } else {
+                        setRedeemSuccess(false)
+                        setPopupMessage(data["exception"])
+                      }
+                      setPopupVisible(true)
                     });
 
                   actions.setSubmitting(false);
