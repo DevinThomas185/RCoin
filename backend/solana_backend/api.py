@@ -16,8 +16,6 @@ from spl.token.instructions import create_associated_token_account
 
 from spl.token.instructions import (
     create_associated_token_account,
-    transfer_checked,
-    TransferCheckedParams,
 )
 
 # Module dependencies
@@ -33,6 +31,7 @@ from solana_backend.common import (
 from solana_backend.exceptions import (
     BlockchainQueryFailedException,
     InvalidGetTransactionRespException,
+    InvalidUserInputException,
     TokenAccountAlreadyExists,
     TransactionCreationFailedException,
     TransactionTimeoutException,
@@ -94,7 +93,7 @@ def request_create_token_account(public_key: str) -> Response:
             # Token_owner is paying for the creation of the new Stablecoin account.
             # It is done to ensure that a user can create an account even if they
             # don't have any sol at the moment.
-            #payer=TOKEN_OWNER,
+            # payer=TOKEN_OWNER,
             payer=owner_key,
             # User is the new owner of the new Stablecoin account.
             owner=owner_key,
@@ -117,6 +116,11 @@ def issue_stablecoins(recipient_public_key: str, amount: float) -> Response:
         amount: number of stablecoins to be issues.
     """
     key = PublicKey(recipient_public_key)
+
+    if amount < 0:
+        return CreateTransactionFailure(
+            InvalidUserInputException("The amount to issue has to be positive.")
+        )
 
     try:
         transaction = construct_stablecoin_transfer(TOKEN_OWNER, amount, key)
@@ -163,7 +167,18 @@ def issue_stablecoins(recipient_public_key: str, amount: float) -> Response:
 ### Trade ###
 def new_stablecoin_transfer(sender: str, amount: float, recipient: str) -> Response:
     sender_key = PublicKey(sender)
-    recipient_key = PublicKey(recipient)
+
+    try:
+        recipient_key = PublicKey(recipient)
+    except ValueError as exception:
+        return CreateTransactionFailure(
+            InvalidUserInputException("Invalid receiver public key")
+        )
+
+    if amount < 0:
+        return CreateTransactionFailure(
+            InvalidUserInputException("The amount to send has to be positive.")
+        )
 
     try:
         transaction = construct_stablecoin_transfer(sender_key, amount, recipient_key)
@@ -177,6 +192,11 @@ def new_stablecoin_transfer(sender: str, amount: float, recipient: str) -> Respo
 ### Redeem ###
 def burn_stablecoins(public_key: str, amount: float) -> Response:
     key = PublicKey(public_key)
+
+    if amount < 0:
+        return CreateTransactionFailure(
+            InvalidUserInputException("The amount to redeem has to be positive.")
+        )
 
     try:
         transaction = construct_stablecoin_transfer(key, amount, TOKEN_OWNER)
