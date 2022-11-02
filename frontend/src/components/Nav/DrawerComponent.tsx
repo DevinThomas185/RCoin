@@ -41,6 +41,9 @@ function DrawerComponent({isOpen, setIsOpen}: {isOpen: boolean, setIsOpen: React
                             <Link to='/redeem'>
                                 <Button width='100%'>Redeem</Button>
                             </Link>
+                            <Link to='/transaction-history'>
+                                <Button width='100%'>Transaction History</Button>
+                            </Link>
                         </Stack>
                     </DrawerBody>
                 </DrawerContent>
