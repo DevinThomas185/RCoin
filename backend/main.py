@@ -141,19 +141,6 @@ async def transactionHistory(
     user = await database_api.get_user(email=transactionHistoryInformation.email, db=db)
     wallet_id = user.wallet_id
     return get_stablecoin_transactions(wallet_id).to_json()
-    # transactions = get_stablecoin_transactions(wallet_id).to_json()["transaction_history"]
-
-    # return {
-    #     "transactions": [
-    #         {
-    #             "source": transaction[0],
-    #             "target": transaction[1],
-    #             "amount": transaction[2]
-    #         }
-    #         for transaction in transactions
-    #     ]
-    # }
-
 
 # ISSUE
 @app.post("/api/issue")
