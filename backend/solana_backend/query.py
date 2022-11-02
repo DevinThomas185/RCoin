@@ -152,7 +152,13 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
                 post_token_balances[1].ui_token_amount.amount
             )
 
-        processed_transactions.append((signature, sender, recipient, amount))
+        # processed_transactions.append((signature, sender, recipient, amount))
+        processed_transactions.append({
+            "signature": signature,
+            "sender": sender,
+            "recipient": recipient,
+            "amount": amount
+        })
 
     return processed_transactions
 
