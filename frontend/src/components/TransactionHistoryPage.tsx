@@ -8,19 +8,19 @@ const TransactionHistoryPage = ({ email }: { email: string }) => {
   const initArr: any[] = []
   const [transactionHistory, setTransactionHistory] = React.useState<any[]>(initArr)
 
-  useEffect(() => {
-    fetch("/api/transaction_history", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ "email": email })
-    })
-      .then(res => res.json())
-      .then(data => {
-        setTransactionHistory(data["transaction_history"])
-      })
-  }, [])
+  // useEffect(() => {
+  //   fetch("/api/transaction_history", {
+  //     method: "POST",
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify({ "email": email })
+  //   })
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       setTransactionHistory(data["transaction_history"])
+  //     })
+  // }, [])
 
   return (
     <Box>
@@ -28,9 +28,9 @@ const TransactionHistoryPage = ({ email }: { email: string }) => {
       <Heading textAlign={"center"}>origin: {transactionHistory[0][0]}</Heading>
       <Heading textAlign={"center"}>target: {transactionHistory[0][1]}</Heading>
       <Heading textAlign={"center"}>amount: {transactionHistory[0][2]}</Heading>
-      <Heading textAlign={"center"}>origin: {transactionHistory[1][0]}</Heading>
+      {/* <Heading textAlign={"center"}>origin: {transactionHistory[1][0]}</Heading>
       <Heading textAlign={"center"}>target: {transactionHistory[1][1]}</Heading>
-      <Heading textAlign={"center"}>amount: {transactionHistory[1][2]}</Heading>
+      <Heading textAlign={"center"}>amount: {transactionHistory[1][2]}</Heading> */}
       {/* <Heading textAlign={"center"}>origin: {transactionHistory[2][0]}</Heading>
       <Heading textAlign={"center"}>target: {transactionHistory[2][1]}</Heading>
       <Heading textAlign={"center"}>amount: {transactionHistory[2][2]}</Heading>
