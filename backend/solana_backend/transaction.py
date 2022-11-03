@@ -54,20 +54,25 @@ def construct_stablecoin_transfer(
     assert source_account is not None
     assert dest_account is not None
 
-    transaction.add(
-        transfer_checked(
-            TransferCheckedParams(
-                program_id=TOKEN_PROGRAM_ID,
-                source=source_account,
-                mint=MINT_ACCOUNT,
-                dest=dest_account,
-                owner=sender,
-                amount=int(amount * (10**TOKEN_DECIMALS)),
-                decimals=TOKEN_DECIMALS,
-                signers=[],
+    try:
+        transaction.add(
+            transfer_checked(
+                TransferCheckedParams(
+                    program_id=TOKEN_PROGRAM_ID,
+                    source=source_account,
+                    mint=MINT_ACCOUNT,
+                    dest=dest_account,
+                    owner=sender,
+                    amount=int(amount * (10**TOKEN_DECIMALS)),
+                    decimals=TOKEN_DECIMALS,
+                    signers=[],
+                )
             )
         )
-    )
+    except Exception as exception:
+        print(exception)
+        raise TransactionCreationFailedException(exception)
+
 
     return transaction
 

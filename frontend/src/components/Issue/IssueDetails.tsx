@@ -9,16 +9,22 @@ import {
     ModalBody,
     ModalFooter,
     ModalCloseButton,
+    Flex,
+    Grid,
 } from "@chakra-ui/react";
 
 import { useRef, useState } from "react";
 import { PaystackButton } from 'react-paystack';
+import { PopupAlert } from "../Alerts/PopupAlert";
 
 
 function IssueDetails({ amount }: { amount: number }) {
     const finalRef = useRef(null)
     const [issueSuccess, setIssueSuccess] = useState(false)
     const [dataReturned, setDataReturned] = useState(false)
+    const [isPopupVisible, setPopupVisible] = useState(false)
+    const [popupMessage, setPopupMessage] = useState("")
+  //Add ability to view the successful transaction on the blockchain
     const [isOpen, setIsOpen] = useState(false)
     const service_charge_perc = 0.15
     const service_charge_val = Math.round(100 * 0.15 * amount) / 100  // Round to 2 sf
@@ -26,6 +32,18 @@ function IssueDetails({ amount }: { amount: number }) {
 
     return (
         <>
+          <Flex textAlign="center" alignItems="center" flexDirection={{base: 'column'}} fontSize="xl">
+          <Grid maxH="100%" maxW="100%" p={3}>
+            {isPopupVisible &&
+              <PopupAlert
+                isVisible={isPopupVisible}
+                setVisible={setPopupVisible}
+                isSuccessful={issueSuccess}
+                alertMessage={popupMessage}
+              ></PopupAlert>}
+          </Grid>
+          </Flex>
+
             <Box ref={finalRef} tabIndex={-1} aria-label='Focus moved to this box'>
                 Minimum transaction amount is 10 ZAR
             </Box>
@@ -66,11 +84,16 @@ function IssueDetails({ amount }: { amount: number }) {
                                     })
                                         .then((res) => res.json())
                                         .then((data) => {
-                                            if (data["status"] === "success") {
+                                            if (data.success) {
                                                 setIssueSuccess(true)
+                                                setPopupMessage("Tokens issued successfully!")
+                                            } else {
+                                                setIssueSuccess(false)
+                                                setPopupMessage(data["exception"])
+                                                setDataReturned(true)
                                             }
-                                            setDataReturned(true)
-                                        })
+                                              setPopupVisible(true)
+                                            })
                                     // actions.setSubmitting(false)
                                 }, 1000)
                                 setIsOpen(false)

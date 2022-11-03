@@ -77,7 +77,7 @@ async def signup(
         user.password = hash_password(user.password)
         # verify = paystack_api.verify_account_ZA(
         #     bank_code=user.sort_code,
-        #     account_number=user.bank_account, 
+        #     account_number=user.bank_account,
         #     account_name=user.first_name + " " + user.last_name,
         #     document_number=user.document_number
         # )
@@ -209,13 +209,13 @@ async def issue(
 
     # 1:1 issuance of Rands to Coins
     coins_to_issue = issue_transaction.amount_in_rands
-    response = issue_stablecoins(buyer.wallet_id, coins_to_issue)
+    resp = issue_stablecoins(buyer.wallet_id, coins_to_issue)
 
     await database_api.complete_issue_transaction(
         issue_transac.id, database_api.get_dummy_id(), db
     )
 
-    return response.to_json()
+    return resp.to_json()
 
 
 # TRADE
@@ -283,7 +283,7 @@ async def complete_redeem(
     reference = paystack_api.initiate_transfer(amount_resp.contents, redeemer.recipient_code, redeemer.wallet_id)
     if reference == -1:
         # TODO[devin]: WHAT TO DO WHEN PAYSTACK FAILS - SEND TO FRONTEND
-        return {"success": False} 
+        return {"success": False}
 
     await database_api.create_redeem_transaction(
         redeem=transaction,

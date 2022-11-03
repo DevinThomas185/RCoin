@@ -6,10 +6,14 @@ import { Transaction, Connection } from "@solana/web3.js";
 
 export const PhantomSigner = ({
     transactionBytes,
-    setSignedTransaction
+    setSignedTransaction,
+    setPopupMessage,
+    setPopupVisible
 }: {
     transactionBytes: number[];
     setSignedTransaction?: React.Dispatch<React.SetStateAction<Transaction | null>>;
+    setPopupMessage?: React.Dispatch<React.SetStateAction<string>>
+    setPopupVisible?: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
     const phantomProvider = usePhantom();
 
@@ -28,6 +32,9 @@ export const PhantomSigner = ({
                 const response = await solana.connect();
                 console.log("wallet account ", response.publicKey.toString());
                 setWalletKey(response.publicKey.toString());
+                if (setPopupVisible != null) {
+                  setPopupVisible(false)
+                }
             } catch (err) {
                 // { code: 4001, message: 'User rejected the request.' }
             }
@@ -59,7 +66,7 @@ export const PhantomSigner = ({
             };
 
             const transaction = Transaction.from(new Uint8Array(transactionBytes));
-           
+
             blockhash = (await connection.getLatestBlockhash("finalized"))
             .blockhash;
 
@@ -70,7 +77,7 @@ export const PhantomSigner = ({
                 const signedTransaction = await phantomProvider.signTransaction(
                     transaction
                 );
-                
+
                 setSignedTransaction(signedTransaction);
                 return;
             }
@@ -78,6 +85,11 @@ export const PhantomSigner = ({
             const signature = await phantomProvider.signAndSendTransaction(
                 transaction
             );
+
+            if (setPopupVisible != null && setPopupMessage != null) {
+              setPopupMessage("Transaction signed successfully")
+              setPopupVisible(true)
+            }
             console.log(signature);
         }
     };

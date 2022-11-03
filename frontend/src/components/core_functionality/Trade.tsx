@@ -12,26 +12,46 @@ import {
 } from '@chakra-ui/react'
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react';
+import { PopupAlert } from '../Alerts/PopupAlert';
 import { PhantomSigner } from '../phantom/Phantom';
 
 const Trade = () => {
 
   const [readyToSign, setReadyToSign] = useState(false)
   const [transactionBytes, setTransactionBytes] = useState([]);
+  const [tradeSuccess, setTradeSuccess] = useState(false)
+  const [isPopupVisible, setPopupVisible] = useState(false)
+  const [popupMessage, setPopupMessage] = useState("")
+  //Add ability to view the successful transaction on the blockchain
+  const [transactionSignature, setTransactionSignature] = useState("")
 
   return (
     <ChakraProvider theme={theme}>
-      <Flex textAlign="center" fontSize="xl">
+      <Flex textAlign="center" alignItems="center" flexDirection={{base: 'column'}} fontSize="xl">
+        <Grid maxH="100%" maxW="60%" p={3}>
+          {isPopupVisible &&
+            <PopupAlert
+              isVisible={isPopupVisible}
+              setVisible={setPopupVisible}
+              isSuccessful={tradeSuccess}
+              alertMessage={popupMessage}
+            ></PopupAlert>}
+        </Grid>
         <Spacer></Spacer>
         <Grid maxH="100%" maxW="60%" p={3}>
           {readyToSign &&
-            <PhantomSigner transactionBytes={transactionBytes}></PhantomSigner>
+            <PhantomSigner
+              transactionBytes={transactionBytes}
+              setPopupMessage={setPopupMessage}
+              setPopupVisible={setPopupVisible}
+            ></PhantomSigner>
           }
 
           {!readyToSign &&
             <Formik
               initialValues={{recipient_wallet: "", coins_to_transfer: "" }}
               onSubmit={(values, actions) => {
+                setPopupVisible(false)
                 setTimeout(() => {
                   // alert(JSON.stringify(values, null, 2))
                   fetch('/api/trade', {
@@ -43,9 +63,16 @@ const Trade = () => {
                   })
                     .then((res) => res.json())
                     .then((data) => {
-                      setTransactionBytes(data.transaction_bytes)
-                      setReadyToSign(true)
-
+                      if(data.success) {
+                        setTransactionBytes(data.transaction_bytes)
+                        setReadyToSign(true)
+                        setTradeSuccess(true)
+                        setPopupMessage("Transaction request created successfully, please sign it now.")
+                      } else {
+                        setTradeSuccess(false)
+                        setPopupMessage(data.exception)
+                      }
+                      setPopupVisible(true)
                     })
 
                   actions.setSubmitting(false)

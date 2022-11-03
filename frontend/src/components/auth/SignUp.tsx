@@ -18,17 +18,30 @@ import { Link } from 'react-router-dom'
 import { Field, Form, Formik } from 'formik'
 import { useState } from 'react'
 import { PhantomSigner } from '../phantom/Phantom'
+import { PopupAlert } from '../Alerts/PopupAlert'
 const SignUp = () => {
 
   const [readyToSign, setReadyToSign] = useState(false)
   const [transactionBytes, setTransactionBytes] = useState([])
   const [showPassword, setShowPassword] = useState(false)
+  const [issueSuccess, setIssueSuccess] = useState(false)
+  const [isPopupVisible, setPopupVisible] = useState(false)
+  const [popupMessage, setPopupMessage] = useState("")
+  //Add ability to view the successful transaction on the blockchain
+  const [transactionSignature, setTransactionSignature] = useState("")
 
   return (
     <ChakraProvider theme={theme}>
       <Flex textAlign="center" fontSize="xl">
         <Spacer></Spacer>
         <Grid maxH="100%" maxW="60%" p={3}>
+          {isPopupVisible &&
+            <PopupAlert
+              isVisible={isPopupVisible}
+              setVisible={setPopupVisible}
+              isSuccessful={issueSuccess}
+              alertMessage={popupMessage}
+            ></PopupAlert>}
           {readyToSign &&
             <PhantomSigner transactionBytes={transactionBytes}></PhantomSigner>
           }
@@ -57,10 +70,16 @@ const SignUp = () => {
                   })
                     .then((res) => res.json())
                     .then((data) => {
-                      console.log(data)
-                      setTransactionBytes(data.transaction_bytes)
-                      setReadyToSign(true)
-
+                      if (data["success"]) {
+                        setIssueSuccess(true)
+                        setTransactionBytes(data.transaction_bytes)
+                        setPopupMessage("Account created successfully! Please connect the wallet now.")
+                        setReadyToSign(true)
+                      } else {
+                        setIssueSuccess(false)
+                        setPopupMessage(data["exception"])
+                      }
+                      setPopupVisible(true)
                     })
                   actions.setSubmitting(false)
                 }, 1000)
