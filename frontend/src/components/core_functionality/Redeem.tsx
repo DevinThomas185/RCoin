@@ -60,8 +60,7 @@ const Redeem = () => {
 
   return (
     <ChakraProvider theme={theme}>
-      <Flex textAlign="center" fontSize="xl">
-        <Spacer></Spacer>
+      <Flex textAlign="center" alignItems="center" flexDirection={{base: 'column'}} fontSize="xl">
         <Grid maxH="100%" maxW="60%" p={3}>
           {isPopupVisible &&
             <PopupAlert
@@ -70,9 +69,17 @@ const Redeem = () => {
               isSuccessful={redeemSuccess}
               alertMessage={popupMessage}
             ></PopupAlert>}
+        </Grid>
+        <Spacer></Spacer>
+        <Grid maxH="100%" maxW="60%" p={3}>
 
           {readyToSign &&
-            <PhantomSigner transactionBytes={transactionBytes} setSignedTransaction={setSignedTransaction}></PhantomSigner>
+            <PhantomSigner
+              transactionBytes={transactionBytes}
+              setSignedTransaction={setSignedTransaction}
+              setPopupVisible={setPopupVisible}
+              setPopupMessage={setPopupMessage}
+            ></PhantomSigner>
           }
 
           {!readyToSign &&
