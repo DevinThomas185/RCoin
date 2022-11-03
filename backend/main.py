@@ -86,7 +86,7 @@ async def signup(
             name=user.first_name + " " + user.last_name,
             account_number=user.bank_account,
             bank_code=user.sort_code,
-            currency="ZAR"
+            currency="ZAR",
         )
         user.recipient_code = recipient_code
         await database_api.create_user(user=user, db=db)
@@ -211,9 +211,7 @@ async def issue(
     coins_to_issue = issue_transaction.amount_in_rands
     resp = issue_stablecoins(buyer.wallet_id, coins_to_issue)
 
-    await database_api.complete_issue_transaction(
-        issue_transac.id, database_api.get_dummy_id(), db
-    )
+    await database_api.complete_issue_transaction(issue_transac.id, resp.contents, db)
 
     return resp.to_json()
 
@@ -254,7 +252,6 @@ async def redeem(
     ).to_json()
 
 
-
 # [sk4520]: Do we want to wait for the transaction to appear on the blockchain
 # and check its health before returning?
 @app.post("/api/complete-redeem")
@@ -280,7 +277,9 @@ async def complete_redeem(
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()
 
-    reference = paystack_api.initiate_transfer(amount_resp.contents, redeemer.recipient_code, redeemer.wallet_id)
+    reference = paystack_api.initiate_transfer(
+        amount_resp.contents, redeemer.recipient_code, redeemer.wallet_id
+    )
     if reference == -1:
         # TODO[devin]: WHAT TO DO WHEN PAYSTACK FAILS - SEND TO FRONTEND
         return {"success": False}
@@ -299,13 +298,16 @@ async def complete_redeem(
 
 
 # GET TOKEN BALANCE
-@app.post("/api/get_token_balance")
+@app.get("/api/get_token_balance")
+@login_required
 async def token_balance(
-    token_balance: TokenBalance,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
     # Get the user from the database #TODO[devin]: Change to session data
-    user = await database_api.get_user(email=token_balance.email, db=db)
+    email = request.session["logged_in_email"]
+    user = await database_api.get_user(email=email, db=db)
 
     token_balance_resp = get_user_token_balance(user.wallet_id)
     if isinstance(token_balance_resp, Failure):
