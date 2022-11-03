@@ -25,26 +25,24 @@ const TransactionHistoryPage = () => {
     <Box>
       <Heading textAlign={"center"}>Your Transaction History</Heading>
 
-      <TableContainer overflowY="auto" maxHeight="400px" margin={10}>
+      <TableContainer overflowY="auto" overflowX="auto" maxHeight="400px" margin={10}>
         <Table variant='striped' colorScheme='pink'>
           <TableCaption>Click on each transaction to view on the blockchain</TableCaption>
           <Thead>
             <Tr>
-              <Th>Signature</Th>
-              <Th>Origin</Th>
+              <Th>Your Wallet</Th>
               <Th>Target</Th>
               <Th isNumeric>Amount</Th>
-              {/* <Th>Transaction Date</Th> */}
+              <Th>Signature</Th>
             </Tr>
           </Thead>
           <Tbody>
             {transactionHistory.map((transaction) => (
               < Tr onClick={() => { console.log(transactionHistory.at(0)) }}>
-                <Td>{transaction.signature}</Td>
                 <Td>{transaction.sender}</Td>
                 <Td>{transaction.recipient}</Td>
-                <Td isNumeric >{transaction.amount}</Td>
-                {/* <Td>{transaction.date}</Td> */}
+                <Td isNumeric >{transaction.amount / (Math.pow(10, 9))}</Td>
+                <Td>{transaction.signature}</Td>
               </Tr>
             ))}
           </Tbody>
