@@ -27,8 +27,7 @@ const Trade = () => {
 
   return (
     <ChakraProvider theme={theme}>
-      <Flex textAlign="center" fontSize="xl">
-        <Spacer></Spacer>
+      <Flex textAlign="center" alignItems="center" flexDirection={{base: 'column'}} fontSize="xl">
         <Grid maxH="100%" maxW="60%" p={3}>
           {isPopupVisible &&
             <PopupAlert
@@ -37,8 +36,15 @@ const Trade = () => {
               isSuccessful={tradeSuccess}
               alertMessage={popupMessage}
             ></PopupAlert>}
+        </Grid>
+        <Spacer></Spacer>
+        <Grid maxH="100%" maxW="60%" p={3}>
           {readyToSign &&
-            <PhantomSigner transactionBytes={transactionBytes}></PhantomSigner>
+            <PhantomSigner
+              transactionBytes={transactionBytes}
+              setPopupMessage={setPopupMessage}
+              setPopupVisible={setPopupVisible}
+            ></PhantomSigner>
           }
 
           {!readyToSign &&
