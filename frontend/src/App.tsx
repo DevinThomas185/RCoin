@@ -10,7 +10,7 @@ import {
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import Login from "./components/auth/Login";
 import SignUp from "./components/auth/SignUp";
-import Issue from "./components/core_functionality/Issue";
+import Issue from "./components/Issue/Issue";
 import Redeem from "./components/core_functionality/Redeem";
 import Trade from "./components/core_functionality/Trade";
 import Home from "./components/Home";
