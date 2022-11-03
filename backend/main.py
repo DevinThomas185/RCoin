@@ -75,28 +75,28 @@ async def signup(
     response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    try:
-        user.password = hash_password(user.password)
-        # verify = paystack_api.verify_account_ZA(
-        #     bank_code=user.sort_code,
-        #     account_number=user.bank_account, 
-        #     account_name=user.first_name + " " + user.last_name,
-        #     document_number=user.document_number
-        # )
-        recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
-            bank_type="basa",
-            name=user.first_name + " " + user.last_name,
-            account_number=user.bank_account,
-            bank_code=user.sort_code,
-            currency="ZAR"
-        )
-        user.recipient_code = recipient_code
-        await database_api.create_user(user=user, db=db)
-        response.status_code = 200
-        return request_create_token_account(user.wallet_id).to_json()
-    except:
-        response.status_code = 500
-        return {}  # TODO[devin]: Catch the explicit exception
+    # try:
+    user.password = hash_password(user.password)
+    # verify = paystack_api.verify_account_ZA(
+    #     bank_code=user.sort_code,
+    #     account_number=user.bank_account, 
+    #     account_name=user.first_name + " " + user.last_name,
+    #     document_number=user.document_number
+    # )
+    recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
+        bank_type="basa",
+        name=user.first_name + " " + user.last_name,
+        account_number=user.bank_account,
+        bank_code=user.sort_code,
+        currency="ZAR"
+    )
+    user.recipient_code = recipient_code
+    await database_api.create_user(user=user, db=db)
+    response.status_code = 200
+    return request_create_token_account(user.wallet_id).to_json()
+    # except:
+    #     response.status_code = 500
+    #     return {}  # TODO[devin]: Catch the explicit exception
 
 
 # LOGIN
@@ -190,12 +190,14 @@ async def transactions() -> dict[str, Any]:
 
 
 # TRANSACTION HISTORY
-@app.post("/api/transaction_history")
+@app.get("/api/transaction_history")
+@login_required
 async def transactionHistory(
-    transactionHistoryInformation: TransactionHistoryInformation,
+    request: Request,
+    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
-    user = await database_api.get_user(email=transactionHistoryInformation.email, db=db)
+    user = await database_api.get_user(email=request.session["logged_in_email"], db=db)
     wallet_id = user.wallet_id
     return get_stablecoin_transactions(wallet_id).to_json()
 

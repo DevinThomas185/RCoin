@@ -1,5 +1,5 @@
-import { Flex, Spacer, ChakraProvider, theme, Text} from "@chakra-ui/react";
-import { useState, useEffect} from "react";
+import { Flex, Spacer, ChakraProvider, theme, Text } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
 import {
     BrowserRouter as Router,
     Routes,
@@ -42,19 +42,19 @@ const App = () => {
     // Checks whether we are still authenticated
     useEffect(() => {
         const requestOptions = {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
         }
         fetch("/api/authenticated", requestOptions)
-          .then(res => res.json())
-          .then(data => {
-            if (data["authenticated"]) {
-              setIsAuth(true);
-            }
-            setIsLoadingAuth(false);
-          })
-      }, [])
-        
+            .then(res => res.json())
+            .then(data => {
+                if (data["authenticated"]) {
+                    setIsAuth(true);
+                }
+                setIsLoadingAuth(false);
+            })
+    }, [])
+
 
     return (
         <ChakraProvider theme={theme}>
@@ -79,7 +79,7 @@ const App = () => {
                     <Route path="/login" element={<Login setIsAuth={setIsAuth} setEmail={setEmail} />}></Route>
                     <Route path="/sign-up" element={<SignUp />}></Route>
                     <Route path='/audit' element={<Audit email={email} isAuth={isAuth} />}> </Route>
-                    <Route path='/transaction-history' element={RequireAuth(<TransactionHistoryPage email={email} />, isAuth, isLoadingAuth)}> </Route>
+                    <Route path='/transaction-history' element={RequireAuth(<TransactionHistoryPage />, isAuth, isLoadingAuth)}> </Route>
                 </Routes>
             </Router>
         </ChakraProvider>

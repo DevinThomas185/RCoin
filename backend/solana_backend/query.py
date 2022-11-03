@@ -80,8 +80,9 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
     resp = get_raw_transactions_for_account(public_key, limit)
 
     transactions: list[GetTransactionResp] = [
-        (status.signature, get_transaction_details(status.signature)) for status in resp.value
+        (str(status.signature), get_transaction_details(status.signature)) for status in resp.value
     ]
+    print(transactions)
 
     confirmed_transactions: list[EncodedTransactionWithStatusMeta] = [
         (signature, transaction.value.transaction)

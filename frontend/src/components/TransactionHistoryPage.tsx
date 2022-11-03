@@ -3,18 +3,17 @@ import Welcome from './Welcome';
 import { useState, useEffect } from "react";
 import React from 'react';
 
-const TransactionHistoryPage = ({ email }: { email: string }) => {
+const TransactionHistoryPage = () => {
 
   const initArr: any[] = []
   const [transactionHistory, setTransactionHistory] = React.useState<any[]>(initArr)
 
   useEffect(() => {
     fetch("/api/transaction_history", {
-      method: "POST",
+      method: "GET",
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ "email": email })
     })
       .then(res => res.json())
       .then(data => {
@@ -51,11 +50,11 @@ const TransactionHistoryPage = ({ email }: { email: string }) => {
           </Tbody>
           <Tfoot>
             <Tr>
-              <Th>Type</Th>
-              <Th>Bank Transaction ID</Th>
-              <Th>Blockchain Transaction ID</Th>
+              <Th>Signature</Th>
+              <Th>Origin</Th>
+              <Th>Target</Th>
               <Th isNumeric>Amount</Th>
-              <Th>Transaction Date</Th>
+              {/* <Th>Transaction Date</Th> */}
             </Tr>
           </Tfoot>
         </Table>
