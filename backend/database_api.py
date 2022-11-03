@@ -15,7 +15,6 @@ def get_dummy_id() -> str:
 
 
 DB_URL = "postgresql://stablecoin_database:stablecoin@db:5432/stablecoin_database"
-DB_URL = "postgresql://adam:password@localhost:5432/stablecoin_database"
 
 engine = sql.create_engine(DB_URL)
 
