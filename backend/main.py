@@ -23,7 +23,6 @@ from fastapi import Depends, FastAPI, Response, Request
 from data_models import (
     CompleteRedeemTransaction,
     LoginInformation,
-    TransactionHistoryInformation,
     UserInformation,
     IssueTransaction,
     TradeTransaction,
