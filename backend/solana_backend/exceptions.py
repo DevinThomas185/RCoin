@@ -45,7 +45,14 @@ class BlockchainQueryFailedException(Exception):
     """Raised when a query sent to the blockchain fails."""
 
     def __str__(self):
-        return """Query sent to the blockchain was unsuccessful."""
+        return "Query sent to the blockchain was unsuccessful."
 
+class InvalidUserInputException(Exception):
+    """Raised when we receive invalid/malformed input from the frontend."""
+    def __init__(self, message: str):
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 

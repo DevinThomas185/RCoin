@@ -1,34 +1,51 @@
-import { Flex, Heading, Skeleton, Stat, StatLabel, StatNumber, Center, Box, TableContainer, TableCaption, Table, Tr, Thead, Tbody, Tfoot, Td, Th, ChakraProvider } from '@chakra-ui/react';
-import Welcome from './Welcome';
+import {
+  Flex,
+  Heading,
+  Skeleton,
+  Stat,
+  StatLabel,
+  StatNumber,
+  Center,
+  Box,
+  TableContainer,
+  TableCaption,
+  Table,
+  Tr,
+  Thead,
+  Tbody,
+  Tfoot,
+  Td,
+  Th,
+  ChakraProvider,
+} from "@chakra-ui/react";
+import Welcome from "./Welcome";
 import { useState, useEffect } from "react";
-import React from 'react';
+import React from "react";
 
-const AuditPage = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
-
-  const initArr: any[] = []
-  const [transactions, setTransactions] = React.useState<any[]>(initArr)
+const AuditPage = ({ isAuth }: { isAuth: boolean }) => {
+  const initArr: any[] = [];
+  const [transactions, setTransactions] = React.useState<any[]>(initArr);
 
   useEffect(() => {
     fetch("/api/audit/transactions", { method: "GET" })
-      .then(res => res.json())
-      .then(data => {
-        setTransactions(data["transactions"])
-        console.log(data["transactions"])
-      })
-
-  }, [])
-
+      .then((res) => res.json())
+      .then((data) => {
+        setTransactions(data["transactions"]);
+        console.log(data["transactions"]);
+      });
+  }, []);
 
   return (
     <Box>
       <Heading textAlign={"center"}>Real Time Audit </Heading>
 
-      <Welcome email={email} isAuth={isAuth} />
-
+      <Welcome isAuth={isAuth} />
 
       <TableContainer overflowY="auto" maxHeight="400px" margin={10}>
-        <Table variant='striped' colorScheme='pink'>
-          <TableCaption>Click on each transaction to view on the blockchain</TableCaption>
+        <Table variant="striped" colorScheme="pink">
+          <TableCaption>
+            Click on each transaction to view on the blockchain
+          </TableCaption>
           <Thead>
             <Tr>
               <Th>Type</Th>
@@ -40,11 +57,16 @@ const AuditPage = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
           </Thead>
           <Tbody>
             {transactions.map((transaction) => (
-              < Tr onClick={() => { console.log(transactions.at(0)) }} key={transaction.bank_transaction_id}>
+              <Tr
+                onClick={() => {
+                  console.log(transactions.at(0));
+                }}
+                key={transaction.bank_transaction_id}
+              >
                 <Td>{transaction.type}</Td>
                 <Td>{transaction.bank_transaction_id}</Td>
                 <Td>{transaction.blockchain_transaction_id}</Td>
-                <Td isNumeric >{transaction.amount}</Td>
+                <Td isNumeric>{transaction.amount}</Td>
                 <Td>{transaction.date}</Td>
               </Tr>
             ))}
@@ -60,17 +82,8 @@ const AuditPage = ({ email, isAuth }: { email: string, isAuth: boolean }) => {
           </Tfoot>
         </Table>
       </TableContainer>
-
-
-
-
-
-    </Box >
-
-
-  )
-
-
-}
+    </Box>
+  );
+};
 
 export default AuditPage;

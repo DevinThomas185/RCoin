@@ -9,56 +9,125 @@ import {
   Spacer,
   FormErrorMessage,
   Button,
+  Box,
+  Spinner,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
 import { useState, useEffect } from "react";
 import { PhantomSigner } from "../phantom/Phantom";
 import { Transaction } from "@solana/web3.js";
+import { Success } from "../Success";
+import { PopupAlert } from "../Alerts/PopupAlert";
 
+enum RedeemState {
+  Idle = "Idle",
+  Pending = "Pending",
+  Successful = "Successful",
+  Failure = "Failure",
+}
 
 const Redeem = () => {
-
-  const [readyToSign, setReadyToSign] = useState(false)
+  const [readyToSign, setReadyToSign] = useState(false);
   const [transactionBytes, setTransactionBytes] = useState([]);
-  const [signedTransaction, setSignedTransaction] = useState<Transaction | null>(null);
+  const [redeemState, setRedeemState] = useState(RedeemState.Idle);
+
+  const [signedTransaction, setSignedTransaction] =
+    useState<Transaction | null>(null);
+
+  const [redeemSuccess, setRedeemSuccess] = useState(false);
+  const [isPopupVisible, setPopupVisible] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  //Add ability to view the successful transaction on the blockchain
+  const [transactionSignature, setTransactionSignature] = useState("");
 
   useEffect(() => {
     if (signedTransaction) {
-      fetch('/api/complete-redeem', {
+      setPopupVisible(false);
+      setRedeemState(RedeemState.Pending);
+      fetch("/api/complete-redeem", {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(
-          {
-            "transaction_bytes": Array.from(signedTransaction.serialize()),
-          }
-        )
+        body: JSON.stringify({
+          transaction_bytes: Array.from(signedTransaction.serialize()),
+        }),
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
-        })
+          if (data.success) {
+            setRedeemSuccess(true);
+            setRedeemState(RedeemState.Successful);
+            setPopupMessage("Transaction completed successfully!");
+          } else {
+            setRedeemSuccess(false);
+            setPopupMessage(data["exception"]);
+          }
+          setPopupVisible(true);
+        });
     }
-
   }, [signedTransaction]);
-
 
   return (
     <ChakraProvider theme={theme}>
-      <Flex textAlign="center" fontSize="xl">
+      <Flex
+        textAlign="center"
+        alignItems="center"
+        flexDirection={{ base: "column" }}
+        fontSize="xl"
+      >
+        <Grid maxH="100%" maxW="60%" p={3}>
+          {isPopupVisible && (
+            <PopupAlert
+              isVisible={isPopupVisible}
+              setVisible={setPopupVisible}
+              isSuccessful={redeemSuccess}
+              alertMessage={popupMessage}
+            ></PopupAlert>
+          )}
+        </Grid>
         <Spacer></Spacer>
         <Grid maxH="100%" maxW="60%" p={3}>
-          {readyToSign &&
-            <PhantomSigner transactionBytes={transactionBytes} setSignedTransaction={setSignedTransaction}></PhantomSigner>
-          }
+          {readyToSign && (
+            <>
+              {redeemState === RedeemState.Pending && (
+                <Spinner
+                  thickness="4px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color="blue.500"
+                  size="xl"
+                />
+              )}
+              {redeemState === RedeemState.Successful && (
+                <Success timeout={3000} redirect={"/"} />
+              )}
+              {redeemState === RedeemState.Idle && (
+                <PhantomSigner
+                  transactionBytes={transactionBytes}
+                  setSignedTransaction={setSignedTransaction}
+                  redirect="/"
+                ></PhantomSigner>
+              )}
+            </>
+          )}
 
-          {!readyToSign &&
+          {/* {readyToSign &&
+            <PhantomSigner
+              transactionBytes={transactionBytes}
+              setSignedTransaction={setSignedTransaction}
+              setPopupVisible={setPopupVisible}
+              setPopupMessage={setPopupMessage}
+            ></PhantomSigner>
+          } */}
+
+          {!readyToSign && (
             <Formik
               initialValues={{
-                amount_in_coins: ""
+                amount_in_coins: "",
               }}
               onSubmit={(values, actions) => {
+                setPopupVisible(false);
                 setTimeout(() => {
                   fetch("/api/redeem", {
                     method: "POST",
@@ -69,8 +138,18 @@ const Redeem = () => {
                   })
                     .then((res) => res.json())
                     .then((data) => {
-                      setTransactionBytes(data.transaction_bytes);
-                      setReadyToSign(true);
+                      if (data.success) {
+                        setRedeemSuccess(true);
+                        setTransactionBytes(data.transaction_bytes);
+                        setPopupMessage(
+                          "Transaction request created successfully, please sign the transaction now."
+                        );
+                        setReadyToSign(true);
+                      } else {
+                        setRedeemSuccess(false);
+                        setPopupMessage(data["exception"]);
+                      }
+                      setPopupVisible(true);
                     });
 
                   actions.setSubmitting(false);
@@ -100,7 +179,7 @@ const Redeem = () => {
                 </Form>
               )}
             </Formik>
-          }
+          )}
         </Grid>
         <Spacer></Spacer>
       </Flex>
