@@ -24,25 +24,25 @@ function IssueDetails({ amount }: { amount: number }) {
     const [dataReturned, setDataReturned] = useState(false)
     const [isPopupVisible, setPopupVisible] = useState(false)
     const [popupMessage, setPopupMessage] = useState("")
-  //Add ability to view the successful transaction on the blockchain
+    //Add ability to view the successful transaction on the blockchain
     const [isOpen, setIsOpen] = useState(false)
     const service_charge_perc = 0.15
-    const service_charge_val = Math.round(100 * 0.15 * amount) / 100  // Round to 2 sf
+    const service_charge_val = Math.round(100 * service_charge_perc * amount) / 100  // Round to 2 sf
     const to_charge = service_charge_val + amount
 
     return (
         <>
-          <Flex textAlign="center" alignItems="center" flexDirection={{base: 'column'}} fontSize="xl">
-          <Grid maxH="100%" maxW="100%" p={3}>
-            {isPopupVisible &&
-              <PopupAlert
-                isVisible={isPopupVisible}
-                setVisible={setPopupVisible}
-                isSuccessful={issueSuccess}
-                alertMessage={popupMessage}
-              ></PopupAlert>}
-          </Grid>
-          </Flex>
+            <Flex textAlign="center" alignItems="center" flexDirection={{ base: 'column' }} fontSize="xl">
+                <Grid maxH="100%" maxW="100%" p={3}>
+                    {isPopupVisible &&
+                        <PopupAlert
+                            isVisible={isPopupVisible}
+                            setVisible={setPopupVisible}
+                            isSuccessful={issueSuccess}
+                            alertMessage={popupMessage}
+                        ></PopupAlert>}
+                </Grid>
+            </Flex>
 
             <Box ref={finalRef} tabIndex={-1} aria-label='Focus moved to this box'>
                 Minimum transaction amount is 10 ZAR
@@ -54,7 +54,7 @@ function IssueDetails({ amount }: { amount: number }) {
             <Modal finalFocusRef={finalRef} isOpen={isOpen} size={"lg"} onClose={() => setIsOpen(false)}>
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Modal Title</ModalHeader>
+                    <ModalHeader>Payment Summary</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <>
@@ -92,8 +92,8 @@ function IssueDetails({ amount }: { amount: number }) {
                                                 setPopupMessage(data["exception"])
                                                 setDataReturned(true)
                                             }
-                                              setPopupVisible(true)
-                                            })
+                                            setPopupVisible(true)
+                                        })
                                     // actions.setSubmitting(false)
                                 }, 1000)
                                 setIsOpen(false)
