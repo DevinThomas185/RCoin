@@ -4,6 +4,7 @@ import bcrypt
 from datetime import datetime
 
 from solana_backend.api import (
+    get_stablecoin_transactions,
     new_stablecoin_transfer,
     request_create_token_account,
     issue_stablecoins,
@@ -186,6 +187,18 @@ async def transactions() -> dict[str, Any]:
         "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2)),
     }
 
+
+# TRANSACTION HISTORY
+@app.get("/api/transaction_history")
+@login_required
+async def transactionHistory(
+    request: Request,
+    response: Response,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> dict:
+    user = await database_api.get_user(email=request.session["logged_in_email"], db=db)
+    wallet_id = user.wallet_id
+    return get_stablecoin_transactions(wallet_id).to_json()
 
 # ISSUE
 @app.post("/api/issue")

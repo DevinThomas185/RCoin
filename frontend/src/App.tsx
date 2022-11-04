@@ -1,4 +1,4 @@
-import { ChakraProvider, theme } from "@chakra-ui/react";
+import { Flex, Spacer, ChakraProvider, theme, Text } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -17,6 +17,7 @@ import Home from "./components/Home";
 import Audit from "./components/AuditPage";
 import "./main.css";
 import NavBar from "./components/Nav/NavBar";
+import TransactionHistoryPage from "./components/TransactionHistoryPage";
 
 const RequireAuth = (
   child: JSX.Element,
@@ -84,6 +85,7 @@ const App = () => {
           <Route path="/audit" element={<Audit isAuth={isAuth} />}>
             {" "}
           </Route>
+          <Route path='/transaction-history' element={RequireAuth(<TransactionHistoryPage />, isAuth, isLoadingAuth)}> </Route>
         </Routes>
       </Router>
     </ChakraProvider>

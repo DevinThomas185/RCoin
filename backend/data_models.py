@@ -24,7 +24,6 @@ class LoginInformation(BaseModel):
     class Config:
         orm_mode = True
 
-
 class IssueTransaction(BaseModel):
     # email: str
     # wallet: str
