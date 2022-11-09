@@ -140,6 +140,11 @@ async def create_user(
     return data_models.UserInformation.from_orm(user)
 
 
+async def get_user_by_id(id: str, db: "Session") -> User:
+    user = db.query(User).filter(User.id == id).first()
+    return user
+
+
 async def get_user(
     email: str,
     db: "Session",
