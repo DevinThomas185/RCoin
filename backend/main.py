@@ -2,6 +2,14 @@ import functools
 from typing import Any
 import bcrypt
 from datetime import datetime
+import hmac
+import hashlib
+import os
+import json
+from jose import JWTError, jwt
+
+# import datetime
+from datetime import timezone, datetime, timedelta
 
 from solana_backend.api import (
     get_stablecoin_transactions,
@@ -19,10 +27,12 @@ from solana_backend.api import (
 from solana_backend.response import Success, Failure
 import sqlalchemy.orm as orm
 from starlette.middleware.sessions import SessionMiddleware
-from fastapi import Depends, FastAPI, Response, Request
+from fastapi import Depends, FastAPI, Response, Request, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from data_models import (
     CompleteRedeemTransaction,
     LoginInformation,
+    TokenResponse,
     UserInformation,
     IssueTransaction,
     TradeTransaction,
@@ -30,8 +40,11 @@ from data_models import (
     TokenBalance,
 )
 import database_api
+from database_api import User
 import paystack_api
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
+JWT_SECRET = "secret"
 
 app = FastAPI()
 
@@ -48,24 +61,53 @@ def verify_password(password: str, hashed_password: bytes) -> bool:
     return bcrypt.checkpw(password.encode("utf8"), hashed_password)
 
 
-def login_required(func):
-    """Decorator for api endpoints to require login.
-    Returns 401 if user is not logged in.
-    Requires request: Request and response: Response in the decorated function.
-    """
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        user_id: str = payload.get("context", {}).get("user_id")
+        if user_id is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    # TODO[Karim] this get_user_by_id should return None if no user
+    user = await database_api.get_user_by_id(id=user_id, db=db)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+def from_paystack(func):
+    """Decorator for ensuring that a webhook comes from paystack"""
 
     @functools.wraps(func)
     async def secure_function(*args, **kwargs):
-        if "logged_in_email" not in kwargs["request"].session:
-            kwargs["response"].status_code = 401
+        data = await kwargs["request"].json()
 
+        hash = hmac.new(
+            os.getenv("PAYSTACK_SECRET_KEY").encode(),
+            msg=json.dumps(data, separators=(",", ":")).encode(),
+            digestmod=hashlib.sha512,
+        ).hexdigest()
+
+        if hash != kwargs["request"].headers["x-paystack-signature"]:
+            kwargs["response"].status_code = 401
             return {"error": "unauthorised"}
+
+        print("from paystack")
         return await func(*args, **kwargs)
 
     return secure_function
 
-
-# TODO[Devin]: Add return types for these functions
 
 # SIGNUP
 @app.post("/api/signup")
@@ -99,23 +141,40 @@ async def signup(
 
 
 # LOGIN
-@app.post("/api/login")
+
+
+class JwtToken:
+    iss = "imperial-server"
+
+    def __init__(self, user_id: str, email: str, name: str):
+        current_time = datetime.now(tz=timezone.utc)
+        self.iat = current_time
+        self.exp = current_time + timedelta(days=31)
+        self.jti = ""  # to uniquely identify, empty for now
+        self.context = {"user_id": user_id, "email": email, "name": name}
+
+    def get_jwt(self):
+        return jwt.encode(self.__dict__, JWT_SECRET, algorithm="HS256")
+
+
+@app.post("/api/login", response_model=TokenResponse)
 async def login(
     login: LoginInformation,
-    request: Request,
-    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
-    try:
-        match = await database_api.get_user(email=login.email, db=db)
-        if match != None and verify_password(login.password, match.password):
-            request.session["logged_in_email"] = match.email
-            response.status_code = 200
-        else:
-            response.status_code = 401
 
-    except:  # TODO[devin]: Catch explicit exception
-        response.status_code = 500
+    match = await database_api.get_user(email=login.email, db=db)
+    if not match or not verify_password(login.password, match.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Build the jwt
+    token = JwtToken(match.id, match.email, match.first_name)
+    jwt_token = token.get_jwt()
+    return {"access_token": jwt_token, "token_type": "bearer"}
 
 
 # LOGOUT
@@ -190,31 +249,23 @@ async def transactions() -> dict[str, Any]:
 
 # TRANSACTION HISTORY
 @app.get("/api/transaction_history")
-@login_required
 async def transactionHistory(
-    request: Request,
-    response: Response,
+    user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
-    user = await database_api.get_user(email=request.session["logged_in_email"], db=db)
     wallet_id = user.wallet_id
     return get_stablecoin_transactions(wallet_id).to_json()
 
+
 # ISSUE
 @app.post("/api/issue")
-@login_required
 async def issue(
     issue_transaction: IssueTransaction,
-    request: Request,
-    response: Response,
+    user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    # Get the user from the database #TODO[devin]: Change to session data
-    email = request.session["logged_in_email"]
-    buyer = await database_api.get_user(email=email, db=db)
-
     issue_transac = await database_api.create_issue_transaction(
-        issue_transaction, email, database_api.get_dummy_id(), datetime.now(), db
+        issue_transaction, user.email, database_api.get_dummy_id(), datetime.now(), db
     )
 
     # Below should be done in a background job once we verify the bank transaction
@@ -222,7 +273,7 @@ async def issue(
 
     # 1:1 issuance of Rands to Coins
     coins_to_issue = issue_transaction.amount_in_rands
-    resp = issue_stablecoins(buyer.wallet_id, coins_to_issue)
+    resp = issue_stablecoins(user.wallet_id, coins_to_issue)
 
     await database_api.complete_issue_transaction(issue_transac.id, resp.contents, db)
 
@@ -231,15 +282,12 @@ async def issue(
 
 # TRADE
 @app.post("/api/trade")
-@login_required
 async def trade(
     trade_transaction: TradeTransaction,
-    request: Request,
-    response: Response,
+    user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    sender_email = request.session["logged_in_email"]
-    sender = await database_api.get_user(email=sender_email, db=db)
+    sender = await database_api.get_user(email=user.email, db=db)
     # recipient = await database_api.get_user(email=trade_transaction.recipient_email, db=db)
     return new_stablecoin_transfer(
         sender.wallet_id,
@@ -250,35 +298,28 @@ async def trade(
 
 # REDEEM
 @app.post("/api/redeem")
-@login_required
 async def redeem(
     redeem_transaction: RedeemTransaction,
-    request: Request,
-    response: Response,
+    user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    # Get the user from the database #TODO[devin]: Change to session data
-    email = request.session["logged_in_email"]
-    redeemer = await database_api.get_user(email=email, db=db)
+    redeemer = await database_api.get_user(email=user.email, db=db)
     return burn_stablecoins(
         redeemer.wallet_id, redeem_transaction.amount_in_coins
     ).to_json()
 
 
-# [sk4520]: Do we want to wait for the transaction to appear on the blockchain
+# TODO[sk4520]: Do we want to wait for the transaction to appear on the blockchain
 # and check its health before returning?
 @app.post("/api/complete-redeem")
-@login_required
 async def complete_redeem(
     transaction: CompleteRedeemTransaction,
-    request: Request,
-    response: Response,
+    user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
 
-    email = request.session["logged_in_email"]
     transaction_bytes = bytes(transaction.transaction_bytes)
-    redeemer = await database_api.get_user(email=email, db=db)
+    redeemer = await database_api.get_user(email=user.email, db=db)
     resp = send_transaction_from_bytes(transaction_bytes)
 
     # TODO[szymon] add more robust error handling.
@@ -299,7 +340,7 @@ async def complete_redeem(
 
     await database_api.create_redeem_transaction(
         redeem=transaction,
-        email=email,
+        email=user.email,
         bank_transaction_id=reference,
         blockchain_transaction_id=resp.contents.value.__str__(),
         date=datetime.now(),
@@ -312,15 +353,10 @@ async def complete_redeem(
 
 # GET TOKEN BALANCE
 @app.get("/api/get_token_balance")
-@login_required
 async def token_balance(
-    request: Request,
-    response: Response,
+    user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    # Get the user from the database #TODO[devin]: Change to session data
-    email = request.session["logged_in_email"]
-    user = await database_api.get_user(email=email, db=db)
 
     token_balance_resp = get_user_token_balance(user.wallet_id)
     if isinstance(token_balance_resp, Failure):
@@ -334,6 +370,50 @@ async def token_balance(
         "token_balance": token_balance_resp.contents,
         "sol_balance": sol_balance_resp.contents,
     }
+
+
+@app.post("/api/webhook")
+@from_paystack
+async def recieve_issue_webhook(
+    request: Request,
+    response: Response,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+
+    data = await request.json()
+
+    # Issued coins payment
+    if data["event"] == "charge.success":
+        transaction_id = data["data"]["reference"]
+        amount = data["data"]["amount"] / 100
+        metadata = data["data"]["metadata"]
+
+        user = await database_api.get_user(
+            "devin@group4.com",
+            db=db,  # TODO: get rid of hardcoded email for get user (also in get_token_balance)
+        )  # Add get by user id
+
+        # If there is already a row, or something, check blockchain, waiting for szymon
+
+        issue_transaction = await database_api.create_issue_transaction(
+            IssueTransaction(amount_in_rands=amount),
+            user.email,
+            bank_transaction_id=transaction_id,
+            date=datetime.now(),
+            db=db,
+        )
+
+        resp = issue_stablecoins(user.wallet_id, amount)
+
+        await database_api.complete_issue_transaction(
+            issue_transaction.id, resp.contents, db=db
+        )
+
+        print(transaction_id, amount)
+
+    # If issued, return 200
+    response.status_code = 200
+    return "done"  # for paystack coz it stoopid
 
 
 app.add_middleware(SessionMiddleware, secret_key="random-string")

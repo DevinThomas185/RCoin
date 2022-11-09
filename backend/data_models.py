@@ -24,6 +24,7 @@ class LoginInformation(BaseModel):
     class Config:
         orm_mode = True
 
+
 class IssueTransaction(BaseModel):
     # email: str
     # wallet: str
@@ -54,3 +55,8 @@ class CompleteRedeemTransaction(BaseModel):
 
 class TokenBalance(BaseModel):
     email: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str

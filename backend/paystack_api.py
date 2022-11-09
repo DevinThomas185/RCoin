@@ -7,12 +7,13 @@ load_dotenv(find_dotenv())
 PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
 PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY")
 
+
 def check_balance():
-    response =  requests.get(
+    response = requests.get(
         """https://api.paystack.co/balance""",
         headers={
-            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY)
-        }
+            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
+        },
     ).json()
     if response["status"] == True:
         return response["data"][0]["balance"] / 100
@@ -24,22 +25,24 @@ def fetch_balance_ledger():
     return requests.get(
         """https://api.paystack.co/balance/ledger""",
         headers={
-            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY)
-        }
+            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
+        },
     ).json()
+
 
 def list_banks(
     currency: str,
 ):
     return requests.get(
-        """https://api.paystack.co/bank""", 
+        """https://api.paystack.co/bank""",
         headers={
-            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY)
+            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
         },
         params={
-            "currency": currency
-        }
+            "currency": currency,
+        },
     ).json()
+
 
 def list_banks_for_mobile(
     currency: str,
@@ -47,12 +50,12 @@ def list_banks_for_mobile(
     return requests.get(
         """https://api/paystack.co/bank""",
         headers={
-            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY)
+            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
         },
         params={
             "currency": currency,
-            "type": "mobile_money"
-        }
+            "type": "mobile_money",
+        },
     ).json()
 
 
@@ -66,7 +69,7 @@ def verify_account_ZA(
         """https://api.paystack.co/bank/validate""",
         headers={
             "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
         json={
             "bank_code": bank_code,
@@ -75,8 +78,8 @@ def verify_account_ZA(
             "account_name": account_name,
             "account_type": "personal",
             "document_type": "identityNumber",
-            "document_number": document_number
-        }
+            "document_number": document_number,
+        },
     ).json()
 
 
@@ -91,15 +94,15 @@ def create_transfer_recipient_by_bank_account(
         """https://api.paystack.co/transferrecipient""",
         headers={
             "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
-            "Content-Type": "application.json"
+            "Content-Type": "application.json",
         },
         json={
             "type": bank_type,
             "name": name,
             "account_number": account_number,
             "bank_code": bank_code,
-            "currency": currency
-        }
+            "currency": currency,
+        },
     ).json()
 
     if response["status"] == True:
@@ -118,40 +121,85 @@ def create_transfer_recipient_by_mobile_money(
         """https://api.paystack.co/transferrecipient""",
         headers={
             "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
-            "Content-Type": "application.json"
+            "Content-Type": "application.json",
         },
         json={
             "type": "mobile_money",
             "name": name,
             "account_number": account_number,
             "bank_code": bank_code,
-            "currency": currency
-        }
+            "currency": currency,
+        },
     ).json()
+
 
 def initiate_transfer(
     amount: float,
     recipient_code: str,
     recipient_wallet_id: str,
 ):
-    response =  requests.post(
+    response = requests.post(
         """https://api.paystack.co/transfer""",
         headers={
             "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-        json = {
+        json={
             "source": "balance",
             "amount": str(int(amount * 100)),
             "recipient": recipient_code,
-            "reason": "RCoin Payout to {}".format(recipient_wallet_id)
-        }
+            "reason": "RCoin Payout to {}".format(recipient_wallet_id),
+        },
     ).json()
     if response["status"] == True:
         return response["data"]["reference"]
     else:
         return -1
 
+
+def initiate_transaction(
+    amount: float,
+):
+    response = requests.post(
+        """https://api.paystack.co/transaction/initialize""",
+        headers={
+            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
+            "Content-Type": "application/json",
+        },
+        json={
+            "email": "email@email.com",
+            "amount": amount,
+            "percentage_charge": 0.2,
+        },
+    ).json()
+    if response["status"] == True:
+        url = response["data"]["authorization_url"]
+        reference = response["data"]["reference"]
+        return url, reference
+    else:
+        return -1
+
+
+def verify_transaction(reference: str):
+    response = requests.get(
+        "https://api.paystack.co/transaction/verify/{}".format(reference),
+        headers={
+            "Authorization": "Bearer {}".format(PAYSTACK_SECRET_KEY),
+        },
+    ).json()
+    if response["status"] == True:
+        return response["data"]["status"]
+    else:
+        return -1
+
+
+# url, ref = initiate_transaction(1000)
+# print(url)
+# for i in range(100):
+#     import time
+
+#     time.sleep(2)
+#     print(verify_transaction(ref))
 
 # bank_code = "632005"
 # account_number = "08100000000"
