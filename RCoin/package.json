@@ -24,7 +24,8 @@
     "react-native-screens": "^3.18.2",
     "react-native-tab-view": "^3.3.0",
     "react-native-ui-lib": "^6.23.1",
-    "react-native-webview": "^11.23.1"
+    "react-native-webview": "^11.23.1",
+    "react-native-wizard": "^2.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

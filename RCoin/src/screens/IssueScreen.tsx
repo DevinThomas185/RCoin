@@ -1,19 +1,49 @@
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import React from 'react';
-import MakingADeposit from './IssueStages/MakingADeposit'
-import PaymentSummary from './IssueStages/PaymentSummary'
-import PaymentConfirmation from './IssueStages/PaymentConfirmation'
+import React, { useState } from "react";
+import { Text, View, Card, Button, Wizard, Colors } from "react-native-ui-lib";
+import IssueAmount from './IssueStages/Issue0Amount'
+import IssueSummary from './IssueStages/Issue1Summary'
+import IssueSuccess from './IssueStages/Issue2Success'
 
-const Tab = createMaterialTopTabNavigator();
 
-const IssueScreen = () => {
+const TransferScreen = () => {
+  const [stage, setStage] = useState(0);
+  const [recipient, setRecipient] = useState("");
+
+  const renderCurrentStage = () => {
+    if (stage == 0) {
+      return <IssueAmount setStage={setStage} />;
+    }
+    else if (stage == 1) {
+      return <IssueSummary setStage={setStage} />;
+    }
+    else {
+      return <IssueSuccess setStage={setStage} />;
+    }
+  }
+
+  const getStageState = (givenStage: number) => {
+    let state = Wizard.States.DISABLED;
+    if (stage > givenStage) {
+      state = Wizard.States.COMPLETED;
+    }
+    else if (givenStage == stage) {
+      state = Wizard.States.ENABLED;
+    }
+
+    return state
+  }
+
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Making A Deposit" component={MakingADeposit} />
-      <Tab.Screen name="Payment Summary" component={PaymentSummary} />
-      <Tab.Screen name="Payment Confirmation" component={PaymentConfirmation} />
-    </Tab.Navigator>
-  );
-};
+    <View flex>
+      <Wizard activeIndex={stage}>
+        <Wizard.Step state={getStageState(0)} label={"Making A Deposit"} />
+        <Wizard.Step state={getStageState(1)} label={"Payment Summary"} />
+        <Wizard.Step state={getStageState(2)} label={"Confirmation"} />
+      </Wizard>
+      {renderCurrentStage()}
+    </View>
+  )
 
-export default IssueScreen;
+}
+
+export default TransferScreen
