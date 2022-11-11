@@ -6,6 +6,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import DepositScreen from './src/screens/DepositScreen';
 import TransferScreen from './src/screens/TransferScreen';
 import LoginScreen from './src/screens/LoginScreen';
+import WithdrawScreen from './src/screens/WithdrawScreen';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { AuthProvider, useAuth } from './src/contexts/Auth';
 import IssueScreen from './src/screens/IssueScreen';
@@ -55,6 +56,7 @@ const App = () => {
           <Tab.Screen name="Issue" component={IssueScreen} />
           <Tab.Screen name="Deposit" component={DepositScreen} />
           <Tab.Screen name="Transfer" component={TransferScreen} />
+          <Tab.Screen name="Withdraw" component={WithdrawScreen} />
         </Tab.Navigator>
       </AuthRouter>
     </AuthProvider>

@@ -229,24 +229,6 @@ async def auditTransactions(
     return {"transactions": transactions}
 
 
-# Why is is duplicated?
-# AUDIT TABLE
-@app.get("/api/transactions")
-async def transactions() -> dict[str, Any]:
-    resp = get_total_tokens_issued()
-
-    if isinstance(resp, Failure):
-        return resp.to_json()
-
-    rands_in_reserve = issued_coins = round(resp.contents, 2)
-
-    return {
-        "rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
-        "issued_coins": "{:,.2f}".format(issued_coins),
-        "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2)),
-    }
-
-
 # TRANSACTION HISTORY
 @app.get("/api/transaction_history")
 async def transactionHistory(
@@ -349,6 +331,53 @@ async def complete_redeem(
     )
 
     return amount_resp.to_json()
+
+
+# GET BANK ACCOUNTS FOR USER
+@app.get("/api/get_bank_accounts")
+async def get_bank_accounts(
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> list[dict[str, Any]]:
+
+    return [
+        {
+            "bank_account": user.bank_account,
+            "sort_code": user.sort_code,
+        },
+    ]
+
+
+@app.get("/api/get_coins_to_issue")
+async def get_coins_to_issue_api(
+    amount: float,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> dict[str, int]:
+    return {"coins_to_issue": get_coins_to_issue(amount)}
+
+
+@app.get("/api/get_rand_to_return")
+async def get_coins_to_issue_api(
+    amount: float,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> dict[str, int]:
+    return {"rand_to_return": get_rand_to_return(amount)}
+
+
+# GET AMOUNT OF COINS TO ISSUE
+def get_coins_to_issue(
+    amount_of_rand: float,
+) -> int:
+    return amount_of_rand  # TODO[dt120]: Add in trust calculations
+
+
+# GET AMOUNT OF RAND TO RETURN
+def get_rand_to_return(
+    amount_in_coins: float,
+) -> int:
+    return amount_in_coins  # TODO[dt120]: Add in trust calculations
 
 
 # GET TOKEN BALANCE
