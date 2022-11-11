@@ -103,7 +103,7 @@ const Issue = () => {
           >
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>Modal Title</ModalHeader>
+              <ModalHeader>Payment Summary</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
                 <>

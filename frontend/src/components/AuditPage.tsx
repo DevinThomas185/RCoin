@@ -59,7 +59,8 @@ const AuditPage = ({ isAuth }: { isAuth: boolean }) => {
             {transactions.map((transaction) => (
               <Tr
                 onClick={() => {
-                  console.log(transactions.at(0));
+                  console.log(transaction.blockchain_transaction_id);
+                  window.open("https://explorer.solana.com/tx/" + transaction.blockchain_transaction_id + "?cluster=devnet")
                 }}
                 key={transaction.bank_transaction_id}
               >
