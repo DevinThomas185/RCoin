@@ -39,7 +39,7 @@ def construct_stablecoin_transfer(
         transaction and decomposed into bytes.
 
     """
-    transaction = Transaction()
+    transaction = Transaction(fee_payer=TOKEN_OWNER)
 
     source_account = None
     dest_account = None
