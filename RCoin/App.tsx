@@ -8,7 +8,7 @@ import TransferScreen from './src/screens/TransferScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { AuthProvider, useAuth } from './src/contexts/Auth';
-
+import IssueScreen from './src/screens/IssueScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -52,6 +52,7 @@ const App = () => {
       <AuthRouter>
         <Tab.Navigator>
           <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Issue" component={IssueScreen} />
           <Tab.Screen name="Deposit" component={DepositScreen} />
           <Tab.Screen name="Transfer" component={TransferScreen} />
         </Tab.Navigator>
