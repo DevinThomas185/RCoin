@@ -60,10 +60,36 @@ from solana_backend.response import (
 
 BLOCKCHAIN_RESPONSE_TIMEOUT = 30
 
-
 def send_transaction_from_bytes(txn: bytes):
     resp = SOLANA_CLIENT.send_raw_transaction(txn)
     return Success("response", resp)
+
+def fund_account(public_key, amount):
+    public_key = PublicKey(public_key)
+    try:
+        if amount > 2 :
+            print("The maximum amount allowed is 2 SOL")
+            return
+
+        print("Requesting {} SOL to the Solana account: {}".format(amount, public_key))
+
+        resp = SOLANA_CLIENT.request_airdrop(public_key, amount)
+        print(resp)
+        transaction_id = str(resp.value)
+
+        if transaction_id is None:
+            print("Failed to fund your Solana account")
+            return
+
+        print(resp)
+
+        print("The transaction: {} was executed.".format(transaction_id))
+        print("You requested funding your account with {} SOL.".format(amount))
+        return Success("message", "Transaction successfully created")
+
+    except Exception as e:
+        print(e)
+        return Failure('exception', e)
 
 
 def request_create_token_account(public_key: str) -> Response:
@@ -93,8 +119,7 @@ def request_create_token_account(public_key: str) -> Response:
             # Token_owner is paying for the creation of the new Stablecoin account.
             # It is done to ensure that a user can create an account even if they
             # don't have any sol at the moment.
-            # payer=TOKEN_OWNER,
-            payer=owner_key,
+            payer=TOKEN_OWNER,
             # User is the new owner of the new Stablecoin account.
             owner=owner_key,
             # Mint account is the one which defines our Stablecoin token.

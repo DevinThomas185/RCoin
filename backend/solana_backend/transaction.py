@@ -1,3 +1,4 @@
+from solana.keypair import Keypair
 from solana.transaction import Transaction
 from solana.rpc.types import TokenAccountOpts
 from solana.publickey import PublicKey
@@ -12,6 +13,7 @@ from spl.token.instructions import (
 
 from solana_backend.common import (
     MINT_ACCOUNT,
+    SECRET_KEY,
     TOKEN_DECIMALS,
     RESERVE_ACCOUNT_ADDRESS,
     SOLANA_CLIENT,
@@ -39,7 +41,7 @@ def construct_stablecoin_transfer(
         transaction and decomposed into bytes.
 
     """
-    transaction = Transaction()
+    transaction = Transaction(fee_payer=TOKEN_OWNER)
 
     source_account = None
     dest_account = None
@@ -54,6 +56,7 @@ def construct_stablecoin_transfer(
     assert source_account is not None
     assert dest_account is not None
 
+
     try:
         transaction.add(
             transfer_checked(
@@ -65,12 +68,11 @@ def construct_stablecoin_transfer(
                     owner=sender,
                     amount=int(amount * (10**TOKEN_DECIMALS)),
                     decimals=TOKEN_DECIMALS,
-                    signers=[],
+                    signers=[TOKEN_OWNER, sender],
                 )
             )
         )
     except Exception as exception:
-        print(exception)
         raise TransactionCreationFailedException(exception)
 
 
