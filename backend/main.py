@@ -22,6 +22,8 @@ from solana_backend.api import (
     get_user_sol_balance,
     send_transaction_from_bytes,
     get_transfer_amount_for_transaction,
+    create_and_fund_solana_account,
+    create_token_account,
 )
 
 from solana_backend.response import Success, Failure
@@ -109,35 +111,37 @@ def from_paystack(func):
     return secure_function
 
 
+@app.post("/api/create-sol-account")
+async def create_sol_account():
+    kp = create_and_fund_solana_account(1)
+    return {"pk": kp.public_key.__str__(), "sk": kp.secret_key.hex()}
+
+
+# Do check if already created token account (incase failure)
+
 # SIGNUP
 @app.post("/api/signup")
 async def signup(
     user: UserInformation,
-    response: Response,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    try:
-        user.password = hash_password(user.password)
-        # verify = paystack_api.verify_account_ZA(
-        #     bank_code=user.sort_code,
-        #     account_number=user.bank_account,
-        #     account_name=user.first_name + " " + user.last_name,
-        #     document_number=user.document_number
-        # )
-        recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
-            bank_type="basa",
-            name=user.first_name + " " + user.last_name,
-            account_number=user.bank_account,
-            bank_code=user.sort_code,
-            currency="ZAR",
-        )
-        user.recipient_code = recipient_code
-        await database_api.create_user(user=user, db=db)
-        response.status_code = 200
-        return request_create_token_account(user.wallet_id).to_json()
-    except:
-        response.status_code = 500
-        return {}  # TODO[devin]: Catch the explicit exception
+    user.password = hash_password(user.password)
+    # verify = paystack_api.verify_account_ZA(
+    #     bank_code=user.sort_code,
+    #     account_number=user.bank_account,
+    #     account_name=user.first_name + " " + user.last_name,
+    #     document_number=user.document_number
+    # )
+    recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
+        bank_type="basa",
+        name=user.first_name + " " + user.last_name,
+        account_number=user.bank_account,
+        bank_code=user.sort_code,
+        currency="ZAR",
+    )
+    user.recipient_code = recipient_code
+    await database_api.create_user(user=user, db=db)
+    return create_token_account(user.wallet_id).to_json()
 
 
 # LOGIN
