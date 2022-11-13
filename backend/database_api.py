@@ -7,6 +7,7 @@ import sqlalchemy.orm as orm
 import data_models
 import uuid
 from typing import List, Tuple
+import os
 
 
 def get_dummy_id() -> str:
@@ -14,8 +15,7 @@ def get_dummy_id() -> str:
     return str(uuid.uuid4())
 
 
-# DB_URL = "postgresql://stablecoin_database:stablecoin@db:5432/stablecoin_database"
-DB_URL = "postgresql://shivbhatia:password@localhost:5432/stablecoin_database"
+DB_URL = os.getenv("DATABASE_URL")
 
 engine = sql.create_engine(DB_URL)
 

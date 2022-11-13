@@ -1,40 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from './src/screens/HomeScreen';
 import DepositScreen from './src/screens/DepositScreen';
 import TransferScreen from './src/screens/TransferScreen';
-import LoginScreen from './src/screens/LoginScreen';
+import {Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {AuthProvider, useAuth} from './src/contexts/Auth';
+import {AuthStack} from './src/routes/AuthStack';
 import WithdrawScreen from './src/screens/WithdrawScreen';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { AuthProvider, useAuth } from './src/contexts/Auth';
 import IssueScreen from './src/screens/IssueScreen';
+import {KeypairProvider} from './src/contexts/Keypair';
 
 const Tab = createBottomTabNavigator();
 
 const App = () => {
-  // const [isAuth, setIsAuth] = useState(false);
-  // const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-
-  // useEffect(() => {
-  //   const requestOptions = {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //   };
-
-  //   fetch('http://10.0.2.2:8000/api/authenticated', requestOptions)
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setIsAuth(data['authenticated']);
-  //       setIsLoadingAuth(false);
-  //     });
-  // }, []);
-
-  const AuthRouter = ({ children }: { children: React.ReactNode }) => {
-    const { authData, loading } = useAuth();
+  const AuthRouter = ({children}: {children: React.ReactNode}) => {
+    const {authData, loading} = useAuth();
 
     if (loading) {
       // Have a loading component
@@ -43,23 +25,25 @@ const App = () => {
 
     return (
       <NavigationContainer>
-        {authData ? children : <LoginScreen />}
+        {authData ? children : <AuthStack />}
       </NavigationContainer>
     );
   };
 
   return (
-    <AuthProvider>
-      <AuthRouter>
-        <Tab.Navigator>
-          <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="Issue" component={IssueScreen} />
-          <Tab.Screen name="Deposit" component={DepositScreen} />
-          <Tab.Screen name="Transfer" component={TransferScreen} />
-          <Tab.Screen name="Withdraw" component={WithdrawScreen} />
-        </Tab.Navigator>
-      </AuthRouter>
-    </AuthProvider>
+    <KeypairProvider>
+      <AuthProvider>
+        <AuthRouter>
+          <Tab.Navigator>
+            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Issue" component={IssueScreen} />
+            <Tab.Screen name="Deposit" component={DepositScreen} />
+            <Tab.Screen name="Transfer" component={TransferScreen} />
+            <Tab.Screen name="Withdraw" component={WithdrawScreen} />
+          </Tab.Navigator>
+        </AuthRouter>
+      </AuthProvider>
+    </KeypairProvider>
   );
   // } else {
   //   return <LoginScreen setIsAuth={setIsAuth} />;
