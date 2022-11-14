@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
 const { TextField } = Incubator
+import styles from "../style/style"
 
 // Select the amount
 const Transfer2Confirm = ({
@@ -8,49 +9,32 @@ const Transfer2Confirm = ({
 }: {
     setStage: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-
-    const [token_balance, setTokenBalance] = useState(0.0)
-    const [sol_balance, setSolBalance] = useState(0.0)
-    const [amount, setAmount] = useState(0.0)
-
-    useEffect(() => {
-        fetch("http://10.0.2.2:8000/api/get_token_balance", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setTokenBalance(data["token_balance"]);
-                setSolBalance(data["sol_balance"]);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }, []);
-
     return (
         <View flex>
-            <Text text40 blue10 margin-30>
+            <Text text40 color={styles.rcoin} style={{
+
+            }} margin-30>
                 Successful ✅
             </Text>
             <View margin-30>
-                <Text>
-                    x Rcoin has successfuly been sent to y@email.com
-                    Transaction ID = abc
+                <Text style={styles.buttonCaption}>
+                    392 RCoin has successfuly been sent to adam@email.com {'\n'}
+                    Transaction ID = asdkljf238ak92p3jhk239asdfih2lir3
                 </Text>
             </View>
-            <View margin-30>
-
+            <View flex bottom marginH-30-0>
+                <Text style={styles.buttonCaption}>
+                    You can now see your updated balance on the dashboard
+                </Text>
+                <Button onPress={() => { setStage(0) }} label="RCoin Dashboard" backgroundColor={styles.rcoin} />
             </View>
-            <View flex bottom marginH-30 marginB-50>
-                <Button onPress={() => { setStage(0) }} label="Continue" backgroundColor={Colors.blue10} />
+            <View flex bottom marginH-30-0>
+                <Text style={styles.buttonCaption}>
+                    Make another transfer below.
+                </Text>
+                <Button marginB-20 onPress={() => { setStage(0) }} label="Make a transfer" backgroundColor={styles.rcoin} />
             </View>
-            <View flex bottom marginH-10 marginB-10>
-                <Button onPress={() => { setStage(2) }} label="Back" />
-            </View>
-        </View>
+        </View >
     );
 }
 
