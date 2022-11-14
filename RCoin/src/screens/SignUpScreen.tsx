@@ -7,6 +7,7 @@ import {StepTwo} from '../components/signup/StepTwo';
 import {StepThree} from '../components/signup/StepThree';
 import {UserSignUp} from '../types/SignUp';
 import {NavigationScreenProp} from 'react-navigation';
+import { useBackHandler } from '../services/BackHandler';
 
 export const SignUpScreen = ({
   navigation,
@@ -20,6 +21,19 @@ export const SignUpScreen = ({
 
   // Without "dummy" final page which is the underlying signup component
   const NUM_PAGES = 2;
+
+  const backHandlerAction = () => {
+    switch (stage) {
+      case 1:
+      case 2:
+        setStage(stage - 1)
+        return true
+      default:
+        return false
+    }
+  }
+
+  useBackHandler(backHandlerAction)
 
   const conditionalComponent = () => {
     switch (stage) {

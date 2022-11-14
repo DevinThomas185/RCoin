@@ -5,6 +5,7 @@ import WithdrawStage1 from "../components/WithdrawStage1";
 import WithdrawStage2 from "../components/WithdrawStage2";
 import WithdrawStage3 from "../components/WithdrawStage3";
 import { useAuth } from '../contexts/Auth';
+import { useBackHandler } from "../services/BackHandler";
 
 
 const WithdrawScreen = () => {
@@ -18,6 +19,22 @@ const WithdrawScreen = () => {
   const [token_balance, setTokenBalance] = useState(0.0);
   const [sol_balance, setSolBalance] = useState(0.0);
   const auth = useAuth();
+
+  const backHandlerAction = () => {
+    switch (stage) {
+      case 1:
+      case 2:
+        setStage(stage - 1)
+        return true
+      case 3:
+        setStage(0)
+        return true
+      default:
+        return false
+    }
+  }
+
+  useBackHandler(backHandlerAction)
 
   const numberWithCommas = (x: number) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

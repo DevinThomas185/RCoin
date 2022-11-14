@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Text, View, Card, Button, Wizard, Colors } from "react-native-ui-lib";
+import { useBackHandler } from "../services/BackHandler";
 import IssueAmount from './IssueStages/Issue0Amount'
 import IssueSummary from './IssueStages/Issue1Summary'
 import IssueSuccess from './IssueStages/Issue2Success'
@@ -8,6 +9,21 @@ import IssueSuccess from './IssueStages/Issue2Success'
 const TransferScreen = () => {
   const [stage, setStage] = useState(0);
   const [recipient, setRecipient] = useState("");
+
+  const backHandlerAction = () => {
+    switch (stage) {
+      case 1:
+        setStage(stage - 1)
+        return true
+      case 2:
+        setStage(0)
+        return true
+      default:
+        return false
+    }
+  }
+
+  useBackHandler(backHandlerAction)
 
   const renderCurrentStage = () => {
     if (stage == 0) {
