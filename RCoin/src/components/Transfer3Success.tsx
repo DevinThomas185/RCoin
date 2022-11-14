@@ -6,8 +6,12 @@ import styles from "../style/style"
 // Select the amount
 const Transfer2Confirm = ({
     setStage,
+    amount,
+    recipient,
 }: {
     setStage: React.Dispatch<React.SetStateAction<number>>;
+    amount: number;
+    recipient: string;
 }) => {
     return (
         <View flex>
@@ -18,7 +22,9 @@ const Transfer2Confirm = ({
             </Text>
             <View margin-30>
                 <Text style={styles.buttonCaption}>
-                    392 RCoin has successfuly been sent to adam@email.com {'\n'}
+                    {amount} Rcoin has successfuly been sent to {recipient}
+                </Text>
+                <Text>
                     Transaction ID = asdkljf238ak92p3jhk239asdfih2lir3
                 </Text>
             </View>

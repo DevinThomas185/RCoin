@@ -61,11 +61,12 @@ const WithdrawScreen = () => {
   const renderCurrentStage = () => {
     switch (stage) {
       case 0:
-        return <WithdrawStage0
-          nextStage={() => { setStage(1) }}
-        // token_balance={token_balance}
-        // sol_balance={sol_balance}
-        />;
+        return <WithdrawStage0 
+                  nextStage={() => {setStage(1)}} 
+                  setCoinsToWithdraw={setCoinstoWithdraw}
+                  setRandsBeingCredited={setRandsBeingCredited}
+                  coins_to_withdraw={coins_to_withdraw}
+                />;
       case 1:
         return <WithdrawStage1
           nextStage={() => { setStage(2) }}
