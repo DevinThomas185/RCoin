@@ -4,12 +4,28 @@ import TransferEmail from "../components/Transfer0Email";
 import TransferAmount from "../components/Transfer1Amount";
 import TransferConfirm from "../components/Transfer2Confirm";
 import TransferSuccess from "../components/Transfer3Success";
+import { useBackHandler } from "../services/BackHandler";
 
 
 const TransferScreen = () => {
   const [stage, setStage] = useState(0);
   const [recipient, setRecipient] = useState("");
 
+  const backHandlerAction = () => {
+    switch (stage) {
+      case 1:
+      case 2:
+        setStage(stage - 1)
+        return true
+      case 3:
+        setStage(0)
+        return true
+      default:
+        return false
+    }
+  }
+
+  useBackHandler(backHandlerAction)
 
 
   const renderCurrentStage = () => {
