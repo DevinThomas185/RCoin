@@ -23,12 +23,10 @@ const PasswordPopup = ({
     const keyPair = useKeypair();
 
     const handleClose = () => {
-        setIsModalVisible(() => !isModalVisible);
+        setIsModalVisible(false);
         setInput("")
         setFailed(false)
     }
-
-
 
     const handleSignUp = () => {
         keyPair.readPair(input).then((v: Keypair) => {
@@ -86,10 +84,9 @@ const PasswordPopup = ({
         },
     });
     
-
     return (
         <View>
-            <Modal isVisible={isModalVisible}>
+            <Modal isVisible={isModalVisible} onBackButtonPress={handleClose}>
                 <CustomModal.Container>
                     <View style={styles.modal}>
                         <CustomModal.Header title="Wallet Password"/>
