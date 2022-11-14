@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
+import { Text, View, Card, Button, Colors, Incubator, Image } from "react-native-ui-lib";
 const { TextField } = Incubator
+import styles from "../style/style"
 
 // Select the amount
 const Transfer0Email = ({
@@ -8,34 +9,12 @@ const Transfer0Email = ({
 }: {
     setStage: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-
-    const [token_balance, setTokenBalance] = useState(0.0)
-    const [sol_balance, setSolBalance] = useState(0.0)
-    const [amount, setAmount] = useState(0.0)
-
-    useEffect(() => {
-        fetch("http://10.0.2.2:8000/api/get_token_balance", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setTokenBalance(data["token_balance"]);
-                setSolBalance(data["sol_balance"]);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }, []);
-
     return (
         <View flex>
-            <Text text40 blue10 margin-30>
+            <Text text40 style={styles.title}>
                 Make a Transfer
             </Text>
-            <View margin-30>
+            <View style={{ marginHorizontal: 30 }}>
                 <Text>
                     You can send RCoin to any other user.
                     Simply enter the email of the recipient and choose the amount.
@@ -44,21 +23,27 @@ const Transfer0Email = ({
                     The transaction will appear on both your accounts as well as the real time audit.
                 </Text>
             </View>
+
+            <Image
+                source={require('../style/RCoin-RCoin.png')}
+                style={{ width: '100%', height: 130 }}
+            />
+
             <View margin-30>
                 <Text>
                     Who would you like to send RCoin to?
                 </Text>
                 <TextField
                     placeholder="email"
-                    floatingPlaceholder
+                    style={styles.input}
                     validationMessage={["Email is required"]}
                     keyboardType="email"
                 />
             </View>
-            <View flex bottom marginH-30 marginB-50>
-                <Button onPress={() => { setStage(1) }} label="Continue" backgroundColor={Colors.blue10} />
+            <View flex bottom marginH-30 marginB-20>
+                <Button onPress={() => { setStage(1) }} label="Continue" backgroundColor={styles.rcoin} />
             </View>
-        </View>
+        </View >
     );
 }
 

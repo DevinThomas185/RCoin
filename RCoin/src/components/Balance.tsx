@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Text, View, Card, Button, Colors, Incubator, Image } from "react-native-ui-lib";
 import { useAuth } from '../contexts/Auth';
 const { TextField } = Incubator
+import style from '../style/style'
 
 
 // Select the amount
-const Balance = () => {
+const Balance = ({ confirmation }: { confirmation: boolean }) => {
     const [token_balance, setTokenBalance] = useState(0.0)
     const [timeUpdated, setTimeUpdated] = useState(0.0)
     const auth = useAuth()
@@ -38,11 +39,11 @@ const Balance = () => {
 
     return (
         <View>
-            <Text>Your available balance:</Text>
+            <Text>{confirmation ? 'From your balance of:' : 'Your available balance:'}</Text>
             <View style={{ flexDirection: "row" }}>
                 <Image
-                    source={require('../components/Logo.png')}
-                    style={{ width: 60, height: 60 }}
+                    source={require('../style/Logo.png')}
+                    style={style.balanceLogo}
                 />
                 <Text text20 grey10 left>
                     {numberWithCommas(token_balance)}
