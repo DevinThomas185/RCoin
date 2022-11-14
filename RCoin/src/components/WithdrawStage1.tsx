@@ -3,7 +3,8 @@ import { Text, View, Card, Button, Colors, Incubator, Picker } from "react-nativ
 import { useAuth } from "../contexts/Auth";
 const { TextField } = Incubator;
 import styles from "../style/style"
-import Balance from "./Balance"
+import Balance from "../components/Balances/Balance"
+import AmountEntry from "./AmountEntry";
 
 // Select Account
 const WithdrawStage1 = ({
@@ -45,23 +46,14 @@ const WithdrawStage1 = ({
         Choose an Amount
       </Text>
       <View margin-20>
-        <Balance confirmation={false} />
+        <Balance />
       </View>
 
       <View margin-30>
         <Text>
           How much would you like to send?
         </Text>
-        <TextField
-          placeholder="RCoin"
-          style={styles.input}
-          validationMessage={["Amount is required"]}
-          keyboardType="numeric"
-          onChangeText={(coins: number) => {
-            setCoinsToWithdraw(coins);
-            setRandsBeingCredited(coins)
-          }}
-        />
+        <AmountEntry setAmount={setCoinsToWithdraw} least_limit={0}/>
       </View>
 
       {/* <View margin-30>

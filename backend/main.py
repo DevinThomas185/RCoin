@@ -410,6 +410,7 @@ async def token_balance(
 async def recieve_issue_webhook(
     request: Request,
     response: Response,
+    user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
 
@@ -420,11 +421,6 @@ async def recieve_issue_webhook(
         transaction_id = data["data"]["reference"]
         amount = data["data"]["amount"] / 100
         metadata = data["data"]["metadata"]
-
-        user = await database_api.get_user(
-            "devin@group4.com",
-            db=db,  # TODO: get rid of hardcoded email for get user (also in get_token_balance)
-        )  # Add get by user id
 
         # If there is already a row, or something, check blockchain, waiting for szymon
 

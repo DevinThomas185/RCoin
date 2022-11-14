@@ -8,7 +8,8 @@ import IssueSuccess from './IssueStages/Issue2Success'
 
 const TransferScreen = () => {
   const [stage, setStage] = useState(0);
-  const [recipient, setRecipient] = useState("");
+  const [coins_to_issue, setCoinsToIssue] = useState(0.0);
+  const [rand_to_pay, setRandToPay] = useState(0.0);
 
   const backHandlerAction = () => {
     switch (stage) {
@@ -27,10 +28,10 @@ const TransferScreen = () => {
 
   const renderCurrentStage = () => {
     if (stage == 0) {
-      return <IssueAmount setStage={setStage} />;
+      return <IssueAmount setStage={setStage} setAmount={setCoinsToIssue} setRandToPay={setRandToPay}/>;
     }
     else if (stage == 1) {
-      return <IssueSummary setStage={setStage} />;
+      return <IssueSummary setStage={setStage} coins_to_issue={coins_to_issue} rand_to_pay={rand_to_pay} />;
     }
     else {
       return <IssueSuccess setStage={setStage} />;

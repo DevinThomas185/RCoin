@@ -1,35 +1,42 @@
 
 import React, { useEffect, useState } from "react";
 import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
-const { TextField } = Incubator
+import AmountEntry from "../../components/AmountEntry";
+import { useAuth } from "../../contexts/Auth";
+
+const LEAST_LIMIT = 0;
 
 // Select the amount
 const IssueAmount = ({
   setStage,
+  setAmount,
+  setRandToPay,
 }: {
   setStage: React.Dispatch<React.SetStateAction<number>>;
+  setAmount: React.Dispatch<React.SetStateAction<number>>;
+  setRandToPay: React.Dispatch<React.SetStateAction<number>>;
 }) => {
 
-  const [token_balance, setTokenBalance] = useState(0.0)
-  const [sol_balance, setSolBalance] = useState(0.0)
-  const [amount, setAmount] = useState(0.0)
+  const auth = useAuth();
 
-  useEffect(() => {
-    fetch("http://10.0.2.2:8000/api/get_token_balance", {
-      method: "GET",
+  // TODO: CHANGE TO GET RAND TO PAY
+  const setRands = (coins: number) => {
+    fetch('http://10.0.2.2:8000/api/get_rand_to_return/?amount=' + coins.toString(), {
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.authData?.token}`,
       },
     })
-      .then((res) => res.json())
-      .then((data) => {
-        setTokenBalance(data["token_balance"]);
-        setSolBalance(data["sol_balance"]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+      setRandToPay(data['rand_to_return']);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
 
   return (
     <View flex>
@@ -43,21 +50,13 @@ const IssueAmount = ({
           {'\n'}
           The transaction will appear on your account as well as the real time audit.
         </Text>
-        <Text text30 grey10 left>
-          {token_balance}
-        </Text>
       </View>
       <View margin-30>
         <Text>
           How many RCoin would you like?
         </Text>
-        <TextField
-          placeholder="amount"
-          floatingPlaceholder
-          validationMessage={["Amount is required"]}
-          keyboardType="amount"
-        />
       </View>
+      <AmountEntry setAmount={setAmount} least_limit={LEAST_LIMIT} />
       <View flex bottom marginH-30 marginB-50>
         <Button onPress={() => { setStage(1) }} label="Continue" backgroundColor={Colors.blue10} />
       </View>

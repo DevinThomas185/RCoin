@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator, Image } from "react-native-ui-lib";
+import React, { useEffect } from "react";
+import { Text, View, Button, Image } from "react-native-ui-lib";
+import Balance from "./Balances/Balance";
 import { useAuth } from "../contexts/Auth";
-const { TextField } = Incubator
 import styles from "../style/style"
 
 const LEAST_LIMIT = 0
@@ -9,14 +9,43 @@ const LEAST_LIMIT = 0
 // Select the amount
 const WithdrawStage0 = ({
   nextStage,
+  setCoinsToWithdraw,
+  setRandsBeingCredited,
+  coins_to_withdraw,
 }: {
   nextStage: React.Dispatch<void>;
+  setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
+  setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
+  coins_to_withdraw: number;
 }) => {
+
+  const auth = useAuth();
+
+  useEffect(() => {
+    fetch('http://10.0.2.2:8000/api/get_rand_to_return/?amount=' + coins_to_withdraw.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.authData?.token}`,
+      },
+    })
+    .then(res => res.json())
+    .then(data => {
+      setRandsBeingCredited(data['rand_to_return']);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }, [coins_to_withdraw])
+
   return (
     <View flex>
       <Text text40 style={styles.title}>
         Make a Withdrawal
       </Text>
+      <View margin-30>
+        <Balance />
+      </View>
       <View style={{ marginHorizontal: 30 }}>
         <Text>
           You can withdraw RCoin as Rand at any time.

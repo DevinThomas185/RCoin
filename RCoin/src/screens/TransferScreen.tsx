@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, View, Card, Button, Wizard, Colors } from "react-native-ui-lib";
+import { View, Wizard } from "react-native-ui-lib";
 import TransferEmail from "../components/Transfer0Email";
 import TransferAmount from "../components/Transfer1Amount";
 import TransferConfirm from "../components/Transfer2Confirm";
@@ -10,6 +10,7 @@ import { useBackHandler } from "../services/BackHandler";
 const TransferScreen = () => {
   const [stage, setStage] = useState(0);
   const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState(0.0);
 
   const backHandlerAction = () => {
     switch (stage) {
@@ -30,16 +31,16 @@ const TransferScreen = () => {
 
   const renderCurrentStage = () => {
     if (stage == 0) {
-      return <TransferEmail setStage={setStage} />;
+      return <TransferEmail setStage={setStage} setRecipient={setRecipient} />;
     }
     else if (stage == 1) {
-      return <TransferAmount setStage={setStage} />;
+      return <TransferAmount setStage={setStage} setAmount={setAmount} />;
     }
     else if (stage == 2) {
-      return <TransferConfirm setStage={setStage} />;
+      return <TransferConfirm setStage={setStage} deduction={amount} recipient={recipient} />;
     }
     else {
-      return <TransferSuccess setStage={setStage} />;
+      return <TransferSuccess setStage={setStage} amount={amount} recipient={recipient}/>;
     }
   }
 

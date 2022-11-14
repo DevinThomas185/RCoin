@@ -3,11 +3,13 @@ import { Text, View, Card, Button, Colors, Incubator, Image } from "react-native
 const { TextField } = Incubator
 import styles from "../style/style"
 
-// Select the amount
+// Select the recipient
 const Transfer0Email = ({
     setStage,
+    setRecipient,
 }: {
     setStage: React.Dispatch<React.SetStateAction<number>>;
+    setRecipient: React.Dispatch<React.SetStateAction<string>>;
 }) => {
     return (
         <View flex>
@@ -38,6 +40,9 @@ const Transfer0Email = ({
                     style={styles.input}
                     validationMessage={["Email is required"]}
                     keyboardType="email"
+                    onChangeText={(email: string) => {
+                        setRecipient(email);
+                    }}
                 />
             </View>
             <View flex bottom marginH-30 marginB-20>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
+import ChangingBalance from "./Balances/ChangingBalance";
 const { TextField } = Incubator
 import styles from "../style/style"
 import Balance from "./Balance"
@@ -28,7 +29,7 @@ const WithdrawStage1 = ({
         Confirm your transaction
       </Text>
       <View margin-30>
-        <Balance confirmation={true} />
+        <ChangingBalance deduction={coins_to_withdraw} />
         <WithdrawReciept coins={coins_to_withdraw} rands={rands_being_credited} bank_account={current_bank_account} />
       </View>
       <View flex bottom marginH-30 marginB-5>

@@ -1,50 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
-const { TextField } = Incubator
+import { Text, View, Button, Colors } from "react-native-ui-lib";
+import ChangingBalance from "../../components/Balances/ChangingBalance";
 
 // Show the summary
 const IssueSummary = ({
   setStage,
+  coins_to_issue,
+  rand_to_pay,
 }: {
   setStage: React.Dispatch<React.SetStateAction<number>>;
+  coins_to_issue: number;
+  rand_to_pay: number;
 }) => {
-
-  const [token_balance, setTokenBalance] = useState(0.0)
-  const [sol_balance, setSolBalance] = useState(0.0)
-  const [amount, setAmount] = useState(0.0)
-
-  useEffect(() => {
-    fetch("http://10.0.2.2:8000/api/get_token_balance", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setTokenBalance(data["token_balance"]);
-        setSolBalance(data["sol_balance"]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
 
   return (
     <View flex>
       <Text text40 blue10 margin-30>
         Payment Summary
       </Text>
+      <ChangingBalance deduction={-coins_to_issue} />
       <View margin-30>
-        <Text text30 grey10 left>
-          {token_balance}
-        </Text>
         <Text>
           You are purchasing {'\n'}
-          x RCoin {'\n'}
+          {coins_to_issue} RCoin {'\n'}
           for {'\n'}
-          y Rand {'\n'}
-          Fees: z Rand
+          {rand_to_pay} Rand {'\n'}
         </Text>
       </View>
 

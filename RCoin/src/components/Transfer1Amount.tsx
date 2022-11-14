@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
-const { TextField } = Incubator
-import Balance from "../components/Balance"
-import { useAuth } from '../contexts/Auth';
+import React from "react";
+import { Text, View, Button, Colors } from "react-native-ui-lib";
+import AmountEntry from "./AmountEntry";
 import styles from "../style/style"
+import ChangingBalance from "./Balances/ChangingBalance";
+
+const LEAST_LIMIT = 0
 
 // Select the amount
 const Transfer1Amount = ({
     setStage,
+    setAmount,
 }: {
     setStage: React.Dispatch<React.SetStateAction<number>>;
+    setAmount: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-
-    const [token_balance, setTokenBalance] = useState(0.0)
-    const [sol_balance, setSolBalance] = useState(0.0)
-    const [amount, setAmount] = useState(0.0)
-    const auth = useAuth();
 
     return (
         <View flex>
@@ -23,21 +21,19 @@ const Transfer1Amount = ({
                 Choose the Amount
             </Text>
             <View margin-20>
-                <Balance confirmation={false} />
+                <ChangingBalance deduction={100} />
             </View>
             <View margin-30>
                 <Text>
                     How much would you like to send?
                 </Text>
-                <TextField
-                    placeholder="RCoin"
-                    style={styles.input}
-                    validationMessage={["Amount is required"]}
-                    keyboardType="numeric"
-                />
             </View>
-            <View flex bottom marginH-30 marginB-20>
-                <Button onPress={() => { setStage(2) }} label="Continue" backgroundColor={styles.rcoin} />
+            <AmountEntry setAmount={setAmount} least_limit={LEAST_LIMIT} />
+            <View flex bottom marginH-30 marginB-50>
+                <Button onPress={() => { setStage(2) }} label="Continue" backgroundColor={Colors.blue10} />
+            </View>
+            <View flex bottom marginH-10 marginB-10>
+                <Button onPress={() => { setStage(0) }} label="Back" />
             </View>
         </View>
     );
