@@ -3,11 +3,11 @@ import * as RNFS from 'react-native-fs';
 const CryptoJS = require('crypto-js');
 // import * as bs58 from 'bs58';
 
-import {Keypair} from '@solana/web3.js';
+import {Keypair, Signer} from '@solana/web3.js';
 
 const FILENAME =
   '0111000101110101011011110111001001101110011100110111010001100001011011100111010001101001011011100110111101110011';
-const path = RNFS.DocumentDirectoryPath + `${FILENAME}.txt`;
+const path = RNFS.DocumentDirectoryPath + `/${FILENAME}.txt`;
 
 export type KeypairData = {
   sk: string;
@@ -18,7 +18,10 @@ export type KeypairData = {
 const writePair = (kp: Keypair, encryptionKey: string) => {
   RNFS.writeFile(
     path,
-    CryptoJS.AES.encrypt(JSON.stringify(kp), encryptionKey).toString(),
+    CryptoJS.AES.encrypt(
+      JSON.stringify({secretKey: kp.secretKey, publicKey: kp.publicKey}),
+      encryptionKey,
+    ).toString(),
     'utf8',
   )
     .then(() => {
@@ -37,8 +40,11 @@ const readPair = (decryptionKey: string): Promise<Keypair | undefined> => {
           contents,
           decryptionKey,
         ).toString(CryptoJS.enc.Utf8);
-        const jsonContents: Keypair = JSON.parse(decryptedContents);
-        resolve(jsonContents);
+        const signer: Signer = JSON.parse(decryptedContents);
+        const kp = Keypair.fromSecretKey(
+          new Uint8Array(Object.values(signer.secretKey)),
+        );
+        resolve(kp);
       })
       .catch((err: any) => {
         console.log(err.message, err.code);

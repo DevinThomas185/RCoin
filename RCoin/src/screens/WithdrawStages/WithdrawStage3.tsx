@@ -1,7 +1,7 @@
-import React from "react";
-import { Text, View, Button } from "react-native-ui-lib";
-import { Svg, Circle, Path } from 'react-native-svg';
-import styles from "../../style/style"
+import React from 'react';
+import {Text, View, Button} from 'react-native-ui-lib';
+import {Svg, Circle, Path} from 'react-native-svg';
+import styles from '../../style/style';
 
 // Success
 const WithdrawStage3 = ({
@@ -13,26 +13,37 @@ const WithdrawStage3 = ({
   nextStage: React.Dispatch<void>;
   coins_to_withdraw: number;
   rands_being_credited: number;
-  bank_account: { [key: string]: string };
+  bank_account: {[key: string]: string};
 }) => {
-
   return (
     <View flex>
-      <View marginT-30 style={{ alignSelf: "center" }}>
-        <Svg height="100" width="100" >
+      <View marginT-30 style={{alignSelf: 'center'}}>
+        <Svg height="100" width="100">
           <Circle cx="43.5" cy="43.5" r="43.5" fill="#5DB075" />
-          <Path d="M27.6818 43.4999L38.2148 55.3635L59.3181 31.6362" stroke="white" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" />
+          <Path
+            d="M27.6818 43.4999L38.2148 55.3635L59.3181 31.6362"
+            stroke="white"
+            stroke-width="15"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </Svg>
       </View>
-      <Text text40 color={styles.rcoin} style={{
-        textAlign: 'center',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>Successful</Text>
+      <Text
+        text40
+        color={styles.rcoin}
+        style={{
+          textAlign: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        Successful
+      </Text>
 
       <View margin-30>
         <Text style={styles.buttonCaption}>
-          {rands_being_credited} RCoin has successfuly been withdrawn from your account {'\n'}
+          {rands_being_credited} RCoin has successfuly been withdrawn from your
+          account {'\n'}
           Transaction ID = asdkljf238ak92p3jhk239asdfih2lir3
         </Text>
       </View>
@@ -40,13 +51,19 @@ const WithdrawStage3 = ({
         <Text style={styles.buttonCaption}>
           You can now see your updated balance on the dashboard
         </Text>
-        <Button onPress={nextStage} label="RCoin Dashboard" backgroundColor={styles.rcoin} />
+        <Button
+          onPress={nextStage}
+          label="RCoin Dashboard"
+          backgroundColor={styles.rcoin}
+        />
       </View>
       <View flex bottom marginH-30 marginB-50>
-        <Button onPress={nextStage} label="Make another Withdrawal" backgroundColor={styles.rcoin} />
+        <Button
+          onPress={nextStage}
+          label="Make another Withdrawal"
+          backgroundColor={styles.rcoin}
+        />
       </View>
-
-
 
       {/* <Text text40 blue10 margin-30>
         Success
@@ -62,6 +79,6 @@ const WithdrawStage3 = ({
       </View> */}
     </View>
   );
-}
+};
 
-export default WithdrawStage3
+export default WithdrawStage3;

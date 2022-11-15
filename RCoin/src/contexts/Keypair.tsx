@@ -1,10 +1,10 @@
 import React, {createContext, useState, useContext} from 'react';
 import {KeypairData, keypairService} from '../services/keypairService';
-import {Keypair} from '@solana/web3.js';
+import {Keypair, Signer} from '@solana/web3.js';
 
 type KeypairContextData = {
   writePair(kp: Keypair, encryptionKey: string): void;
-  readPair(decryptionKey: string): Promise<KeyPair>;
+  readPair(decryptionKey: string): Promise<Keypair | undefined>;
 };
 
 const KeypairContext = createContext<KeypairContextData>(

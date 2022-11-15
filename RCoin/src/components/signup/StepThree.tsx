@@ -30,15 +30,6 @@ export const StepThree = ({
   const [loading, setLoading] = useState(true);
   const keyPair = useKeypair();
 
-  const gimmeMoney = async (pk: any) => {
-    const network = 'http://api.devnet.solana.com';
-    const connection = new Connection(network);
-
-    let airdropSignature = await connection.requestAirdrop(pk, 1e9);
-
-    await connection.confirmTransaction(airdropSignature);
-  };
-
   useEffect(() => {
     const kp = Keypair.generate();
 

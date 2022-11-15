@@ -3,6 +3,10 @@ from solana.transaction import Transaction
 from solana.rpc.types import TokenAccountOpts
 from solana.publickey import PublicKey
 from solana.transaction import Transaction
+from solders.transaction import Transaction as SoldersTx
+from solders.signature import Signature
+from solana.blockhash import Blockhash, BlockhashCache
+
 
 # Spl-token dependencies
 from spl.token.constants import TOKEN_PROGRAM_ID
@@ -10,6 +14,7 @@ from spl.token.instructions import (
     transfer_checked,
     TransferCheckedParams,
 )
+from solana_backend.response import Failure, Success
 
 from solana_backend.common import (
     MINT_ACCOUNT,
@@ -24,6 +29,33 @@ from solana_backend.exceptions import (
     NoTokenAccountException,
     TransactionCreationFailedException,
 )
+
+
+def send_transaction_from_signature(
+    transaction_bytes: bytes, signer: bytes, signer_wallet: str
+):
+    try:
+        solderstxn = SoldersTx.from_bytes(transaction_bytes)
+        transaction = Transaction.from_solders(solderstxn)
+
+        pub_key = PublicKey(signer_wallet)
+        signature = Signature.from_bytes(signer)
+
+        # Sign by mint account
+        signers = Keypair.from_secret_key(SECRET_KEY)
+        transaction.sign_partial(signers)
+
+        # Sign by token owner
+        transaction.add_signature(pub_key, signature)
+
+        final_bytes = transaction.serialize()
+
+        resp = SOLANA_CLIENT.send_raw_transaction(final_bytes)
+    except Exception as e:
+        return Failure("exception", e)
+
+    return Success("response", str(resp))
+
 
 def construct_stablecoin_transfer(
     sender: PublicKey, amount: float, recipient: PublicKey
@@ -56,7 +88,6 @@ def construct_stablecoin_transfer(
     assert source_account is not None
     assert dest_account is not None
 
-
     try:
         transaction.add(
             transfer_checked(
@@ -72,9 +103,13 @@ def construct_stablecoin_transfer(
                 )
             )
         )
+
+        blockhash_resp = SOLANA_CLIENT.get_latest_blockhash()
+        recent_blockhash = Blockhash(str(blockhash_resp.value.blockhash))
+        transaction.recent_blockhash = recent_blockhash
+
     except Exception as exception:
         raise TransactionCreationFailedException(exception)
-
 
     return transaction
 
@@ -125,5 +160,3 @@ def get_associated_token_account(public_key: PublicKey) -> PublicKey:
 
 def transaction_to_bytes(transaction: Transaction) -> list[int]:
     return list(transaction.to_solders().__bytes__())
-
-
