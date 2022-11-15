@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { Text, View, Button, Picker } from "react-native-ui-lib";
-import { useAuth } from "../../contexts/Auth";
-import styles from "../../style/style"
-import Balance from "../../components/Balances/Balance"
-import AmountEntry from "../../components/AmountEntry";
+import React, {useEffect} from 'react';
+import {Text, View, Button, Picker} from 'react-native-ui-lib';
+import {useAuth} from '../../contexts/Auth';
+import styles from '../../style/style';
+import Balance from '../../components/Balances/Balance';
+import AmountEntry from '../../components/AmountEntry';
 
 // Select Account
 const WithdrawStage1 = ({
@@ -15,9 +15,8 @@ const WithdrawStage1 = ({
   nextStage: React.Dispatch<void>;
   setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
   setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
-  setBankAccount: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
+  setBankAccount: React.Dispatch<React.SetStateAction<{[key: string]: string}>>;
 }) => {
-
   const auth = useAuth();
 
   useEffect(() => {
@@ -30,8 +29,8 @@ const WithdrawStage1 = ({
     })
       .then(res => res.json())
       .then(data => {
-        data.forEach((element: { [key: string]: string }) => {
-          setBankAccount(data[0])
+        data.forEach((element: {[key: string]: string}) => {
+          setBankAccount(data[0]);
         });
       })
       .catch(error => {
@@ -49,10 +48,8 @@ const WithdrawStage1 = ({
       </View>
 
       <View margin-30>
-        <Text>
-          How much would you like to send?
-        </Text>
-        <AmountEntry setAmount={setCoinsToWithdraw} least_limit={0}/>
+        <Text>How much would you like to send?</Text>
+        <AmountEntry setAmount={setCoinsToWithdraw} least_limit={0} />
       </View>
 
       {/* <View margin-30>
@@ -60,10 +57,10 @@ const WithdrawStage1 = ({
           Select which account you'd like to be paid into
         </Text>
         <Text text70 marginT-20>
-          Bank Account: {current_bank_account["bank_account"]}
+          Bank Account: {current_bank_account['bank_account']}
         </Text>
         <Text text70 marginT-20>
-          Sort Code: {current_bank_account["sort_code"]}
+          Sort Code: {current_bank_account['sort_code']}
         </Text>
         {/* <Picker
           migrateTextField
@@ -81,10 +78,14 @@ const WithdrawStage1 = ({
         </Picker>
       </View> */}
       <View flex bottom marginH-30 marginB-50>
-        <Button onPress={nextStage} label="Continue" backgroundColor={styles.rcoin} />
+        <Button
+          onPress={nextStage}
+          label="Continue"
+          backgroundColor={styles.rcoin}
+        />
       </View>
     </View>
   );
-}
+};
 
-export default WithdrawStage1
+export default WithdrawStage1;

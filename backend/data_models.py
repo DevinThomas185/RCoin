@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Any
 from pydantic import BaseModel
 
 
@@ -34,12 +34,17 @@ class IssueTransaction(BaseModel):
 class TradeTransaction(BaseModel):
     coins_to_transfer: float
     # sender_email: str
-    # recipient_email: str
+    recipient_email: str
 
     # sender_wallet: str
-    recipient_wallet: str
+    # recipient_wallet: str
     # TODO[devin]: Timestamp add to all transactions?
     # Probably wanted for auditing purposes?
+
+
+class CompleteTradeTransaction(BaseModel):
+    signature: List[int]
+    transaction_bytes: List[int]
 
 
 class RedeemTransaction(BaseModel):

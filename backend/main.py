@@ -14,7 +14,6 @@ from datetime import timezone, datetime, timedelta
 from solana_backend.api import (
     get_stablecoin_transactions,
     new_stablecoin_transfer,
-    request_create_token_account,
     issue_stablecoins,
     burn_stablecoins,
     get_total_tokens_issued,
@@ -26,6 +25,10 @@ from solana_backend.api import (
     create_token_account,
 )
 
+from solana_backend.transaction import (
+    send_transaction_from_signature,
+)
+
 from solana_backend.response import Success, Failure
 import sqlalchemy.orm as orm
 from starlette.middleware.sessions import SessionMiddleware
@@ -33,6 +36,7 @@ from fastapi import Depends, FastAPI, Response, Request, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from data_models import (
     CompleteRedeemTransaction,
+    CompleteTradeTransaction,
     LoginInformation,
     TokenResponse,
     UserInformation,
@@ -270,15 +274,37 @@ async def issue(
 @app.post("/api/trade")
 async def trade(
     trade_transaction: TradeTransaction,
-    user: User = Depends(get_current_user),
+    sender: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    sender = await database_api.get_user(email=user.email, db=db)
-    # recipient = await database_api.get_user(email=trade_transaction.recipient_email, db=db)
+    # sender = await database_api.get_user(email=user.email, db=db)
+    recipient = await database_api.get_user(
+        email=trade_transaction.recipient_email, db=db
+    )
+
+    if recipient is None:
+        # return some error
+        pass
+
     return new_stablecoin_transfer(
         sender.wallet_id,
         trade_transaction.coins_to_transfer,
-        trade_transaction.recipient_wallet,
+        recipient.wallet_id,
+    ).to_json()
+
+
+@app.post("/api/complete-trade")
+async def trade(
+    trade_transaction: CompleteTradeTransaction,
+    sender: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> dict[str, Any]:
+
+    signature = bytes(trade_transaction.signature)
+    transaction = bytes(trade_transaction.transaction_bytes)
+
+    return send_transaction_from_signature(
+        transaction, signature, sender.wallet_id
     ).to_json()
 
 

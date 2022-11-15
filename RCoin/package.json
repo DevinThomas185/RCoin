@@ -34,9 +34,10 @@
     "react-native-tab-view": "^3.3.0",
     "react-native-ui-lib": "^6.23.1",
     "react-native-webview": "^11.23.1",
+    "react-native-wizard": "^2.1.0",
     "react-navigation": "^4.4.4",
-    "uuid": "^9.0.0",
-    "react-native-wizard": "^2.1.0"
+    "tweetnacl": "^1.0.3",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
