@@ -3,14 +3,15 @@ import { Paystack, paystackProps } from 'react-native-paystack-webview';
 import { Text, View, Button, Colors } from "react-native-ui-lib";
 import ChangingBalance from "../../components/Balances/ChangingBalance";
 import { TouchableOpacity } from 'react-native';
+import IssueReceipt from './IssueReceipt';
 
 // Show the summary
 const IssueSummary = ({
-  nextStage,
+  setStage,
   coins_to_issue,
   rand_to_pay,
 }: {
-  nextStage: React.Dispatch<void>;
+  setStage: React.Dispatch<React.SetStateAction<number>>;
   coins_to_issue: number;
   rand_to_pay: number;
 }) => {
@@ -32,11 +33,11 @@ const IssueSummary = ({
         paystackKey="pk_test_74b1d55fbad5fc6c5bb27a7d6030a0e575aa75f4"
         currency="ZAR"
         activityIndicatorColor="blue"
-        onCancel={(e) => {
+        onCancel={() => {
           // handle response here
           setStage(1)
         }}
-        onSuccess={(res) => {
+        onSuccess={() => {
           // handle response here
           setStage(2)
         }}

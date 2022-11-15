@@ -28,10 +28,10 @@ const TransferScreen = () => {
 
   const renderCurrentStage = () => {
     if (stage == 0) {
-      return <IssueAmount setStage={setStage} setAmount={setCoinsToIssue} setRandToPay={setRandToPay} />;
+      return <IssueAmount nextStage={() => {setStage(1)}} setCoinsToIssue={setCoinsToIssue} setRandToPay={setRandToPay} coins_to_issue={coins_to_issue}/>;
     }
     else if (stage == 1) {
-      return <IssueSummary nextStage={() => {setStage(2)}} coins_to_issue={coins_to_issue} rand_to_pay={rand_to_pay} />;
+      return <IssueSummary setStage={setStage} coins_to_issue={coins_to_issue} rand_to_pay={rand_to_pay} />;
     }
     else {
       return <IssueSuccess nextStage={() => {setStage(0)}} rand_to_pay={rand_to_pay}/>;
@@ -55,7 +55,7 @@ const TransferScreen = () => {
       <Wizard activeIndex={stage}>
         <Wizard.Step state={getStageState(0)} label={"Making A Deposit"} />
         <Wizard.Step state={getStageState(1)} label={"Payment Summary"} />
-        <Wizard.Step state={getStageState(3)} label={"Confirmation"} />
+        <Wizard.Step state={getStageState(2)} label={"Confirmation"} />
       </Wizard>
       {renderCurrentStage()}
     </View>
