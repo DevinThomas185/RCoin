@@ -1,4 +1,3 @@
-
 Style = {
 
     underline: { textDecorationLine: 'underline' },
@@ -26,6 +25,19 @@ Style = {
         marginRight: 10,
     },
 
+    divider: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+
+    thinDivider: {
+        borderWidth: 0.5,
+        borderColor: '#435C9C',
+        width: '90%',
+        alignSelf: 'center',
+    },
+
 
     bankDetailsLabel: {
         textAlign: 'left',
@@ -36,9 +48,46 @@ Style = {
     balanceLogo: {
         width: 60,
         height: 60,
+        marginTop: 3,
+        marginHorizontal: 10
+    },
+
+    transactionIcon: {
+        width: 60,
+        height: 60,
         marginTop: 3
     },
 
+    arrow: {
+        marginLeft: 'auto',
+        justifyContent: 'center',
+        alignItems: 'baseline'
+    },
+    
+
+
+// /* Iconsax/Linear/arrowright2 */
+
+// position: absolute;
+// width: 24px;
+// height: 24px;
+// left: 314px;
+// top: 410px;
+
+
+
+// /* Vector */
+
+// position: absolute;
+// left: 37.12%;
+// right: 33.3%;
+// top: 17%;
+// bottom: 17%;
+
+// border: 2px solid #000000;
+
+
+    
     input: {
         height: 40,
         margin: 12,

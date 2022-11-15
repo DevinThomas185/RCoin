@@ -1,8 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
-import {useAuth} from '../contexts/Auth';
+import React, { useEffect, useState } from 'react';
+import { Text, View, Image, TouchableOpacity } from "react-native-ui-lib";
+import { useAuth } from '../contexts/Auth';
+import Balance from '../components/Balance';
+import ServiceLink from "../components/ServiceLink"
+import style from '../style/style'
+import { NavigationScreenProp } from 'react-navigation';
 
-const HomeScreen = () => {
+const HomeScreen = ({
+  navigation,
+}: {
+  navigation: NavigationScreenProp<any, any>;
+}) => {
   const [rand_in_reserve, setRandInReserve] = useState(0.0);
   const [issued_coins, setIssuedCoins] = useState(0.0);
   const [ratio, setRatio] = useState(0.0);
@@ -44,13 +52,41 @@ const HomeScreen = () => {
       });
   }, []);
 
+  const divider = (
+    <View style={style.thinDivider} />
+  )
+
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>R{rand_in_reserve}</Text>
-      <Text>RCoin: {issued_coins}</Text>
-      <Text>Ratio: {ratio}</Text>
-      <Text>Balance: {token_balance}</Text>
-      <Text>SOL Balance: {sol_balance}</Text>
+    <View flex>
+      <TouchableOpacity onPress={() => navigation.navigate('Balance')}>
+        <View margin-30>
+          <Text text40>RCoin Balance</Text>
+          <Balance confirmation={false} margin-30 />
+          <View style={style.divider}>
+            <Image
+              source={require('../style/Divider.png')}
+            />
+          </View>
+        </View>
+      </TouchableOpacity>
+
+
+      <Text marginH-30 text40 marginB-20 >Services</Text>
+
+      {/* TODO: On press, go to the relevant pages */}
+      {divider}
+      <TouchableOpacity onPress={() => navigation.navigate('Issue')}>
+        <ServiceLink title="Deposit" message={"Make a payment to acquire your RCoin.\nCompleted securely through paystack."} />
+      </TouchableOpacity>
+      {divider}
+      <TouchableOpacity onPress={() => navigation.navigate('Transfer')}>
+        <ServiceLink title="Transfer" message={"Send your RCoin to another user.\nYour transfer will be signed on the blockchain."} />
+      </TouchableOpacity>
+      {divider}
+      <TouchableOpacity onPress={() => navigation.navigate('Withdraw')}>
+        <ServiceLink title="Withdraw" message={"Withdraw your RCoin as Rand.\nCompleted securely through paystack."} />
+      </TouchableOpacity>
+      {divider}
     </View>
   );
 };
