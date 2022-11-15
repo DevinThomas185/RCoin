@@ -24,8 +24,11 @@ const IssueSuccess = ({
           We have received {rand_to_pay} Rand and are now processing your deposit. {'\n'}
         </Text>
       </View>
-      <View flex bottom marginH-30 marginB-50>
-        <Button onPress={nextStage} label="Issue More Coins" backgroundColor={styles.rcoin} />
+      <View flex bottom marginH-10 marginB-10>
+        <Button onPress={() => { setStage(0) }} label="Continue" backgroundColor={Colors.blue10} />
+      </View>
+      <View flex bottom marginH-10 marginB-10>
+        <Button onPress={() => { setStage(1) }} label="Back" />
       </View>
     </View>
   );

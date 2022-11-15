@@ -1,5 +1,6 @@
-import React from "react";
-import { Text, View, Button, Colors } from "react-native-ui-lib";
+
+import React, { useEffect, useState } from "react";
+import { Text, View, Card, Button, Colors, Incubator, Image } from "react-native-ui-lib";
 import AmountEntry from "../../components/AmountEntry";
 import { useAuth } from "../../contexts/Auth";
 import styles from "../../style/style"
@@ -30,19 +31,19 @@ const IssueAmount = ({
         Authorization: `Bearer ${auth.authData?.token}`,
       },
     })
-    .then(res => res.json())
-    .then(data => {
-      console.log(data);
-      setRandToPay(data['rand_to_return']);
-    })
-    .catch(error => {
-      console.log(error);
-    });
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        setRandToPay(data['rand_to_return']);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   return (
     <View flex>
-      <Text text40 blue10 margin-30>
+      <Text text40 style={styles.title}>
         Making A Deposit
       </Text>
       <View margin-30>
@@ -53,14 +54,11 @@ const IssueAmount = ({
           The transaction will appear in your transaction history and on the Real-Time Audit.
         </Text>
       </View>
-      <View marginH-30>
-        <Text>
-          How many RCoin would you like?
-        </Text>
-      </View>
-      <View marginH-30>
-        <AmountEntry setAmount={setCoinsToIssue} least_limit={LEAST_LIMIT} />
-      </View>
+      <AmountEntry setAmount={setAmount} least_limit={LEAST_LIMIT} />
+      <Image
+        source={require('../../style/RCoin-ZAR.png')}
+        style={{ width: '100%', height: 130, marginVertical: 30 }}
+      />
       <View flex bottom marginH-30 marginB-50>
         <Button onPress={() => {nextStage(); setRands(coins_to_issue)}} label="Continue to Summary" backgroundColor={styles.rcoin} />
       </View>
