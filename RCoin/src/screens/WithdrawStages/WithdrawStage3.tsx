@@ -1,6 +1,5 @@
-import React from 'react';
-import {Text, View, Button} from 'react-native-ui-lib';
-import {Svg, Circle, Path} from 'react-native-svg';
+import React, { useEffect, useState } from "react";
+import { Text, View, Button, Image } from "react-native-ui-lib";
 import styles from '../../style/style';
 
 // Success
@@ -13,21 +12,14 @@ const WithdrawStage3 = ({
   nextStage: React.Dispatch<void>;
   coins_to_withdraw: number;
   rands_being_credited: number;
-  bank_account: {[key: string]: string};
+  bank_account: { [key: string]: string };
 }) => {
   return (
     <View flex>
-      <View marginT-30 style={{alignSelf: 'center'}}>
-        <Svg height="100" width="100">
-          <Circle cx="43.5" cy="43.5" r="43.5" fill="#5DB075" />
-          <Path
-            d="M27.6818 43.4999L38.2148 55.3635L59.3181 31.6362"
-            stroke="white"
-            stroke-width="15"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </Svg>
+      <View marginT-30 style={{ alignSelf: "center" }}>
+        <Image
+          source={require('../style/Success.png')}
+        />
       </View>
       <Text
         text40

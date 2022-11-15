@@ -11,6 +11,8 @@ import { AuthStack } from './src/routes/AuthStack';
 import WithdrawScreen from './src/screens/WithdrawScreen';
 import IssueScreen from './src/screens/IssueScreen';
 import { KeypairProvider } from './src/contexts/Keypair';
+import TransactionHistory from './src/screens/TransactionHistory';
+import Dashboard from './src/screens/Dashboard';
 
 const Tab = createBottomTabNavigator();
 
@@ -35,10 +37,16 @@ const App = () => {
       <AuthProvider>
         <AuthRouter>
           <Tab.Navigator>
-            <Tab.Screen name="Home" component={HomeScreen} />
-            <Tab.Screen name="Deposit" component={IssueScreen} />
-            <Tab.Screen name="Transfer" component={TransferScreen} />
-            <Tab.Screen name="Withdraw" component={WithdrawScreen} />
+            <Tab.Screen
+              name="Dashboard"
+              component={Dashboard}
+              options={{ headerShown: false }}
+            />
+            {/* <Tab.Screen name="Dashboard" component={HomeScreen} options={{ headerShown: false }} /> */}
+            <Tab.Screen name="Issue" component={IssueScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Deposit" component={DepositScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Transfer" component={TransferScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="Withdraw" component={WithdrawScreen} options={{ headerShown: false }} />
           </Tab.Navigator>
         </AuthRouter>
       </AuthProvider>
