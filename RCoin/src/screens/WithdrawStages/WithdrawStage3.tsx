@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator, Image } from "react-native-ui-lib";
+import React from "react";
+import { Text, View, Button } from "react-native-ui-lib";
 import { Svg, Circle, Path } from 'react-native-svg';
-const { TextField } = Incubator
-import styles from "../style/style"
+import styles from "../../style/style"
 
 // Success
 const WithdrawStage3 = ({
@@ -41,13 +40,10 @@ const WithdrawStage3 = ({
         <Text style={styles.buttonCaption}>
           You can now see your updated balance on the dashboard
         </Text>
-        <Button onPress={() => { }} label="RCoin Dashboard" backgroundColor={styles.rcoin} />
+        <Button onPress={nextStage} label="RCoin Dashboard" backgroundColor={styles.rcoin} />
       </View>
-      <View flex bottom marginH-30 marginB-20>
-        <Text style={styles.buttonCaption}>
-          Make a transfer below.
-        </Text>
-        <Button onPress={() => { nextStage }} label="Make a transfer" backgroundColor={styles.rcoin} />
+      <View flex bottom marginH-30 marginB-50>
+        <Button onPress={nextStage} label="Make another Withdrawal" backgroundColor={styles.rcoin} />
       </View>
 
 

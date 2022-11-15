@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
-const { TextField } = Incubator
-import ChangingBalance from "./Balances/ChangingBalance"
+import React from "react";
+import { Text, View, Button } from "react-native-ui-lib";
+import ChangingBalance from "../../components/Balances/ChangingBalance"
 import Reciept from "./TransferReciept"
-import styles from "../style/style"
+import styles from "../../style/style"
 
 // Select the amount
 const Transfer2Confirm = ({
-    setStage,
+    nextStage,
     deduction,
     recipient,
 }: {
-    setStage: React.Dispatch<React.SetStateAction<number>>;
+    nextStage: React.Dispatch<void>;
     deduction: number;
     recipient: string;
 }) => {
@@ -25,8 +24,8 @@ const Transfer2Confirm = ({
                 <Reciept email={recipient} amount={deduction} />
             </View>
 
-            <View flex bottom marginH-30 marginB-20>
-                <Button onPress={() => { setStage(3) }} label="Continue" backgroundColor={styles.rcoin} />
+            <View flex bottom marginH-30 marginB-50>
+                <Button onPress={nextStage} label="Transfer RCoin" backgroundColor={styles.rcoin} />
             </View>
         </View>
     );

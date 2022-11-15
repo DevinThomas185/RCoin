@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, Card, Button, Colors, Incubator, Image } from "react-native-ui-lib";
-import { useAuth } from '../contexts/Auth';
-import styles from "../style/style"
+import { useAuth } from '../../contexts/Auth';
+import styles from "../../style/style"
 const { TextField } = Incubator
 
 
@@ -42,8 +42,8 @@ const Reciept = ({
                     {bank_account["bank_account"]}
                 </Text>
                 <Text style={styles.bankDetailsLabel}>
-                    bank code{'\n'}
-                    account number
+                    Bank Code{'\n'}
+                    Account Number
                 </Text>
             </View>
         </View >

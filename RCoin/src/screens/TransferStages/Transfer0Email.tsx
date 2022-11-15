@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator, Image } from "react-native-ui-lib";
+import React from "react";
+import { Text, View, Button, Incubator, Image } from "react-native-ui-lib";
 const { TextField } = Incubator
-import styles from "../style/style"
+import styles from "../../style/style"
 
 // Select the recipient
 const Transfer0Email = ({
-    setStage,
+    nextStage,
     setRecipient,
 }: {
-    setStage: React.Dispatch<React.SetStateAction<number>>;
+    nextStage: React.Dispatch<void>;
     setRecipient: React.Dispatch<React.SetStateAction<string>>;
 }) => {
     return (
@@ -22,12 +22,12 @@ const Transfer0Email = ({
                     Simply enter the email of the recipient and choose the amount.
                     {'\n'}
                     {'\n'}
-                    The transaction will appear on both your accounts as well as the real time audit.
+                    The transaction will appear in both of your transaction histories as well as the Real-Time Audit.
                 </Text>
             </View>
 
             <Image
-                source={require('../style/RCoin-RCoin.png')}
+                source={require('../../style/RCoin-RCoin.png')}
                 style={{ width: '100%', height: 130 }}
             />
 
@@ -36,7 +36,7 @@ const Transfer0Email = ({
                     Who would you like to send RCoin to?
                 </Text>
                 <TextField
-                    placeholder="email"
+                    placeholder="Email of Recipient"
                     style={styles.input}
                     validationMessage={["Email is required"]}
                     keyboardType="email"
@@ -45,8 +45,8 @@ const Transfer0Email = ({
                     }}
                 />
             </View>
-            <View flex bottom marginH-30 marginB-20>
-                <Button onPress={() => { setStage(1) }} label="Continue" backgroundColor={styles.rcoin} />
+            <View flex bottom marginH-30 marginB-50>
+                <Button onPress={nextStage} label="Continue to Choose Amount" backgroundColor={styles.rcoin} />
             </View>
         </View >
     );

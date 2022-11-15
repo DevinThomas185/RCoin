@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, View, Card, Button, Wizard, Colors } from "react-native-ui-lib";
+import { View, Wizard } from "react-native-ui-lib";
 import { useBackHandler } from "../services/BackHandler";
 import IssueAmount from './IssueStages/Issue0Amount'
 import IssueSummary from './IssueStages/Issue1Summary'
@@ -28,13 +28,13 @@ const TransferScreen = () => {
 
   const renderCurrentStage = () => {
     if (stage == 0) {
-      return <IssueAmount setStage={setStage} setAmount={setCoinsToIssue} setRandToPay={setRandToPay}/>;
+      return <IssueAmount nextStage={() => {setStage(1)}} setCoinsToIssue={setCoinsToIssue} setRandToPay={setRandToPay} coins_to_issue={coins_to_issue}/>;
     }
     else if (stage == 1) {
-      return <IssueSummary setStage={setStage} coins_to_issue={coins_to_issue} rand_to_pay={rand_to_pay} />;
+      return <IssueSummary nextStage={() => {setStage(2)}} coins_to_issue={coins_to_issue} rand_to_pay={rand_to_pay} />;
     }
     else {
-      return <IssueSuccess setStage={setStage} />;
+      return <IssueSuccess nextStage={() => {setStage(0)}} rand_to_pay={rand_to_pay}/>;
     }
   }
 

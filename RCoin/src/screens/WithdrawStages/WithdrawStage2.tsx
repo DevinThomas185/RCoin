@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
-import ChangingBalance from "./Balances/ChangingBalance";
-const { TextField } = Incubator
-import styles from "../style/style"
-import Balance from "./Balance"
+import React from "react";
+import { Text, View, Button } from "react-native-ui-lib";
+import ChangingBalance from "../../components/Balances/ChangingBalance";
+import styles from "../../style/style"
 import WithdrawReciept from "./WithdrawReciept"
 
 // Confirmation
@@ -36,7 +34,7 @@ const WithdrawStage1 = ({
         <Button onPress={nextStage} label="Account Settings" backgroundColor={styles.rcoin} />
       </View>
       <Text style={styles.buttonCaption}>Wrong bank info? Change in your account settings</Text>
-      <View flex bottom marginH-30 marginB-20>
+      <View flex bottom marginH-30 marginB-50>
         <Button onPress={nextStage} label="Continue" backgroundColor={styles.rcoin} />
       </View>
     </View>

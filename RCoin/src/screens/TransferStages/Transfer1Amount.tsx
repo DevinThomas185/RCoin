@@ -1,17 +1,17 @@
 import React from "react";
 import { Text, View, Button, Colors } from "react-native-ui-lib";
-import AmountEntry from "./AmountEntry";
-import styles from "../style/style"
-import ChangingBalance from "./Balances/ChangingBalance";
+import AmountEntry from "../../components/AmountEntry";
+import styles from "../../style/style"
+import Balance from "../../components/Balances/Balance";
 
 const LEAST_LIMIT = 0
 
 // Select the amount
 const Transfer1Amount = ({
-    setStage,
+    nextStage,
     setAmount,
 }: {
-    setStage: React.Dispatch<React.SetStateAction<number>>;
+    nextStage: React.Dispatch<void>;
     setAmount: React.Dispatch<React.SetStateAction<number>>;
 }) => {
 
@@ -21,19 +21,18 @@ const Transfer1Amount = ({
                 Choose the Amount
             </Text>
             <View margin-20>
-                <ChangingBalance deduction={100} />
+                <Balance />
             </View>
-            <View margin-30>
+            <View marginH-30>
                 <Text>
                     How much would you like to send?
                 </Text>
             </View>
-            <AmountEntry setAmount={setAmount} least_limit={LEAST_LIMIT} />
-            <View flex bottom marginH-30 marginB-50>
-                <Button onPress={() => { setStage(2) }} label="Continue" backgroundColor={Colors.blue10} />
+            <View marginH-30>
+                <AmountEntry setAmount={setAmount} least_limit={LEAST_LIMIT} />
             </View>
-            <View flex bottom marginH-10 marginB-10>
-                <Button onPress={() => { setStage(0) }} label="Back" />
+            <View flex bottom marginH-30 marginB-50>
+                <Button onPress={nextStage} label="Continue to Confirmation" backgroundColor={styles.rcoin} />
             </View>
         </View>
     );

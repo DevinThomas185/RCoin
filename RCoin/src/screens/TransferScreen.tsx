@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { View, Wizard } from "react-native-ui-lib";
-import TransferEmail from "../components/Transfer0Email";
-import TransferAmount from "../components/Transfer1Amount";
-import TransferConfirm from "../components/Transfer2Confirm";
-import TransferSuccess from "../components/Transfer3Success";
+import TransferEmail from "./TransferStages/Transfer0Email";
+import TransferAmount from "./TransferStages/Transfer1Amount";
+import TransferConfirm from "./TransferStages/Transfer2Confirm";
+import TransferSuccess from "./TransferStages/Transfer3Success";
 import { useBackHandler } from "../services/BackHandler";
 
 
@@ -31,16 +31,16 @@ const TransferScreen = () => {
 
   const renderCurrentStage = () => {
     if (stage == 0) {
-      return <TransferEmail setStage={setStage} setRecipient={setRecipient} />;
+      return <TransferEmail nextStage={() => {setStage(1)}} setRecipient={setRecipient} />;
     }
     else if (stage == 1) {
-      return <TransferAmount setStage={setStage} setAmount={setAmount} />;
+      return <TransferAmount nextStage={() => {setStage(2)}} setAmount={setAmount} />;
     }
     else if (stage == 2) {
-      return <TransferConfirm setStage={setStage} deduction={amount} recipient={recipient} />;
+      return <TransferConfirm nextStage={() => {setStage(3)}} deduction={amount} recipient={recipient} />;
     }
     else {
-      return <TransferSuccess setStage={setStage} amount={amount} recipient={recipient}/>;
+      return <TransferSuccess nextStage={() => {setStage(0)}} amount={amount} recipient={recipient}/>;
     }
   }
 
