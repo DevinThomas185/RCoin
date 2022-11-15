@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator, Picker } from "react-native-ui-lib";
-import { useAuth } from "../contexts/Auth";
-const { TextField } = Incubator;
-import styles from "../style/style"
-import Balance from "../components/Balances/Balance"
-import AmountEntry from "./AmountEntry";
+import React, { useEffect } from "react";
+import { Text, View, Button, Picker } from "react-native-ui-lib";
+import { useAuth } from "../../contexts/Auth";
+import styles from "../../style/style"
+import Balance from "../../components/Balances/Balance"
+import AmountEntry from "../../components/AmountEntry";
 
 // Select Account
 const WithdrawStage1 = ({
@@ -81,7 +80,7 @@ const WithdrawStage1 = ({
           })}
         </Picker>
       </View> */}
-      <View flex bottom marginH-30 marginB-20>
+      <View flex bottom marginH-30 marginB-50>
         <Button onPress={nextStage} label="Continue" backgroundColor={styles.rcoin} />
       </View>
     </View>

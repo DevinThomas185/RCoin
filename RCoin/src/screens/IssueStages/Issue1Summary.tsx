@@ -1,13 +1,15 @@
 import { Text, View, Button, Colors } from "react-native-ui-lib";
 import ChangingBalance from "../../components/Balances/ChangingBalance";
+import styles from "../../style/style";
+import IssueReceipt from "./IssueReceipt";
 
 // Show the summary
 const IssueSummary = ({
-  setStage,
+  nextStage,
   coins_to_issue,
   rand_to_pay,
 }: {
-  setStage: React.Dispatch<React.SetStateAction<number>>;
+  nextStage: React.Dispatch<void>;
   coins_to_issue: number;
   rand_to_pay: number;
 }) => {
@@ -19,19 +21,11 @@ const IssueSummary = ({
       </Text>
       <ChangingBalance deduction={-coins_to_issue} />
       <View margin-30>
-        <Text>
-          You are purchasing {'\n'}
-          {coins_to_issue} RCoin {'\n'}
-          for {'\n'}
-          {rand_to_pay} Rand {'\n'}
-        </Text>
+        <IssueReceipt rand_to_pay={rand_to_pay} coins_to_issue={coins_to_issue}/>
       </View>
 
       <View flex bottom marginH-30 marginB-50>
-        <Button onPress={() => { setStage(2) }} label="Continue" backgroundColor={Colors.blue10} />
-      </View>
-      <View flex bottom marginH-10 marginB-10>
-        <Button onPress={() => { setStage(0) }} label="Back" />
+        <Button onPress={nextStage} label="Purchase RCoin" backgroundColor={styles.rcoin} />
       </View>
     </View>
   );

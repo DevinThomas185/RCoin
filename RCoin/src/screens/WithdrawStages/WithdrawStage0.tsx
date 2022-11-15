@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Text, View, Button, Image } from "react-native-ui-lib";
-import Balance from "./Balances/Balance";
-import { useAuth } from "../contexts/Auth";
-import styles from "../style/style"
+import Balance from "../../components/Balances/Balance";
+import { useAuth } from "../../contexts/Auth";
+import styles from "../../style/style"
 
 const LEAST_LIMIT = 0
 
@@ -48,19 +48,19 @@ const WithdrawStage0 = ({
       </View>
       <View style={{ marginHorizontal: 30 }}>
         <Text>
-          You can withdraw RCoin as Rand at any time.
+          You can withdraw RCoin to Rand at any time.
           {'\n'}
           {'\n'}
-          The transaction will appear on both your accounts as well as the real time audit.
+          The transaction will appear in your transaction history as well as on the Real-Time Audit.
         </Text>
       </View>
 
       <Image
-        source={require('../style/RCoin-ZAR.png')}
+        source={require('../../style/RCoin-ZAR.png')}
         style={{ width: '100%', height: 130, marginVertical: 30 }}
       />
 
-      <View flex bottom marginH-30 marginB-20>
+      <View flex bottom marginH-30 marginB-50>
         <Button onPress={nextStage} label="Continue" backgroundColor={styles.rcoin} />
       </View>
     </View>

@@ -1,20 +1,22 @@
-
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
+import React from "react";
+import { Text, View, Button, Colors } from "react-native-ui-lib";
 import AmountEntry from "../../components/AmountEntry";
 import { useAuth } from "../../contexts/Auth";
+import styles from "../../style/style"
 
 const LEAST_LIMIT = 0;
 
 // Select the amount
 const IssueAmount = ({
-  setStage,
-  setAmount,
+  nextStage,
+  setCoinsToIssue,
   setRandToPay,
+  coins_to_issue,
 }: {
-  setStage: React.Dispatch<React.SetStateAction<number>>;
-  setAmount: React.Dispatch<React.SetStateAction<number>>;
+  nextStage: React.Dispatch<void>;
+  setCoinsToIssue: React.Dispatch<React.SetStateAction<number>>;
   setRandToPay: React.Dispatch<React.SetStateAction<number>>;
+  coins_to_issue: number;
 }) => {
 
   const auth = useAuth();
@@ -48,17 +50,19 @@ const IssueAmount = ({
           You can exchange any amount of Rand for RCoin.
           {'\n'}
           {'\n'}
-          The transaction will appear on your account as well as the real time audit.
+          The transaction will appear in your transaction history and on the Real-Time Audit.
         </Text>
       </View>
-      <View margin-30>
+      <View marginH-30>
         <Text>
           How many RCoin would you like?
         </Text>
       </View>
-      <AmountEntry setAmount={setAmount} least_limit={LEAST_LIMIT} />
+      <View marginH-30>
+        <AmountEntry setAmount={setCoinsToIssue} least_limit={LEAST_LIMIT} />
+      </View>
       <View flex bottom marginH-30 marginB-50>
-        <Button onPress={() => { setStage(1) }} label="Continue" backgroundColor={Colors.blue10} />
+        <Button onPress={() => {nextStage(); setRands(coins_to_issue)}} label="Continue to Summary" backgroundColor={styles.rcoin} />
       </View>
     </View>
   );

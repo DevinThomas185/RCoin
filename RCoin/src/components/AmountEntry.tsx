@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
+import React, { useState } from "react";
+import { Text, View, Incubator } from "react-native-ui-lib";
 import styles from "../style/style";
 const { TextField } = Incubator
 

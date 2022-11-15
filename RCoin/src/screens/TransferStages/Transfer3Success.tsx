@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Card, Button, Colors, Incubator } from "react-native-ui-lib";
-const { TextField } = Incubator
-import styles from "../style/style"
+import React from "react";
+import { Text, View, Button } from "react-native-ui-lib";
+import styles from "../../style/style"
 
 // Select the amount
 const Transfer2Confirm = ({
-    setStage,
+    nextStage,
     amount,
     recipient,
 }: {
-    setStage: React.Dispatch<React.SetStateAction<number>>;
+    nextStage: React.Dispatch<void>;
     amount: number;
     recipient: string;
 }) => {
@@ -32,13 +31,10 @@ const Transfer2Confirm = ({
                 <Text style={styles.buttonCaption}>
                     You can now see your updated balance on the dashboard
                 </Text>
-                <Button onPress={() => { setStage(0) }} label="RCoin Dashboard" backgroundColor={styles.rcoin} />
+                <Button onPress={nextStage} label="RCoin Dashboard" backgroundColor={styles.rcoin} />
             </View>
-            <View flex bottom marginH-30-0>
-                <Text style={styles.buttonCaption}>
-                    Make another transfer below.
-                </Text>
-                <Button marginB-20 onPress={() => { setStage(0) }} label="Make a transfer" backgroundColor={styles.rcoin} />
+            <View flex bottom marginH-30 marginB-50>
+                <Button onPress={nextStage} label="Make another Transfer" backgroundColor={styles.rcoin} />
             </View>
         </View >
     );

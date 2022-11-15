@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from '../../contexts/Auth';
-import { Text, View } from 'react-native-ui-lib'
+import { LoaderScreen, Text, View } from 'react-native-ui-lib';
 import BalanceFormat from "./BalanceFormat";
+import styles from "../../style/style"
 
 const Balance = () => {
-    const [token_balance, setTokenBalance] = useState(0.0)
-    const [timeUpdated, setTimeUpdated] = useState(0.0)
+    const [token_balance, setTokenBalance] = useState(0.0);
+    const [timeUpdated, setTimeUpdated] = useState(0.0);
+    const [loading, setLoading] = useState(true);
     const auth = useAuth()
 
     useEffect(() => {
@@ -19,18 +21,28 @@ const Balance = () => {
             .then(res => res.json())
             .then(data => {
                 setTokenBalance(data['token_balance']);
+                setLoading(false);
             })
             .catch(error => {
                 console.log(error);
             });
     }, []);
 
-    return (
-        <View>
-            <Text>Balance</Text>
-            <BalanceFormat token_balance={token_balance} />
-        </View>
-    );
+    if (loading) {
+        return (
+            <View center marginV-20>
+                <LoaderScreen message={"Loading Balance"} color={styles.rcoin} />
+            </View>
+        );
+    }
+    else {
+        return (
+            <View center marginV-20>
+                <Text>Balance</Text>
+                <BalanceFormat token_balance={token_balance} />
+            </View>
+        );
+    }
 }
 
 export default Balance

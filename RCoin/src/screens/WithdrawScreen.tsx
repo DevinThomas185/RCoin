@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, Card, Button, Wizard, Colors } from "react-native-ui-lib";
-import WithdrawStage0 from "../components/WithdrawStage0";
-import WithdrawStage1 from "../components/WithdrawStage1";
-import WithdrawStage2 from "../components/WithdrawStage2";
-import WithdrawStage3 from "../components/WithdrawStage3";
+import { View, Wizard } from "react-native-ui-lib";
+import WithdrawStage0 from "./WithdrawStages/WithdrawStage0";
+import WithdrawStage1 from "./WithdrawStages/WithdrawStage1";
+import WithdrawStage2 from "./WithdrawStages/WithdrawStage2";
+import WithdrawStage3 from "./WithdrawStages/WithdrawStage3";
 import { useAuth } from '../contexts/Auth';
 import { useBackHandler } from "../services/BackHandler";
 
@@ -17,7 +17,6 @@ const WithdrawScreen = () => {
     sort_code: ""
   });
   const [token_balance, setTokenBalance] = useState(0.0);
-  const [sol_balance, setSolBalance] = useState(0.0);
   const auth = useAuth();
 
   const backHandlerAction = () => {
@@ -36,10 +35,6 @@ const WithdrawScreen = () => {
 
   useBackHandler(backHandlerAction)
 
-  const numberWithCommas = (x: number) => {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-
   useEffect(() => {
     fetch('http://10.0.2.2:8000/api/get_token_balance', {
       method: 'GET',
@@ -51,7 +46,6 @@ const WithdrawScreen = () => {
       .then(res => res.json())
       .then(data => {
         setTokenBalance(data['token_balance']);
-        setSolBalance(data['sol_balance']);
       })
       .catch(error => {
         console.log(error);
