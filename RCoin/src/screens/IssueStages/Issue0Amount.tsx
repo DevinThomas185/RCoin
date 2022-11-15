@@ -54,7 +54,7 @@ const IssueAmount = ({
           The transaction will appear in your transaction history and on the Real-Time Audit.
         </Text>
       </View>
-      <AmountEntry setAmount={setAmount} least_limit={LEAST_LIMIT} />
+      <AmountEntry setAmount={setCoinsToIssue} least_limit={LEAST_LIMIT} />
       <Image
         source={require('../../style/RCoin-ZAR.png')}
         style={{ width: '100%', height: 130, marginVertical: 30 }}

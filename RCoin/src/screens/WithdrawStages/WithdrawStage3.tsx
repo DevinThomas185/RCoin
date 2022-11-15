@@ -18,7 +18,7 @@ const WithdrawStage3 = ({
     <View flex>
       <View marginT-30 style={{ alignSelf: "center" }}>
         <Image
-          source={require('../style/Success.png')}
+          source={require('../../style/Success.png')}
         />
       </View>
       <Text

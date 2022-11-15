@@ -38,13 +38,12 @@ const App = () => {
         <AuthRouter>
           <Tab.Navigator>
             <Tab.Screen
-              name="Dashboard"
+              name="Home"
               component={Dashboard}
               options={{ headerShown: false }}
             />
             {/* <Tab.Screen name="Dashboard" component={HomeScreen} options={{ headerShown: false }} /> */}
             <Tab.Screen name="Issue" component={IssueScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Deposit" component={DepositScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Transfer" component={TransferScreen} options={{ headerShown: false }} />
             <Tab.Screen name="Withdraw" component={WithdrawScreen} options={{ headerShown: false }} />
           </Tab.Navigator>
