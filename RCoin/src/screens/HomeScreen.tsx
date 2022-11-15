@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, Image, TouchableOpacity } from "react-native-ui-lib";
 import { useAuth } from '../contexts/Auth';
-import Balance from '../components/Balance';
+import Balance from '../components/Balances/Balance';
 import ServiceLink from "../components/ServiceLink"
 import style from '../style/style'
 import { NavigationScreenProp } from 'react-navigation';
