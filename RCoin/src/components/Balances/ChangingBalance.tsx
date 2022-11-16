@@ -47,19 +47,19 @@ const ChangingBalance = ({
     else {
         return (
             <View center marginV-20>
-                <BalanceFormat token_balance={token_balance}/>
+                <BalanceFormat token_balance={token_balance} />
                 <View center>
                     {
                         deduction > 0 ?
-                        <Image
-                            source={require('../../style/red-arrow-down.png')}
-                            style={{ width: 30, height: 30 }}
-                        />
-                        :
-                        <Image
-                            source={require('../../style/green-arrow-down.png')}
-                            style={{ width: 30, height: 30}}
-                        />
+                            <Image
+                                source={require('../../style/red-arrow-down.png')}
+                                style={{ width: 40, height: 40 }}
+                            />
+                            :
+                            <Image
+                                source={require('../../style/green-arrow-down.png')}
+                                style={{ width: 40, height: 40 }}
+                            />
                     }
                 </View>
                 <BalanceFormat token_balance={new_balance} />
