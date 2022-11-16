@@ -1,12 +1,13 @@
 // @ts-ignore
-import {useState} from 'react';
-import {StyleSheet} from 'react-native';
-import {Button, LoaderScreen, Text, View, Wizard} from 'react-native-ui-lib';
-import {StepOne} from '../components/signup/StepOne';
-import {StepTwo} from '../components/signup/StepTwo';
-import {StepThree} from '../components/signup/StepThree';
-import {UserSignUp} from '../types/SignUp';
-import {NavigationScreenProp} from 'react-navigation';
+import { useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { Button, LoaderScreen, Text, View, Wizard } from 'react-native-ui-lib';
+import { StepOne } from '../components/signup/StepOne';
+import { StepTwo } from '../components/signup/StepTwo';
+import { StepThree } from '../components/signup/StepThree';
+import { StepFour } from '../components/signup/StepFour';
+import { UserSignUp } from '../types/SignUp';
+import { NavigationScreenProp } from 'react-navigation';
 import { useBackHandler } from '../services/BackHandler';
 import style from "../style/style"
 
@@ -21,17 +22,15 @@ export const SignUpScreen = ({
   );
 
   // Without "dummy" final page which is the underlying signup component
-  const NUM_PAGES = 2;
+  const NUM_PAGES = 3;
 
   const backHandlerAction = () => {
-    switch (stage) {
-      case 1:
-      case 2:
-        setStage(stage - 1)
-        return true
-      default:
-        return false
+    if (stage > 0 && stage <= NUM_PAGES) {
+      setStage(stage - 1)
+      return true
     }
+
+    return false
   }
 
   useBackHandler(backHandlerAction)
@@ -55,6 +54,14 @@ export const SignUpScreen = ({
       case 2:
         return (
           <StepThree
+            navigation={navigation}
+            signUpDetails={signUpDetails}
+            setSignUpDetails={setSignUpDetails}
+          />
+        );
+      case 3:
+        return (
+          <StepFour
             navigation={navigation}
             signUpDetails={signUpDetails}
             setSignUpDetails={setSignUpDetails}
@@ -89,7 +96,8 @@ export const SignUpScreen = ({
       <Wizard activeIndex={stage}>
         <Wizard.Step state={getStageState(0)} label={'Your Details'} circleColor={style.rcoin} color={style.rcoin}/>
         <Wizard.Step state={getStageState(1)} label={'Bank Details'} circleColor={style.rcoin} color={style.rcoin}/>
-        <Wizard.Step state={getStageState(2)} label={'Confirmation'} circleColor={style.rcoin} color={style.rcoin}/>
+        <Wizard.Step state={getStageState(2)} label={'Key Password'} circleColor={style.rcoin} color={style.rcoin}/>
+        <Wizard.Step state={getStageState(3)} label={'Confirmation'} circleColor={style.rcoin} color={style.rcoin}/>
       </Wizard>
 
       <View style={styles.steps}>{conditionalComponent()}</View>

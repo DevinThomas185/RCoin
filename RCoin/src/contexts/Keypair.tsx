@@ -4,7 +4,10 @@ import {Keypair, Signer} from '@solana/web3.js';
 
 type KeypairContextData = {
   writePair(kp: Keypair, encryptionKey: string): void;
+  writePairBio(kp: Keypair, encryptionKey: string): void;
   readPair(decryptionKey: string): Promise<Keypair | undefined>;
+  readPairBio(decryptionKey: string): Promise<Keypair | undefined>;
+  bioSecretKeyExitsts(): Promise<boolean>;
 };
 
 const KeypairContext = createContext<KeypairContextData>(
@@ -17,6 +20,10 @@ const KeypairProvider = ({children}: {children: React.ReactNode}) => {
     keypairService.writePair(kp, encryptionKey);
   };
 
+  const writePairBio = (kp: Keypair, encryptionKey: string) => {
+    keypairService.writePairBio(kp, encryptionKey);
+  };
+
   const readPair = async (decryptionKey: string) => {
     const data: Keypair | undefined = await keypairService.readPair(
       decryptionKey,
@@ -24,8 +31,19 @@ const KeypairProvider = ({children}: {children: React.ReactNode}) => {
     return data;
   };
 
+  const readPairBio = async (decryptionKey: string) => {
+    const data: Keypair | undefined = await keypairService.readPairBio(
+      decryptionKey,
+    );
+    return data;
+  };
+
+  const bioSecretKeyExitsts = (): Promise<boolean> => {
+    return keypairService.bioSecretKeyExitsts();
+  };
+
   return (
-    <KeypairContext.Provider value={{writePair, readPair}}>
+    <KeypairContext.Provider value={{writePair, writePairBio, readPair, readPairBio, bioSecretKeyExitsts}}>
       {children}
     </KeypairContext.Provider>
   );

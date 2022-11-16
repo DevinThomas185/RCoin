@@ -1,12 +1,13 @@
-import React from 'react';
-import {Text, View, Button} from 'react-native-ui-lib';
+import React, { useState } from 'react';
+import { Text, View, Button } from 'react-native-ui-lib';
 import ChangingBalance from '../../components/Balances/ChangingBalance';
 import Reciept from './TransferReciept';
 import styles from '../../style/style';
-import {useAuth} from '../../contexts/Auth';
-import {useKeypair} from '../../contexts/Keypair';
-import {Message, Transaction} from '@solana/web3.js';
+import { useAuth } from '../../contexts/Auth';
+import { useKeypair } from '../../contexts/Keypair';
+import { Message, Transaction } from '@solana/web3.js';
 import nacl from 'tweetnacl';
+import PasswordPopup from '../../components/PasswordPopup';
 
 // Select the amount
 const Transfer2Confirm = ({
@@ -23,7 +24,10 @@ const Transfer2Confirm = ({
   const auth = useAuth();
   const keyPair = useKeypair();
 
-  const handleSend = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [secretKey, setSecretKey] = useState<Uint8Array>()
+
+  const handleSend = (secretKey: Uint8Array) => {
     fetch('http://10.0.2.2:8000/api/trade', {
       method: 'POST',
       headers: {
@@ -31,7 +35,7 @@ const Transfer2Confirm = ({
         Authorization: `Bearer ${auth.authData?.token}`,
       },
       body: JSON.stringify(
-        {coins_to_transfer: amount, recipient_email: recipient},
+        { coins_to_transfer: amount, recipient_email: recipient },
         null,
         2,
       ),
@@ -48,43 +52,40 @@ const Transfer2Confirm = ({
             new Uint8Array(data['transaction_bytes']),
           );
 
-          keyPair.readPair('password').then(kp => {
-            if (kp != undefined) {
-              // Make signature
-              const message: Message = transaction.compileMessage();
-              const signData = message.serialize();
-              const signature = nacl.sign.detached(signData, kp.secretKey);
+          if (secretKey !== undefined) {
+            // Make signature
+            const message: Message = transaction.compileMessage();
+            const signData = message.serialize();
+            const signature = nacl.sign.detached(signData, secretKey);
 
-              fetch('http://10.0.2.2:8000/api/complete-trade', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${auth.authData?.token}`,
+            fetch('http://10.0.2.2:8000/api/complete-trade', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${auth.authData?.token}`,
+              },
+              body: JSON.stringify(
+                {
+                  signature: Array.from(signature),
+                  transaction_bytes: Array.from(data['transaction_bytes']),
                 },
-                body: JSON.stringify(
-                  {
-                    signature: Array.from(signature),
-                    transaction_bytes: Array.from(data['transaction_bytes']),
-                  },
-                  null,
-                  2,
-                ),
+                null,
+                2,
+              ),
+            })
+              .then(res => {
+                if (!res.ok) {
+                  throw new Error('Complete redem failed');
+                }
+                return res.json();
               })
-                .then(res => {
-                  if (!res.ok) {
-                    throw new Error('Complete redem failed');
-                  }
-                  return res.json();
-                })
-                .then(data => {
-                  if (data['success']) {
-                    setTransactionId(data['signature']);
-                    nextStage();
-                  }
-                })
-                .catch(error => console.log(error));
-            }
-          });
+              .then(data => {
+                if (data['success']) {
+                  nextStage();
+                }
+              })
+              .catch(error => console.log(error));
+          }
         }
       })
       .catch(error => console.log(error));
@@ -102,11 +103,16 @@ const Transfer2Confirm = ({
 
       <View flex bottom marginH-30 marginB-50>
         <Button
-          onPress={handleSend}
+          onPress={() => setIsModalVisible(true)}
           label="Transfer RCoin"
           backgroundColor={styles.rcoin}
         />
       </View>
+      <PasswordPopup
+        isVisible={isModalVisible}
+        setIsVisible={setIsModalVisible}
+        onSuccess={handleSend}
+      />
     </View>
   );
 };
