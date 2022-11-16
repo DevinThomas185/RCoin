@@ -3,6 +3,7 @@ export interface UserSignUp {
   firstName: string;
   lastName: string;
   password: string;
+  encryption_password: string;
   bankAccountNumber: string;
   bankCode: string;
   IDNumber: string;

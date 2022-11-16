@@ -29,6 +29,8 @@ export const LoginScreen = ({
         floatingPlaceholder
         onChangeText={(email: string) => setEmail(email)}
         floatingPlaceholderStyle={{alignSelf: 'center'}}
+        keyboardType='email-address'
+        autoCapitalize='none'
       />
       <TextField
         style={styles.inputField}

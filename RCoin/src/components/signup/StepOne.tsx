@@ -27,6 +27,8 @@ export const StepOne = ({
         }
         value={signUpDetails.email}
         floatingPlaceholderStyle={{alignSelf: 'center'}}
+        keyboardType='email-address'
+        autoCapitalize='none'
       />
 
       <TextField
