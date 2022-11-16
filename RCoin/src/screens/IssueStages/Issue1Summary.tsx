@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
 import { Paystack, paystackProps } from 'react-native-paystack-webview';
-import { Text, View, Button, Colors } from "react-native-ui-lib";
+import { Text, View, Button } from "react-native-ui-lib";
 import ChangingBalance from "../../components/Balances/ChangingBalance";
-import { TouchableOpacity } from 'react-native';
 import IssueReceipt from './IssueReceipt';
+import styles from "../../style/style"
 
 // Show the summary
 const IssueSummary = ({
@@ -32,7 +32,7 @@ const IssueSummary = ({
         amount={'1000.00'}
         paystackKey="pk_test_74b1d55fbad5fc6c5bb27a7d6030a0e575aa75f4"
         currency="ZAR"
-        activityIndicatorColor="blue"
+        activityIndicatorColor={styles.rcoin}
         onCancel={() => {
           // handle response here
           setStage(1)
@@ -44,11 +44,8 @@ const IssueSummary = ({
         ref={paystackWebViewRef}
       />
 
-      <View flex bottom marginH-10 marginB-10>
-        <Button onPress={() => paystackWebViewRef.current.startTransaction()} label="Pay Now" />
-      </View>
-      <View flex bottom marginH-10 marginB-10>
-        <Button onPress={() => { setStage(0) }} label="Back" />
+      <View flex bottom marginH-30 marginB-50>
+        <Button onPress={() => paystackWebViewRef.current.startTransaction()} label="Pay with Paystack" backgroundColor={styles.paystack}/>
       </View>
     </View>
   );

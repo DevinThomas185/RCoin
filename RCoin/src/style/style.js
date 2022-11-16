@@ -4,6 +4,7 @@ Style = {
 
     rcoin: '#435C9C',
     success: '#5DB075',
+    paystack: '#41AA5E',
     
     title: { 
         //top right bottom left
