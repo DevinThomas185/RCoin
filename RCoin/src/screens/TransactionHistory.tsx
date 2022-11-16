@@ -67,7 +67,7 @@ const TransactionHistory = () => {
             <Text text50 marginT-20 marginH-30>Transaction History</Text>
             {History.transaction_history.map((transaction) => (
                 <View>
-                    <Transaction amount={transaction.amount} recipient={transaction.recipient} sender={transaction.sender} />
+                    <Transaction amount={transaction.amount} recipient={transaction.recipient} sender={transaction.sender} isPending={false} />
                     <View style={style.thinDivider} />
                 </View>
             ))}

@@ -3,7 +3,7 @@ import { Text, View, Image } from "react-native-ui-lib";
 import style from '../style/style'
 
 
-const Transaction = ({ amount, sender, recipient }: { amount: number, sender: string, recipient: string }) => {
+const Transaction = ({ amount, sender, recipient, isPending }: { amount: number, sender: string, recipient: string, isPending: boolean }) => {
 
     const user_email = "adam@gmail.com"
 
@@ -79,10 +79,10 @@ const Transaction = ({ amount, sender, recipient }: { amount: number, sender: st
         </View>
     )
 
-
+    const bg = isPending ? "lightgrey" : "transparent"
     return (
         <View>
-            <View marginH-30 marginV-20 style={{ flexDirection: "row" }}>
+            <View marginH-30 marginV-20 style={{ flexDirection: "row", backgroundColor: bg }}>
                 {/* <View> */}
                 {recipient == 'reserve' ? deposit(amount, sender, recipient) : null}
                 {sender == 'reserve' ? withdraw(amount, sender, recipient) : null}
