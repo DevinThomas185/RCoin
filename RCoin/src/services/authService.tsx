@@ -1,8 +1,10 @@
 export type AuthData = {
   token: string;
-  //   email: string;
-  //   name: string;
+  token_type: string;
+  token_info: TokenInfo;
 };
+
+export type TokenInfo = {user_id: string; email: string; name: string};
 
 // Returns undefined promise if login is unsuccessful
 const signIn = (
@@ -32,8 +34,34 @@ const signIn = (
           return res.json();
         })
         .then(data => {
-          console.log(data);
-          resolve({token: data['access_token']});
+          fetch('http://10.0.2.2:8000/api/user', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${data['access_token']}`,
+            },
+          })
+            .then(res => {
+              if (!res.ok) {
+                throw new Error('Fetching user data failed');
+              }
+              return res.json();
+            })
+            .then(data_ => {
+              resolve({
+                token: data['access_token'],
+                token_type: data['token_type'],
+                token_info: {
+                  user_id: data_['user_id'],
+                  email: data_['email'],
+                  name: data_['name'],
+                },
+              });
+            })
+            .catch(error => {
+              console.log(error);
+              resolve(undefined);
+            });
         })
         .catch(error => {
           console.log(error);
