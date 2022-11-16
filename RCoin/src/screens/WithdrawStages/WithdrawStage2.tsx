@@ -1,11 +1,11 @@
 import React from 'react';
-import {Text, View, Button} from 'react-native-ui-lib';
+import { Text, View, Button } from 'react-native-ui-lib';
 import ChangingBalance from '../../components/Balances/ChangingBalance';
 import styles from '../../style/style';
 import WithdrawReciept from './WithdrawReciept';
-import {useAuth} from '../../contexts/Auth';
-import {useKeypair} from '../../contexts/Keypair';
-import {Message, Transaction} from '@solana/web3.js';
+import { useAuth } from '../../contexts/Auth';
+import { useKeypair } from '../../contexts/Keypair';
+import { Message, Transaction } from '@solana/web3.js';
 import nacl from 'tweetnacl';
 
 // Confirmation
@@ -21,7 +21,7 @@ const WithdrawStage1 = ({
   token_balance: number;
   coins_to_withdraw: number;
   rands_being_credited: number;
-  current_bank_account: {[key: string]: string};
+  current_bank_account: { [key: string]: string };
   setTransactionId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const auth = useAuth();
@@ -35,7 +35,7 @@ const WithdrawStage1 = ({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${auth.authData?.token}`,
       },
-      body: JSON.stringify({amount_in_coins: coins_to_withdraw}, null, 2),
+      body: JSON.stringify({ amount_in_coins: coins_to_withdraw }, null, 2),
     })
       .then(res => {
         if (!res.ok) {
@@ -96,7 +96,7 @@ const WithdrawStage1 = ({
       <Text text40 style={styles.title}>
         Confirm your transaction
       </Text>
-      <View margin-30>
+      <View>
         <ChangingBalance deduction={coins_to_withdraw} />
         <WithdrawReciept
           coins={coins_to_withdraw}
@@ -114,7 +114,7 @@ const WithdrawStage1 = ({
       <Text style={styles.buttonCaption}>
         Wrong bank info? Change in your account settings
       </Text>
-      <View flex bottom marginH-30 marginB-50>
+      <View flex bottom marginH-30 marginB-10>
         <Button
           onPress={handleSend}
           label="Continue"

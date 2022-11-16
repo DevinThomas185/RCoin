@@ -1,6 +1,6 @@
-import React from 'react';
-import {Text, View, Button, Colors} from 'react-native-ui-lib';
-import styles from '../../style/style';
+import React from "react";
+import { Text, View, Button, Image } from "react-native-ui-lib";
+import styles from "../../style/style"
 
 // Confirm the issue
 const IssueSuccess = ({
@@ -12,11 +12,25 @@ const IssueSuccess = ({
 }) => {
   return (
     <View flex>
-      <Text text40 blue10 margin-30>
-        Confirmation
+      <View marginT-30 style={{ alignSelf: "center" }}>
+        <Image
+          source={require('../../style/Success.png')}
+        />
+      </View>
+      <Text
+        text40
+        color={styles.rcoin}
+        style={{
+          textAlign: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        Successful
       </Text>
+
+
       <View margin-30>
-        <Text>
+        <Text style={styles.buttonCaption}>
           Your payment has been successful.
           {'\n'}
           {'\n'}
@@ -24,13 +38,24 @@ const IssueSuccess = ({
           deposit. {'\n'}
         </Text>
       </View>
-      <View flex bottom marginH-30 marginB-50>
+      <View flex bottom marginH-30 marginB-20>
+        <Text style={styles.buttonCaption}>
+          You can now see your updated balance on the dashboard
+        </Text>
         <Button
-          onPress={nextStage}
-          label="Continue"
+          onPress={nextStage} //nagivate to dashboard page
+          label="RCoin Dashboard"
           backgroundColor={styles.rcoin}
         />
       </View>
+      <View flex bottom marginH-30 marginB-50>
+        <Button
+          onPress={() => { }} //navigate to transfer page
+          label="Make a transfer"
+          backgroundColor={styles.rcoin}
+        />
+      </View>
+
     </View>
   );
 };

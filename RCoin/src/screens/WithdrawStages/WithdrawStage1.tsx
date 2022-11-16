@@ -1,6 +1,6 @@
-import React, {useEffect} from 'react';
-import {Text, View, Button, Picker} from 'react-native-ui-lib';
-import {useAuth} from '../../contexts/Auth';
+import React, { useEffect, useState } from "react";
+import { Text, View, Button, Picker } from 'react-native-ui-lib';
+import { useAuth } from '../../contexts/Auth';
 import styles from '../../style/style';
 import Balance from '../../components/Balances/Balance';
 import AmountEntry from '../../components/AmountEntry';
@@ -15,9 +15,12 @@ const WithdrawStage1 = ({
   nextStage: React.Dispatch<void>;
   setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
   setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
-  setBankAccount: React.Dispatch<React.SetStateAction<{[key: string]: string}>>;
+  setBankAccount: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
 }) => {
   const auth = useAuth();
+
+  const [token_balance, setTokenBalance] = useState(0.0);
+  const [valid, setValid] = useState(false);
 
   useEffect(() => {
     fetch('http://10.0.2.2:8000/api/get_bank_accounts', {
@@ -29,14 +32,50 @@ const WithdrawStage1 = ({
     })
       .then(res => res.json())
       .then(data => {
-        data.forEach((element: {[key: string]: string}) => {
+        data.forEach((element: { [key: string]: string }) => {
           setBankAccount(data[0]);
         });
       })
       .catch(error => {
         console.log(error);
       });
+
+    fetch('http://10.0.2.2:8000/api/get_token_balance', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.authData?.token}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setTokenBalance(data['token_balance']);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }, []);
+
+
+  const continueButton = () => {
+    if (valid) {
+      return (
+        <Button
+          onPress={nextStage}
+          label="Continue"
+          backgroundColor={styles.rcoin}
+        />
+      );
+    } else {
+      return (
+        <Button
+          onPress={() => { }}
+          label="Continue"
+          backgroundColor={styles.grey}
+        />
+      );
+    }
+  }
 
   return (
     <View flex>
@@ -49,7 +88,7 @@ const WithdrawStage1 = ({
 
       <View margin-30>
         <Text>How much would you like to send?</Text>
-        <AmountEntry setAmount={setCoinsToWithdraw} least_limit={0} />
+        <AmountEntry setAmount={setCoinsToWithdraw} least_limit={0} max_limit={token_balance} tellButton={setValid} />
       </View>
 
       {/* <View margin-30>
@@ -77,12 +116,9 @@ const WithdrawStage1 = ({
           })}
         </Picker>
       </View> */}
-      <View flex bottom marginH-30 marginB-50>
-        <Button
-          onPress={nextStage}
-          label="Continue"
-          backgroundColor={styles.rcoin}
-        />
+
+      <View flex bottom marginH-30 marginB-50 >
+        {continueButton()}
       </View>
     </View>
   );
