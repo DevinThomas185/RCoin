@@ -9,21 +9,21 @@ import WithdrawScreen from './src/screens/WithdrawScreen';
 import IssueScreen from './src/screens/IssueScreen';
 import {KeypairProvider} from './src/contexts/Keypair';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import styles from './src/style/style'
-import { LoaderScreen } from 'react-native-ui-lib';
+import styles from './src/style/style';
+import {LoaderScreen} from 'react-native-ui-lib';
 
 const Tab = createBottomTabNavigator();
 
 const App = () => {
-  const AuthRouter = ({ children }: { children: React.ReactNode }) => {
-    const { authData, loading } = useAuth();
+  const AuthRouter = ({children}: {children: React.ReactNode}) => {
+    const {authData, loading} = useAuth();
 
     if (loading) {
       return (
-        <LoaderScreen 
+        <LoaderScreen
           overlay
           backgroundColor={styles.rcoin}
-          loaderColor='white'
+          loaderColor="white"
           message="Loading Dashboard"
           messageStyle={{color: 'white'}}
         />
@@ -42,28 +42,20 @@ const App = () => {
       <AuthProvider>
         <AuthRouter>
           <Tab.Navigator
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused, color, size }) => {
+            screenOptions={({route}) => ({
+              tabBarIcon: ({focused, color, size}) => {
                 let iconName;
-    
+
                 if (route.name === 'Home') {
-                  iconName = focused
-                    ? 'home'
-                    : 'home-outline';
+                  iconName = focused ? 'home' : 'home-outline';
                 } else if (route.name === 'Deposit') {
-                  iconName = focused 
-                    ? 'card'
-                    : 'card-outline';
+                  iconName = focused ? 'card' : 'card-outline';
                 } else if (route.name === 'Transfer') {
-                  iconName = focused
-                    ? 'send'
-                    : 'send-outline';
+                  iconName = focused ? 'send' : 'send-outline';
                 } else if (route.name === 'Withdraw') {
-                  iconName = focused
-                    ? 'cash'
-                    : 'cash-outline';
+                  iconName = focused ? 'cash' : 'cash-outline';
                 }
-    
+
                 return <Ionicons name={iconName} size={size} color={color} />;
               },
               tabBarActiveTintColor: styles.success,
@@ -77,8 +69,7 @@ const App = () => {
               },
               headerTitleAlign: 'center',
               // headerShown: false,
-            })}
-          >
+            })}>
             <Tab.Screen name="Home" component={Dashboard} />
             <Tab.Screen name="Deposit" component={IssueScreen} />
             <Tab.Screen name="Transfer" component={TransferScreen} />

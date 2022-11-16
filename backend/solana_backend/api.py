@@ -1,4 +1,5 @@
 from time import sleep
+from enum import Enum
 
 # Solana dependencies
 from solana.rpc.commitment import Confirmed
@@ -20,6 +21,7 @@ from spl.token.instructions import (
 
 # Module dependencies
 from solana_backend.common import (
+    RESERVE_ACCOUNT_ADDRESS,
     SOLANA_CLIENT,
     MINT_ACCOUNT,
     TOKEN_DECIMALS,
@@ -39,6 +41,7 @@ from solana_backend.exceptions import (
 
 from solana_backend.transaction import (
     construct_stablecoin_transfer,
+    get_associated_token_account,
     transaction_to_bytes,
 )
 
@@ -339,12 +342,58 @@ def get_user_sol_balance(public_key: str) -> Response:
         return Failure("exception", exception)
 
 
+class TransactionType(Enum):
+    Withdraw = "withdraw"
+    Send = "send"
+    Deposit = "deposit"
+    Recieve = "recieve"
+
+
 def get_stablecoin_transactions(public_key: str, limit: int = 10) -> Response:
     try:
 
+        associated_account = get_associated_token_account(PublicKey(public_key))
+
+        transactions = get_processed_transactions_for_account(associated_account, limit)
+
+        # add metadata to transaction if it is issue, trade or redeem
+        # are these issues inverted, it seems I am always recipient when sending? why always negative
+        for transaction in transactions:
+
+            if transaction["amount"] < 0:
+                if transaction["sender"] == public_key:
+                    if transaction["recipient"] == str(TOKEN_OWNER):
+                        transaction_type = TransactionType.Deposit
+                    else:
+                        print(transaction["recipient"], TOKEN_OWNER)
+                        transaction_type = TransactionType.Recieve
+
+                else:
+                    if transaction["sender"] == str(TOKEN_OWNER):
+                        transaction_type = TransactionType.Withdraw
+                    else:
+                        transaction_type = TransactionType.Send
+
+            # This however failed, from doing manually?
+            else:
+                # Flipped
+                if transaction["sender"] == public_key:
+                    if transaction["recipient"] == str(TOKEN_OWNER):
+                        transaction_type = TransactionType.Withdraw
+                    else:
+                        transaction_type = TransactionType.Send
+
+                else:
+                    if transaction["sender"] == str(TOKEN_OWNER):
+                        transaction_type = TransactionType.Deposit
+                    else:
+                        transaction_type = TransactionType.Recieve
+
+            transaction["transaction_type"] = transaction_type
+
         return Success(
             "transaction_history",
-            get_processed_transactions_for_account(PublicKey(public_key), limit),
+            transactions,
         )
 
     except BlockchainQueryFailedException as exception:

@@ -6,7 +6,7 @@ import sqlalchemy.ext.declarative as declarative
 import sqlalchemy.orm as orm
 import data_models
 import uuid
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 import os
 
 
@@ -164,12 +164,12 @@ async def get_user(
 # Issue
 async def create_issue_transaction(
     issue: data_models.IssueTransaction,
-    user_email: str,
+    user_id: str,
     bank_transaction_id: str,
     date: datetime,
     db: "Session",
 ) -> Issue:
-    user = await get_user(email=user_email, db=db)
+    # user = await get_user(email=user_email, db=db)
     # bank_transaction_id = sql.Column(sql.Text, unique=True)
     # blockchain_transaction_id = sql.Column(sql.Text, unique=True)
     # amount = sql.Column(sql.Float)
@@ -181,7 +181,7 @@ async def create_issue_transaction(
     # we should not take blockchain_transaction as we do not add it immediately.
 
     issue_transaction = Issue(
-        user_id=user.id,
+        user_id=user_id,
         bank_transaction_id=bank_transaction_id,
         date=date,
         amount=issue.amount_in_rands,
@@ -194,13 +194,34 @@ async def create_issue_transaction(
 
 
 async def complete_issue_transaction(
-    issue_id: int, blockchain_transaction_id: str, db: "Session"
+    bank_transaction_id: str, blockchain_transaction_id: str, db: "Session"
 ):
     # We have now issued the coins so should update the corresponding row
-    db.query(Issue).filter(Issue.id == issue_id).update(
+    db.query(Issue).filter(Issue.bank_transaction_id == bank_transaction_id).update(
         {"blockchain_transaction_id": blockchain_transaction_id}
     )
     db.commit()
+
+
+async def get_user_issue_for_bank_transaction(
+    user_id: str, bank_transaction_id: str, db: "Session"
+) -> Optional[Issue]:
+    issue = (
+        db.query(Issue)
+        .filter(Issue.id == user_id)
+        .filter(Issue.bank_transaction_id == bank_transaction_id)
+        .first()
+    )
+    return issue
+
+
+async def get_issue_transactions_for_user(
+    user_id: str, db: "Session"
+) -> Optional[List[Issue]]:
+
+    issues = db.query(Issue).filter(Issue.id == user_id)
+
+    return issues
 
 
 # Redeem
