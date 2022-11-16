@@ -7,10 +7,12 @@ const Transfer2Confirm = ({
   nextStage,
   amount,
   recipient,
+  transactionId,
 }: {
   nextStage: React.Dispatch<void>;
   amount: number;
   recipient: string;
+  transactionId: string;
 }) => {
   return (
     <View flex>
@@ -21,7 +23,7 @@ const Transfer2Confirm = ({
         <Text style={styles.buttonCaption}>
           {amount} Rcoin has successfuly been sent to {recipient}
         </Text>
-        <Text>Transaction ID = asdkljf238ak92p3jhk239asdfih2lir3</Text>
+        <Text>Transaction ID = {transactionId}</Text>
       </View>
       <View flex bottom marginH-30-0>
         <Text style={styles.buttonCaption}>

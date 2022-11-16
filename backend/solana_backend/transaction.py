@@ -54,7 +54,7 @@ def send_transaction_from_signature(
     except Exception as e:
         return Failure("exception", e)
 
-    return Success("response", str(resp))
+    return Success("signature", str(resp.value))
 
 
 def construct_stablecoin_transfer(

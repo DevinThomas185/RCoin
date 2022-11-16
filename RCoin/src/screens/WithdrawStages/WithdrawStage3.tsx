@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Button, Image } from "react-native-ui-lib";
+import React, {useEffect, useState} from 'react';
+import {Text, View, Button, Image} from 'react-native-ui-lib';
 import styles from '../../style/style';
 
 // Success
@@ -8,18 +8,18 @@ const WithdrawStage3 = ({
   coins_to_withdraw,
   rands_being_credited,
   bank_account,
+  transactionId,
 }: {
   nextStage: React.Dispatch<void>;
   coins_to_withdraw: number;
   rands_being_credited: number;
-  bank_account: { [key: string]: string };
+  bank_account: {[key: string]: string};
+  transactionId: string;
 }) => {
   return (
     <View flex>
-      <View marginT-30 style={{ alignSelf: "center" }}>
-        <Image
-          source={require('../../style/Success.png')}
-        />
+      <View marginT-30 style={{alignSelf: 'center'}}>
+        <Image source={require('../../style/Success.png')} />
       </View>
       <Text
         text40
@@ -36,7 +36,7 @@ const WithdrawStage3 = ({
         <Text style={styles.buttonCaption}>
           {rands_being_credited} RCoin has successfuly been withdrawn from your
           account {'\n'}
-          Transaction ID = asdkljf238ak92p3jhk239asdfih2lir3
+          Transaction ID = {transactionId}
         </Text>
       </View>
       <View flex bottom marginH-30 marginB-20>

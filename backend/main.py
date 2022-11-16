@@ -324,9 +324,8 @@ async def trade(
     signature = bytes(trade_transaction.signature)
     transaction = bytes(trade_transaction.transaction_bytes)
 
-    return send_transaction_from_signature(
-        transaction, signature, sender.wallet_id
-    ).to_json()
+    res = send_transaction_from_signature(transaction, signature, sender.wallet_id)
+    return res.to_json()
 
 
 # REDEEM
@@ -342,30 +341,32 @@ async def redeem(
     ).to_json()
 
 
+# TODO[ks1020]: We need a way of reconciling if this fails
 # TODO[sk4520]: Do we want to wait for the transaction to appear on the blockchain
 # and check its health before returning?
 @app.post("/api/complete-redeem")
 async def complete_redeem(
-    transaction: CompleteRedeemTransaction,
+    redeem_transaction: CompleteRedeemTransaction,
     user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
 
-    transaction_bytes = bytes(transaction.transaction_bytes)
-    redeemer = await database_api.get_user(email=user.email, db=db)
-    resp = send_transaction_from_bytes(transaction_bytes)
+    signature = bytes(redeem_transaction.signature)
+    transaction = bytes(redeem_transaction.transaction_bytes)
+
+    resp = send_transaction_from_signature(transaction, signature, user.wallet_id)
 
     # TODO[szymon] add more robust error handling.
     if isinstance(resp, Failure):
         return resp.to_json()
 
-    amount_resp = get_transfer_amount_for_transaction(resp.contents.value.__str__())
+    amount_resp = get_transfer_amount_for_transaction(resp.contents)
 
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()
 
     reference = paystack_api.initiate_transfer(
-        amount_resp.contents, redeemer.recipient_code, redeemer.wallet_id
+        amount_resp.contents, user.recipient_code, user.wallet_id
     )
     if reference == -1:
         # TODO[devin]: WHAT TO DO WHEN PAYSTACK FAILS - SEND TO FRONTEND
@@ -375,13 +376,15 @@ async def complete_redeem(
         redeem=transaction,
         email=user.email,
         bank_transaction_id=reference,
-        blockchain_transaction_id=resp.contents.value.__str__(),
+        blockchain_transaction_id=resp.contents,
         date=datetime.now(),
         amount=amount_resp.contents,
         db=db,
     )
 
-    return amount_resp.to_json()
+    final_resp = amount_resp.to_json()
+    final_resp["transaction_id"] = reference
+    return final_resp
 
 
 # GET BANK ACCOUNTS FOR USER
@@ -537,15 +540,6 @@ async def recieve_issue_webhook(
     # If issued, return 200
     response.status_code = 200
     return "done"  # for paystack coz it stoopid
-
-
-@app.get("/api/test")
-def test():
-    # E7uGvP55sHxMBCGgBbsqRbbvCodrsh9YcMRKcF8U6YQK
-    return get_stablecoin_transactions(
-        "3fBP14DqLHAHeRDwwPL9MXSkuqgnixHRnFhVDHdigJov", 1000
-    ).to_json()
-    return issue_stablecoins("3fBP14DqLHAHeRDwwPL9MXSkuqgnixHRnFhVDHdigJov", 100)
 
 
 app.add_middleware(SessionMiddleware, secret_key="random-string")
