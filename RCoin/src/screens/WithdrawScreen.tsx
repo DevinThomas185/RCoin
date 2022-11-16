@@ -6,6 +6,7 @@ import WithdrawStage2 from './WithdrawStages/WithdrawStage2';
 import WithdrawStage3 from './WithdrawStages/WithdrawStage3';
 import {useAuth} from '../contexts/Auth';
 import {useBackHandler} from '../services/BackHandler';
+import styles from '../style/style';
 
 const WithdrawScreen = () => {
   const [stage, setStage] = useState(0);
@@ -115,10 +116,10 @@ const WithdrawScreen = () => {
   return (
     <View flex>
       <Wizard activeIndex={stage}>
-        <Wizard.Step state={getStageState(0)} label={'Select Amount'} />
-        <Wizard.Step state={getStageState(1)} label={'Select Account'} />
-        <Wizard.Step state={getStageState(2)} label={'Confirmation'} />
-        <Wizard.Step state={getStageState(3)} label={'Success'} />
+        <Wizard.Step state={getStageState(0)} label={'Select Amount'} circleColor={styles.rcoin} color={styles.rcoin}/>
+        <Wizard.Step state={getStageState(1)} label={'Select Account'} circleColor={styles.rcoin} color={styles.rcoin}/>
+        <Wizard.Step state={getStageState(2)} label={'Confirmation'} circleColor={styles.rcoin} color={styles.rcoin}/>
+        <Wizard.Step state={getStageState(3)} label={'Success'} circleColor={styles.rcoin} color={styles.rcoin}/>
       </Wizard>
       {renderCurrentStage()}
     </View>

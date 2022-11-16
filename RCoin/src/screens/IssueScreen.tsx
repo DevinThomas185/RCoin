@@ -4,7 +4,7 @@ import { useBackHandler } from "../services/BackHandler";
 import IssueAmount from './IssueStages/Issue0Amount'
 import IssueSummary from './IssueStages/Issue1Summary'
 import IssueSuccess from './IssueStages/Issue2Success'
-
+import styles from "../style/style"
 
 const TransferScreen = () => {
   const [stage, setStage] = useState(0);
@@ -53,9 +53,9 @@ const TransferScreen = () => {
   return (
     <View flex>
       <Wizard activeIndex={stage}>
-        <Wizard.Step state={getStageState(0)} label={"Making A Deposit"} />
-        <Wizard.Step state={getStageState(1)} label={"Payment Summary"} />
-        <Wizard.Step state={getStageState(2)} label={"Confirmation"} />
+        <Wizard.Step state={getStageState(0)} label={"Making A Deposit"} circleColor={styles.rcoin} color={styles.rcoin}/>
+        <Wizard.Step state={getStageState(1)} label={"Payment Summary"} circleColor={styles.rcoin} color={styles.rcoin}/>
+        <Wizard.Step state={getStageState(2)} label={"Confirmation"} circleColor={styles.rcoin} color={styles.rcoin}/>
       </Wizard>
       {renderCurrentStage()}
     </View>

@@ -38,7 +38,7 @@ const Balance = () => {
     else {
         return (
             <View center marginV-20>
-                <Text>Balance</Text>
+                <Text>Current RCoin Balance</Text>
                 <BalanceFormat token_balance={token_balance} />
             </View>
         );

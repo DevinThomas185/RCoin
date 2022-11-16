@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/Auth';
 import style from '../style/style'
 import History from './history.json'
 import Transaction from '../components/Transaction'
+import Balance from '../components/Balances/Balance';
 
 const TransactionHistory = () => {
     const auth = useAuth();
@@ -62,7 +63,8 @@ const TransactionHistory = () => {
 
     return (
         <ScrollView>
-            <Text text30 marginV-20 style={style.buttonCaption}>R{numberWithCommas(token_balance)}</Text>
+            <Balance />
+            <Text text50 marginT-20 marginH-30>Transaction History</Text>
             {History.transaction_history.map((transaction) => (
                 <View>
                     <Transaction amount={transaction.amount} recipient={transaction.recipient} sender={transaction.sender} />

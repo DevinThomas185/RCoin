@@ -8,6 +8,7 @@ import {StepThree} from '../components/signup/StepThree';
 import {UserSignUp} from '../types/SignUp';
 import {NavigationScreenProp} from 'react-navigation';
 import { useBackHandler } from '../services/BackHandler';
+import style from "../style/style"
 
 export const SignUpScreen = ({
   navigation,
@@ -86,9 +87,9 @@ export const SignUpScreen = ({
   return (
     <View style={styles.outerView}>
       <Wizard activeIndex={stage}>
-        <Wizard.Step state={getStageState(0)} label={'Your Details'} />
-        <Wizard.Step state={getStageState(1)} label={'Bank Details'} />
-        <Wizard.Step state={getStageState(2)} label={'Confirmation'} />
+        <Wizard.Step state={getStageState(0)} label={'Your Details'} circleColor={style.rcoin} color={style.rcoin}/>
+        <Wizard.Step state={getStageState(1)} label={'Bank Details'} circleColor={style.rcoin} color={style.rcoin}/>
+        <Wizard.Step state={getStageState(2)} label={'Confirmation'} circleColor={style.rcoin} color={style.rcoin}/>
       </Wizard>
 
       <View style={styles.steps}>{conditionalComponent()}</View>
