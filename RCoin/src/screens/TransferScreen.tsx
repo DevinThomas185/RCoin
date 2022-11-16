@@ -5,12 +5,13 @@ import TransferAmount from './TransferStages/Transfer1Amount';
 import TransferConfirm from './TransferStages/Transfer2Confirm';
 import TransferSuccess from './TransferStages/Transfer3Success';
 import {useBackHandler} from '../services/BackHandler';
-import styles from "../style/style"
+import styles from '../style/style';
 
 const TransferScreen = () => {
   const [stage, setStage] = useState(0);
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState(0.0);
+  const [transactionId, setTransactionId] = useState('');
 
   const backHandlerAction = () => {
     switch (stage) {
@@ -55,6 +56,7 @@ const TransferScreen = () => {
           }}
           amount={amount}
           recipient={recipient}
+          setTransactionId={setTransactionId}
         />
       );
     } else {
@@ -65,6 +67,7 @@ const TransferScreen = () => {
           }}
           amount={amount}
           recipient={recipient}
+          transactionId={transactionId}
         />
       );
     }
@@ -84,10 +87,30 @@ const TransferScreen = () => {
   return (
     <View flex>
       <Wizard activeIndex={stage}>
-        <Wizard.Step state={getStageState(0)} label={'Choose Recipient'} circleColor={styles.rcoin} color={styles.rcoin}/>
-        <Wizard.Step state={getStageState(1)} label={'Choose Amount'} circleColor={styles.rcoin} color={styles.rcoin}/>
-        <Wizard.Step state={getStageState(2)} label={'Confirmation'} circleColor={styles.rcoin} color={styles.rcoin}/>
-        <Wizard.Step state={getStageState(3)} label={'Successful'} circleColor={styles.rcoin} color={styles.rcoin}/>
+        <Wizard.Step
+          state={getStageState(0)}
+          label={'Choose Recipient'}
+          circleColor={styles.rcoin}
+          color={styles.rcoin}
+        />
+        <Wizard.Step
+          state={getStageState(1)}
+          label={'Choose Amount'}
+          circleColor={styles.rcoin}
+          color={styles.rcoin}
+        />
+        <Wizard.Step
+          state={getStageState(2)}
+          label={'Confirmation'}
+          circleColor={styles.rcoin}
+          color={styles.rcoin}
+        />
+        <Wizard.Step
+          state={getStageState(3)}
+          label={'Successful'}
+          circleColor={styles.rcoin}
+          color={styles.rcoin}
+        />
       </Wizard>
       {renderCurrentStage()}
     </View>

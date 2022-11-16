@@ -1,5 +1,11 @@
+# Should load here since this is entry point to system
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from enum import Enum
 import functools
-from typing import Any
+from typing import Any, Optional
 import bcrypt
 from datetime import datetime
 import hmac
@@ -10,8 +16,10 @@ from jose import JWTError, jwt
 
 # import datetime
 from datetime import timezone, datetime, timedelta
+from issue import ShouldIssueStage, get_should_issue_stage
 
 from solana_backend.api import (
+    TransactionType,
     get_stablecoin_transactions,
     new_stablecoin_transfer,
     issue_stablecoins,
@@ -46,7 +54,7 @@ from data_models import (
     TokenBalance,
 )
 import database_api
-from database_api import User
+from database_api import Issue, User
 import paystack_api
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
@@ -182,7 +190,20 @@ async def login(
     # Build the jwt
     token = JwtToken(match.id, match.email, match.first_name)
     jwt_token = token.get_jwt()
-    return {"access_token": jwt_token, "token_type": "bearer"}
+    return {
+        "access_token": jwt_token,
+        "token_type": "bearer",
+        "token_info": token.context,
+    }
+
+
+@app.get("/api/user")
+async def get_user(user: User = Depends(get_current_user)):
+    return {
+        "user_id": user.id,
+        "email": user.email,
+        "name": f"{user.first_name} {user.last_name}",
+    }
 
 
 # LOGOUT
@@ -303,9 +324,8 @@ async def trade(
     signature = bytes(trade_transaction.signature)
     transaction = bytes(trade_transaction.transaction_bytes)
 
-    return send_transaction_from_signature(
-        transaction, signature, sender.wallet_id
-    ).to_json()
+    res = send_transaction_from_signature(transaction, signature, sender.wallet_id)
+    return res.to_json()
 
 
 # REDEEM
@@ -321,30 +341,32 @@ async def redeem(
     ).to_json()
 
 
+# TODO[ks1020]: We need a way of reconciling if this fails
 # TODO[sk4520]: Do we want to wait for the transaction to appear on the blockchain
 # and check its health before returning?
 @app.post("/api/complete-redeem")
 async def complete_redeem(
-    transaction: CompleteRedeemTransaction,
+    redeem_transaction: CompleteRedeemTransaction,
     user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
 
-    transaction_bytes = bytes(transaction.transaction_bytes)
-    redeemer = await database_api.get_user(email=user.email, db=db)
-    resp = send_transaction_from_bytes(transaction_bytes)
+    signature = bytes(redeem_transaction.signature)
+    transaction = bytes(redeem_transaction.transaction_bytes)
+
+    resp = send_transaction_from_signature(transaction, signature, user.wallet_id)
 
     # TODO[szymon] add more robust error handling.
     if isinstance(resp, Failure):
         return resp.to_json()
 
-    amount_resp = get_transfer_amount_for_transaction(resp.contents.value.__str__())
+    amount_resp = get_transfer_amount_for_transaction(resp.contents)
 
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()
 
     reference = paystack_api.initiate_transfer(
-        amount_resp.contents, redeemer.recipient_code, redeemer.wallet_id
+        amount_resp.contents, user.recipient_code, user.wallet_id
     )
     if reference == -1:
         # TODO[devin]: WHAT TO DO WHEN PAYSTACK FAILS - SEND TO FRONTEND
@@ -354,13 +376,15 @@ async def complete_redeem(
         redeem=transaction,
         email=user.email,
         bank_transaction_id=reference,
-        blockchain_transaction_id=resp.contents.value.__str__(),
+        blockchain_transaction_id=resp.contents,
         date=datetime.now(),
         amount=amount_resp.contents,
         db=db,
     )
 
-    return amount_resp.to_json()
+    final_resp = amount_resp.to_json()
+    final_resp["transaction_id"] = reference
+    return final_resp
 
 
 # GET BANK ACCOUNTS FOR USER
@@ -431,12 +455,21 @@ async def token_balance(
     }
 
 
-@app.post("/api/webhook")
+from aioredlock import Aioredlock, LockError, Sentinel
+
+lock_manager = Aioredlock(
+    [
+        {"host": "localhost", "port": 6379, "db": 0},
+    ]
+)
+
+
+@app.post("/api/paystack-webhook")
 @from_paystack
 async def recieve_issue_webhook(
     request: Request,
     response: Response,
-    user: User = Depends(get_current_user),
+    # user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
 
@@ -446,25 +479,63 @@ async def recieve_issue_webhook(
     if data["event"] == "charge.success":
         transaction_id = data["data"]["reference"]
         amount = data["data"]["amount"] / 100
-        metadata = data["data"]["metadata"]
 
-        # If there is already a row, or something, check blockchain, waiting for szymon
+        # Coz of stupid component, doesn't allow us to pass in generic props :(
+        user_id = data["data"]["metadata"]["custom_fields"][0]["variable_name"]
+        user: User = await database_api.get_user_by_id(user_id, db=db)
 
-        issue_transaction = await database_api.create_issue_transaction(
-            IssueTransaction(amount_in_rands=amount),
-            user.email,
-            bank_transaction_id=transaction_id,
-            date=datetime.now(),
-            db=db,
-        )
+        THIRTY_MINUTES = 60 * 30
+        # Need to add timeout to other functions like waiting for blockchain
+        lock_name = f"{user_id}"  # can we lock on amount too, less coarse?
+        lock = await lock_manager.lock(lock_name, lock_timeout=THIRTY_MINUTES)
+        print(f"got lock for user {lock_name}")
 
-        resp = issue_stablecoins(user.wallet_id, amount)
+        issue_check = await get_should_issue_stage(transaction_id, user, amount, db)
+        if not issue_check:
+            response.status_code = 500
+            return "failed checking issue stage"
 
+        print(issue_check)
+
+        should_issue, associated_issue = issue_check
+
+        if should_issue == ShouldIssueStage.Already_Completed:
+            response.status_code = 200
+            await lock.release()
+            print(f"released lock for user {lock_name}")
+            return "already done"
+
+        if should_issue == ShouldIssueStage.Write_Issue_Write:
+            await database_api.create_issue_transaction(
+                issue=IssueTransaction(amount_in_rands=amount),
+                user_id=user_id,
+                bank_transaction_id=transaction_id,
+                date=datetime.now(),
+                db=db,
+            )
+
+        if (
+            should_issue == ShouldIssueStage._Issue_Write
+            or should_issue == ShouldIssueStage.Write_Issue_Write
+        ):
+            associated_issue_resp = issue_stablecoins(user.wallet_id, amount)
+            if not (associated_issue_resp).to_json()["success"]:
+                print("issue failed")
+                response.status_code = 500
+                await lock.release()
+                print(f"released lock for user {lock_name}")
+                return "not done"
+
+            associated_issue = associated_issue_resp.contents
+            print(associated_issue_resp)
+
+        # We always need to complete
         await database_api.complete_issue_transaction(
-            issue_transaction.id, resp.contents, db=db
+            transaction_id, associated_issue, db=db
         )
 
-        print(transaction_id, amount)
+        await lock.release()
+        print(f"released lock for user {lock_name}")
 
     # If issued, return 200
     response.status_code = 200

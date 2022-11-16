@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
-import {Text, View, Button, Image} from 'react-native-ui-lib';
+import React, { useEffect } from 'react';
+import { Text, View, Button, Image } from 'react-native-ui-lib';
 import Balance from '../../components/Balances/Balance';
-import {useAuth} from '../../contexts/Auth';
+import { useAuth } from '../../contexts/Auth';
 import styles from '../../style/style';
 
 const LEAST_LIMIT = 0;
@@ -9,12 +9,10 @@ const LEAST_LIMIT = 0;
 // Select the amount
 const WithdrawStage0 = ({
   nextStage,
-  setCoinsToWithdraw,
   setRandsBeingCredited,
   coins_to_withdraw,
 }: {
   nextStage: React.Dispatch<void>;
-  setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
   setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
   coins_to_withdraw: number;
 }) => {
@@ -23,7 +21,7 @@ const WithdrawStage0 = ({
   useEffect(() => {
     fetch(
       'http://10.0.2.2:8000/api/get_rand_to_return/?amount=' +
-        coins_to_withdraw.toString(),
+      coins_to_withdraw.toString(),
       {
         method: 'GET',
         headers: {
@@ -46,10 +44,10 @@ const WithdrawStage0 = ({
       <Text text40 style={styles.title}>
         Make a Withdrawal
       </Text>
-      <View margin-30>
+      <View>
         <Balance />
       </View>
-      <View style={{marginHorizontal: 30}}>
+      <View style={{ marginHorizontal: 30 }}>
         <Text>
           You can withdraw RCoin to Rand at any time.
           {'\n'}
@@ -61,10 +59,10 @@ const WithdrawStage0 = ({
 
       <Image
         source={require('../../style/RCoin-ZAR.png')}
-        style={{width: '100%', height: 130, marginVertical: 30}}
+        style={{ width: '100%', height: 130, marginVertical: 30 }}
       />
 
-      <View flex bottom marginH-30 marginB-50>
+      <View flex bottom marginH-30 marginB-10>
         <Button
           onPress={nextStage}
           label="Continue"

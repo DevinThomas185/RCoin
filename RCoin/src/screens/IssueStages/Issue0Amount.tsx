@@ -21,6 +21,7 @@ const IssueAmount = ({
 }) => {
 
   const auth = useAuth();
+  const [valid, setValid] = useState(false);
 
   // TODO: CHANGE TO GET RAND TO PAY
   const setRands = (coins: number) => {
@@ -41,12 +42,32 @@ const IssueAmount = ({
       });
   }
 
+  const continueButton = () => {
+    if (valid) {
+      return (
+        <Button
+          onPress={() => { nextStage(); setRands(coins_to_issue) }}
+          label="Continue"
+          backgroundColor={styles.rcoin}
+        />
+      );
+    } else {
+      return (
+        <Button
+          onPress={() => { }}
+          label="Continue"
+          backgroundColor={styles.grey}
+        />
+      );
+    }
+  }
+
   return (
     <View flex>
       <Text text40 style={styles.title}>
         Making A Deposit
       </Text>
-      <View margin-30>
+      <View marginH-30>
         <Text>
           You can exchange any amount of Rand for RCoin.
           {'\n'}
@@ -54,14 +75,18 @@ const IssueAmount = ({
           The transaction will appear in your transaction history and on the Real-Time Audit.
         </Text>
       </View>
-      <AmountEntry setAmount={setCoinsToIssue} least_limit={LEAST_LIMIT} />
       <Image
         source={require('../../style/RCoin-ZAR.png')}
         style={{ width: '100%', height: 130, marginVertical: 30 }}
       />
-      <View flex bottom marginH-30 marginB-50>
-        <Button onPress={() => {nextStage(); setRands(coins_to_issue)}} label="Continue to Summary" backgroundColor={styles.rcoin} />
+      <View marginH-30>
+        <AmountEntry setAmount={setCoinsToIssue} least_limit={LEAST_LIMIT} max_limit={1000000} tellButton={setValid} />
       </View>
+
+      <View flex bottom marginH-30 marginB-50 >
+        {continueButton()}
+      </View>
+
     </View>
   );
 }

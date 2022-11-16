@@ -1,0 +1,408 @@
+{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NTQwMjc2OSwianRpIjoiNjM3NDFhMzVjYmI4OWYwMDI5MzBmNGIyIiwiaWF0IjoxNjY4NTUzMjY5LCJuYmYiOjE2Njg1NTMyNjksImV4cCI6MTY2ODYzOTY2OX0.i4ozk3dlLO97hSf5ldSwcRWpb_FF74Y2sq38tJNYWto",
+  "user": {
+    "integrations": [
+      {
+        "business_name": "Group 4",
+        "business_type": "registered",
+        "short_name": null,
+        "id": 863008,
+        "logged_in_user_role": {
+          "id": 34,
+          "name": "admin",
+          "description": "This role grants users the permissions to manage everything on the dashboard"
+        },
+        "country_code": "ZA",
+        "country": 3,
+        "mfa": {
+          "is_required": false,
+          "enforcement_deadline": null
+        }
+      }
+    ],
+    "email": "africanmicronation@proton.me",
+    "first_name": "Group",
+    "last_name": "4",
+    "phone": "7500043851",
+    "area_code": "0",
+    "calling_code": "+44",
+    "registration_complete": true,
+    "last_login": "2022-11-15T12:44:09.000Z",
+    "wt_access": "none",
+    "is_developer": true,
+    "job_title": "",
+    "truecaller_verified": false,
+    "drip_tag": "merchant - south africa",
+    "mfa_enabled": false,
+    "email_verified": true,
+    "id": 5402769,
+    "invited_by": null,
+    "current_integration": 863008,
+    "passwordLastResetAt": null,
+    "createdAt": "2022-10-20T22:41:46.000Z",
+    "updatedAt": "2022-11-15T12:44:12.000Z",
+    "display_state": "test",
+    "role": {
+      "value": 35175782154239,
+      "name": "admin",
+      "description": "This role grants users the permissions to manage everything on the dashboard",
+      "integration": 0,
+      "service": "dashboard",
+      "id": 34,
+      "organization": 1,
+      "createdAt": "2018-05-10T23:40:26.000Z",
+      "updatedAt": "2018-09-12T17:28:31.000Z",
+      "isDeleted": false,
+      "is_custom": false
+    },
+    "permissions": [
+      "api-key-*",
+      "api-key-view",
+      "user-view",
+      "user-*",
+      "metrics-*",
+      "settings-*",
+      "settings-view",
+      "transaction-view",
+      "transaction-export",
+      "transaction-dispute",
+      "customer-view",
+      "customer-add",
+      "customer-*",
+      "transfer-view",
+      "transfer-*",
+      "transfer-export",
+      "balance-view",
+      "balance-export",
+      "page-view",
+      "page-*",
+      "plan-view",
+      "plan-*",
+      "settlement-view",
+      "settlement-export",
+      "paymentrequest-view",
+      "paymentrequest-*",
+      "subaccount-*",
+      "subaccount-view",
+      "user-add",
+      "customer-insights",
+      "accounts-*",
+      "accounts-view",
+      "charge-*",
+      "request-payout",
+      "product-view",
+      "product-*",
+      "pos-terminal-*",
+      "applepay-*",
+      "refund-pwt",
+      "corporate-cards-*",
+      "corporate-cards-view"
+    ],
+    "password_expiry": "2023-10-15T22:41:46.000Z",
+    "dashboard_preferences": {
+      "pagination": {
+        "use_cursor": true
+      },
+      "timezone": "UTC"
+    },
+    "show_mfa_feature": true
+  },
+  "selected_integration": {
+    "users": [],
+    "keys": [],
+    "terminals": [],
+    "starterintegration": [],
+    "integrationlocale": [
+      {
+        "id": 828309,
+        "integration": 863008,
+        "locale": 28,
+        "locale_overrides": null,
+        "createdAt": "2022-10-20T22:41:46.000Z",
+        "updatedAt": "2022-10-24T21:46:21.000Z"
+      }
+    ],
+    "business_name": "Group 4",
+    "description": "Stablecoin reserve",
+    "rc_number": null,
+    "phone": "7842640720",
+    "email": "africanmicronation@proton.me",
+    "address": null,
+    "product_name": null,
+    "registration_document_number": null,
+    "registration_document_type": null,
+    "primary_contact_name": null,
+    "primary_contact_email": null,
+    "primary_contact_phone": null,
+    "support_email": "africanmicronation@proton.me",
+    "chargeback_email": "africanmicronation@proton.me",
+    "logo_path": "https://public-files-paystack-prod.s3.eu-west-1.amazonaws.com/integration-logos/paystack.jpg",
+    "integration_agreement_path": null,
+    "settlement_bank": null,
+    "account_number": null,
+    "registration_document_path": null,
+    "risk_level": "low",
+    "isw_category": 3,
+    "mcc_category": null,
+    "flat_rate": 1,
+    "charge_percentage": 2.9,
+    "international_flat_rate": 100,
+    "international_charge_percentage": 3.9,
+    "flat_threshhold": 2500,
+    "transfer_charge": 5000,
+    "settlement_schedule": "T3",
+    "test_redirect_url": null,
+    "test_webhook_endpoint": "https://7cff-2a0c-5bc0-40-2e30-7731-b515-76fb-cc18.ngrok.io/api/paystack-webhook",
+    "live_redirect_url": null,
+    "live_webhook_endpoint": null,
+    "test_integration_url": null,
+    "test_integration_instruction": null,
+    "email_notification": "instant",
+    "pwc_id": 102501,
+    "is_live": false,
+    "go_live_requested": false,
+    "go_live_requested_at": null,
+    "live_keys_requested": false,
+    "live_keys_requested_at": null,
+    "reviewed_at": null,
+    "setup_complete": false,
+    "receipts": true,
+    "display_state": "test",
+    "active": true,
+    "short_name": null,
+    "international_toggle_disabled": false,
+    "allow_international_cards": false,
+    "active_channels": [
+      "card",
+      "eft",
+      "qr"
+    ],
+    "allowed_currencies": [
+      "ZAR"
+    ],
+    "allow_whitelist": false,
+    "charge_from_dashboard": false,
+    "can_transfer": true,
+    "transfer_using_otp": false,
+    "payouts_on_hold": false,
+    "go_live_date": null,
+    "payments_session_timeout": 0,
+    "metadata": {
+      "new_checkout_enabled": true
+    },
+    "transfer_notification": "instant",
+    "business_category": null,
+    "business_size": "small",
+    "business_type": "registered",
+    "website_url": null,
+    "social_urls": {
+      "twitter": null,
+      "facebook": null,
+      "instagram": null
+    },
+    "is_under_investigation": false,
+    "is_disabled": false,
+    "disable_reason": null,
+    "disable_at": null,
+    "identity_evidence_path": null,
+    "director_identity_evidence_path": null,
+    "bvn": null,
+    "bvn_date_of_birth": null,
+    "go_live_status": "none",
+    "registration_packet_path": null,
+    "is_deleted": false,
+    "default_currency": "ZAR",
+    "transfer_notification_to_recipient": "instant",
+    "send_transfer_email_otp": true,
+    "fast_checkout_enabled": false,
+    "id": 863008,
+    "primary_user": 5402769,
+    "organization": 1,
+    "createdAt": "2022-10-20T22:41:46.000Z",
+    "updatedAt": "2022-11-15T17:30:07.000Z",
+    "transfer_fees": [
+      {
+        "fee": 5000,
+        "thresholds": [
+          {
+            "max": 499999,
+            "fee": 1000
+          },
+          {
+            "max": 4999999,
+            "fee": 2500
+          }
+        ],
+        "currency": "NGN"
+      },
+      {
+        "fee": 1000,
+        "currency": "GHS"
+      }
+    ],
+    "consent_received": true,
+    "consent_data": {
+      "given_by": "africanmicronation@proton.me",
+      "given_at": "2022-10-20T22:41:46.000Z"
+    },
+    "attributes": {
+      "id": 762968,
+      "integration": 863008,
+      "country": {
+        "id": 3,
+        "active_for_dashboard_onboarding": true,
+        "name": "South Africa",
+        "iso_code": "ZA",
+        "default_currency_code": "ZAR",
+        "calling_code": "+27",
+        "integration_defaults": {},
+        "pilot_mode": false,
+        "relationships": {
+          "currency": {
+            "type": "currency",
+            "data": [
+              "ZAR"
+            ],
+            "supported_currencies": {
+              "ZAR": {
+                "bank": {
+                  "bank_type": "basa",
+                  "account_verification_required": true,
+                  "account_number_label": "accountNumber",
+                  "branch_code": false,
+                  "account_name": true,
+                  "account_number_pattern": {
+                    "exact_match": false,
+                    "pattern": "[0-9]{9,11}"
+                  },
+                  "documents": [
+                    "ZA-BANK"
+                  ],
+                  "show_account_number_tooltip": false
+                },
+                "eft": {
+                  "account_number_pattern": {
+                    "exact_match": false,
+                    "pattern": "^[0-9]{10}$"
+                  },
+                  "placeholder": "050 123 456"
+                }
+              }
+            }
+          },
+          "integration_feature": {
+            "type": "integration_feature",
+            "data": []
+          },
+          "integration_type": {
+            "type": "integration_type",
+            "data": [
+              "ITYPE_006",
+              "ITYPE_007"
+            ]
+          },
+          "payment_method": {
+            "type": "payment_method",
+            "data": [
+              "PAYM_001"
+            ]
+          }
+        }
+      },
+      "industry": null,
+      "integration_type": {
+        "id": 6,
+        "code": "ITYPE_006",
+        "label": "registered",
+        "display_name": "Registered Business",
+        "description": "Choose this if your business has a CM1, CoR 14.3 or CK1",
+        "is_active": true,
+        "relationships": {
+          "kyc_requirement": {
+            "type": "kyc_requirement",
+            "data": [
+              "KYCREQ_025",
+              "KYCREQ_037",
+              "KYCREQ_036",
+              "KYCREQ_041",
+              "KYCREQ_045"
+            ]
+          }
+        },
+        "upgradable_to": []
+      },
+      "legal_business_name": "Imperial Group 4",
+      "duplicated_from_integration": null,
+      "compliance_status": "PENDING",
+      "compliance_due_date": "2022-11-19T00:00:00.000Z",
+      "incorporation_date": null,
+      "country_code": "ZA",
+      "industry_code": "FINANCE",
+      "registration_number": null,
+      "registration_type": "ZA-SOL",
+      "ownership_type": "ZA-SOL-OWN",
+      "industry_categories": "SAVINGS",
+      "area_code": "0",
+      "calling_code": "+44",
+      "form_three_evidence_path": null,
+      "settlement_account_type": "bank_account",
+      "international_requested": false,
+      "compliance_documents_submitted": false,
+      "incorporated_before_2017": 0,
+      "has_refreshed_incorporation_documents": false,
+      "process_amex_cards": false,
+      "is_terminal_integration": false,
+      "mfa_is_required": false,
+      "mfa_enforcement_deadline": null,
+      "legal_agreements": null,
+      "createdAt": "2022-10-20T22:41:46.000Z",
+      "updatedAt": "2022-11-14T11:02:15.000Z"
+    },
+    "terminal_integration_attribute": null,
+    "is_terminal_active": false,
+    "is_registration_type_supported_for_terminal": false,
+    "office_address": {
+      "id": 374385,
+      "street_line_one": "London Road",
+      "street_line_two": null,
+      "post_code": "9300",
+      "model": "integration",
+      "model_row": 863008,
+      "city": "London",
+      "state": "Free State",
+      "country": "South Africa",
+      "type": "office"
+    },
+    "registered_address": {
+      "id": 374384,
+      "street_line_one": "London Road",
+      "street_line_two": null,
+      "post_code": "9300",
+      "model": "integration",
+      "model_row": 863008,
+      "city": "London",
+      "state": "Free State",
+      "country": "South Africa",
+      "type": "registered"
+    },
+    "available_channels": [
+      "card",
+      "qr",
+      "eft",
+      "debit_order"
+    ],
+    "agreements": {
+      "settlement_managed_account": {
+        "agreements": [],
+        "visible": false
+      }
+    },
+    "payouts_on_hold_reason": null,
+    "logged_in_user_role": {
+      "id": 34,
+      "name": "admin",
+      "description": "This role grants users the permissions to manage everything on the dashboard"
+    }
+  },
+  "token_expiry": 1668639669
+}
