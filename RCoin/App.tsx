@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
-
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from './src/screens/HomeScreen';
-import DepositScreen from './src/screens/DepositScreen';
+import React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import Dashboard from './src/screens/Dashboard';
 import TransferScreen from './src/screens/TransferScreen';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { AuthProvider, useAuth } from './src/contexts/Auth';
-import { AuthStack } from './src/routes/AuthStack';
+import {AuthProvider, useAuth} from './src/contexts/Auth';
+import {AuthStack} from './src/routes/AuthStack';
 import WithdrawScreen from './src/screens/WithdrawScreen';
 import IssueScreen from './src/screens/IssueScreen';
-import { KeypairProvider } from './src/contexts/Keypair';
-import TransactionHistory from './src/screens/TransactionHistory';
-import Dashboard from './src/screens/Dashboard';
+import {KeypairProvider} from './src/contexts/Keypair';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import styles from './src/style/style'
+import { LoaderScreen } from 'react-native-ui-lib';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,8 +19,15 @@ const App = () => {
     const { authData, loading } = useAuth();
 
     if (loading) {
-      // Have a loading component
-      return <Text>Loading</Text>;
+      return (
+        <LoaderScreen 
+          overlay
+          backgroundColor={styles.rcoin}
+          loaderColor='white'
+          message="Loading Dashboard"
+          messageStyle={{color: 'white'}}
+        />
+      );
     }
 
     return (
@@ -36,24 +41,53 @@ const App = () => {
     <KeypairProvider>
       <AuthProvider>
         <AuthRouter>
-          <Tab.Navigator>
-            <Tab.Screen
-              name="Home"
-              component={Dashboard}
-              options={{ headerShown: false }}
-            />
-            {/* <Tab.Screen name="Dashboard" component={HomeScreen} options={{ headerShown: false }} /> */}
-            <Tab.Screen name="Issue" component={IssueScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Transfer" component={TransferScreen} options={{ headerShown: false }} />
-            <Tab.Screen name="Withdraw" component={WithdrawScreen} options={{ headerShown: false }} />
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ focused, color, size }) => {
+                let iconName;
+    
+                if (route.name === 'Home') {
+                  iconName = focused
+                    ? 'home'
+                    : 'home-outline';
+                } else if (route.name === 'Deposit') {
+                  iconName = focused 
+                    ? 'card'
+                    : 'card-outline';
+                } else if (route.name === 'Transfer') {
+                  iconName = focused
+                    ? 'send'
+                    : 'send-outline';
+                } else if (route.name === 'Withdraw') {
+                  iconName = focused
+                    ? 'cash'
+                    : 'cash-outline';
+                }
+    
+                return <Ionicons name={iconName} size={size} color={color} />;
+              },
+              tabBarActiveTintColor: styles.success,
+              tabBarInactiveTintColor: styles.rcoin,
+              headerStyle: {
+                backgroundColor: styles.rcoin,
+              },
+              headerTintColor: 'white',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+              headerTitleAlign: 'center',
+              // headerShown: false,
+            })}
+          >
+            <Tab.Screen name="Home" component={Dashboard} />
+            <Tab.Screen name="Deposit" component={IssueScreen} />
+            <Tab.Screen name="Transfer" component={TransferScreen} />
+            <Tab.Screen name="Withdraw" component={WithdrawScreen} />
           </Tab.Navigator>
         </AuthRouter>
       </AuthProvider>
     </KeypairProvider>
   );
-  // } else {
-  //   return <LoginScreen setIsAuth={setIsAuth} />;
-  // }
 };
 
 export default App;
