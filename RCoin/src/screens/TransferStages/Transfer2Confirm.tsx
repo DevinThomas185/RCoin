@@ -13,10 +13,12 @@ const Transfer2Confirm = ({
   nextStage,
   amount,
   recipient,
+  setTransactionId,
 }: {
   nextStage: React.Dispatch<void>;
   amount: number;
   recipient: string;
+  setTransactionId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const auth = useAuth();
   const keyPair = useKeypair();
@@ -76,6 +78,7 @@ const Transfer2Confirm = ({
                 })
                 .then(data => {
                   if (data['success']) {
+                    setTransactionId(data['signature']);
                     nextStage();
                   }
                 })

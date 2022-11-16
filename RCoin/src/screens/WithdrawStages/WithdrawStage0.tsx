@@ -9,12 +9,10 @@ const LEAST_LIMIT = 0;
 // Select the amount
 const WithdrawStage0 = ({
   nextStage,
-  setCoinsToWithdraw,
   setRandsBeingCredited,
   coins_to_withdraw,
 }: {
   nextStage: React.Dispatch<void>;
-  setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
   setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
   coins_to_withdraw: number;
 }) => {
