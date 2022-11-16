@@ -542,4 +542,13 @@ async def recieve_issue_webhook(
     return "done"  # for paystack coz it stoopid
 
 
+# remove this when going to prod
+@app.get("/api/logs")
+async def get_logs():
+    with open("logs/logfile.log", "r") as file:
+        output = file.read()
+
+    return output
+
+
 app.add_middleware(SessionMiddleware, secret_key="random-string")
