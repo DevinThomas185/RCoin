@@ -522,7 +522,7 @@ async def recieve_issue_webhook(
         THIRTY_MINUTES = 60 * 30
         # Need to add timeout to other functions like waiting for blockchain
         lock_name = f"{user_id}"  # can we lock on amount too, less coarse?
-        with redis_lock(lock_name, timeout=THIRTY_MINUTES):
+        async with redis_lock(lock_name, timeout=THIRTY_MINUTES) as lock:
 
             issue_check = await get_should_issue_stage(transaction_id, user, amount, db)
             if not issue_check:
