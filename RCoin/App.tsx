@@ -1,16 +1,17 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Home from './src/screens/Home';
-import TransferScreen from './src/screens/TransferScreen';
-import { AuthProvider, useAuth } from './src/contexts/Auth';
-import { AuthStack } from './src/routes/AuthStack';
-import WithdrawScreen from './src/screens/WithdrawScreen';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import IssueScreen from './src/screens/IssueScreen';
-import { KeypairProvider } from './src/contexts/Keypair';
+import TransferScreen from './src/screens/TransferScreen';
+import WithdrawScreen from './src/screens/WithdrawScreen';
+import AccountScreen from './src/screens/AccountScreen';
+import {AuthProvider, useAuth} from './src/contexts/Auth';
+import {AuthStack} from './src/routes/AuthStack';
+import {KeypairProvider} from './src/contexts/Keypair';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import styles from './src/style/style';
-import { LoaderScreen } from 'react-native-ui-lib';
+import styles from './src/style/style'
+import { Image, LoaderScreen } from 'react-native-ui-lib';
+import Home from './src/screens/Home';
 
 const Tab = createBottomTabNavigator();
 
@@ -53,11 +54,21 @@ const App = () => {
                 } else if (route.name === 'Transfer') {
                   iconName = focused ? 'send' : 'send-outline';
                 } else if (route.name === 'Withdraw') {
-                  iconName = focused ? 'cash' : 'cash-outline';
+                  iconName = focused
+                    ? 'cash'
+                    : 'cash-outline';
+                } else if (route.name === 'Account') {
+                  iconName = focused
+                    ? 'person'
+                    : 'person-outline';
                 }
 
                 return <Ionicons name={iconName} size={size} color={color} />;
               },
+              headerLeft: () => (<Image
+                source={require('./src/style/Logo.png')}
+                style={styles.balanceLogo}
+              />),
               tabBarActiveTintColor: styles.success,
               tabBarInactiveTintColor: styles.rcoin,
               headerStyle: {
@@ -75,6 +86,7 @@ const App = () => {
             <Tab.Screen name="Deposit" component={IssueScreen} />
             <Tab.Screen name="Transfer" component={TransferScreen} />
             <Tab.Screen name="Withdraw" component={WithdrawScreen} />
+            <Tab.Screen name="Account" component={AccountScreen} />
           </Tab.Navigator>
         </AuthRouter>
       </AuthProvider>

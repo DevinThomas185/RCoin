@@ -13,6 +13,9 @@ import hashlib
 import os
 import json
 from jose import JWTError, jwt
+import smtplib
+import ssl
+from email.message import EmailMessage
 
 # import datetime
 from datetime import timezone, datetime, timedelta
@@ -413,15 +416,28 @@ async def complete_redeem(
 @app.get("/api/get_bank_accounts")
 async def get_bank_accounts(
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
 
-    return [
-        {
-            "bank_account": user.bank_account,
-            "sort_code": user.sort_code,
-        },
-    ]
+    return {
+        "bank_accounts": [
+            {
+                "bank_account": user.bank_account,
+                "sort_code": user.sort_code,
+            },
+        ]
+    }
+
+
+# GET DEFAULT BANK ACCOUNTS FOR USER
+@app.get("/api/get_default_bank_account")
+async def get_bank_accounts(
+    user: User = Depends(get_current_user),
+) -> list[dict[str, Any]]:
+
+    return {
+        "bank_account": user.bank_account,
+        "sort_code": user.sort_code,
+    }
 
 
 @app.get("/api/get_coins_to_issue")
@@ -551,6 +567,73 @@ async def recieve_issue_webhook(
     # If issued, return 200
     response.status_code = 200
     return "done"  # for paystack coz it stoopid
+
+
+# CHANGE DETAILS
+@app.post("/api/change_email", status_code=status.HTTP_200_OK)
+async def change_email(
+    request: Request,
+    response: Response,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+
+    data = await request.json()
+
+    await database_api.change_email(user.id, data["new_email"], db=db)
+
+
+@app.post("/api/change_name", status_code=status.HTTP_200_OK)
+async def change_name(
+    request: Request,
+    response: Response,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+
+    data = await request.json()
+
+    await database_api.change_name(
+        user.id, data["new_first_name"], data["new_last_name"], db=db
+    )
+
+
+# SUPPORT MESSAGE
+@app.post("/api/send_message", status_code=status.HTTP_200_OK)
+async def sendMessage(
+    request: Request,
+    response: Response,
+    user: User = Depends(get_current_user),
+) -> None:
+    data = await request.json()
+
+    ctx = ssl.create_default_context()
+    password = os.getenv("GMAIL_PASSWORD")
+    sender = "africanmicronation@gmail.com"
+    recipient = "africanmicronation@proton.me"
+
+    edited_message = """
+    {}
+    
+    {}
+    """.format(
+        data["title"], data["message"]
+    )
+
+    msg = EmailMessage()
+    msg.set_content(edited_message)
+    msg.add_header("reply-to", user.email)
+    msg["Subject"] = "Support for {} {} {}".format(
+        user.first_name,
+        user.last_name,
+        datetime.now().strftime("at %H:%M:%S on %d/%m/%Y"),
+    )
+    msg["From"] = sender
+    msg["To"] = recipient
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
+        server.login(sender, password)
+        server.send_message(msg)
 
 
 # remove this when going to prod

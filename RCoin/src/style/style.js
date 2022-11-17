@@ -6,6 +6,14 @@ Style = {
     success: '#5DB075',
     paystack: '#41AA5E',
     grey: '#757575',
+    yellow: '#FFD23F',
+    failed: '#B31515',
+    tiffany_blue: '#3CBBB1',
+
+    solana_surge_green: '#00FFA3',
+    solana_ocean_blue: '#03E1FF',
+    solana_purple_dino: '#DC1FFF',
+    solana_black: '#000000',
     
     title: { 
         //top right bottom left
@@ -96,8 +104,25 @@ Style = {
         borderWidth: 1,
         padding: 10,
         borderRadius: 7.5,
-      },
+    },
     
+    large_input: {
+        height: 100,
+        margin: 12,
+        borderWidth: 1,
+        padding: 10,
+        borderRadius: 7.5,
+    },
+
+    faq: {
+        height: 50,
+        margin: 10,
+        borderWidth: 1,
+        borderColor: "grey",
+        borderRadius: 7.5,
+        // justifyContent: "center", 
+        alignItems: "center"
+    }
 }
 
 export default Style

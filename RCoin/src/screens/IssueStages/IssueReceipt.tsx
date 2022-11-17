@@ -2,8 +2,6 @@ import React from "react";
 import { Text, View } from "react-native-ui-lib";
 import styles from "../../style/style"
 
-
-// Select the amount
 const IssueReceipt = ({ coins_to_issue, rand_to_pay }: { coins_to_issue: number, rand_to_pay: number }) => {
     const numberWithCommas = (x: number) => {
         const options = {
@@ -14,7 +12,7 @@ const IssueReceipt = ({ coins_to_issue, rand_to_pay }: { coins_to_issue: number,
     }
 
     return (
-        <View>
+        <View center>
             <Text>
                 You are purchasing
             </Text>

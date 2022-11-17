@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, Button } from 'react-native-ui-lib';
 import ChangingBalance from '../../components/Balances/ChangingBalance';
-import Reciept from './TransferReciept';
+import TransferReceipt from './TransferReciept';
 import styles from '../../style/style';
 import { useAuth } from '../../contexts/Auth';
 import { useKeypair } from '../../contexts/Keypair';
@@ -9,7 +9,6 @@ import { Message, Transaction } from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
 
-// Select the amount
 const Transfer2Confirm = ({
   nextStage,
   amount,
@@ -98,7 +97,7 @@ const Transfer2Confirm = ({
       </Text>
       <View margin-30>
         <ChangingBalance deduction={amount} />
-        <Reciept email={recipient} amount={amount} />
+        <TransferReceipt email={recipient} amount={amount} />
       </View>
 
       <View flex bottom marginH-30 marginB-50>

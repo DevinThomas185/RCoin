@@ -21,7 +21,7 @@ const IssueSummary = ({
 
   return (
     <View flex>
-      <Text text40 color={styles.rcoin} margin-30>
+      <Text text40 margin-30 color={styles.rcoin}>
         Payment Summary
       </Text>
       <ChangingBalance deduction={-coins_to_issue} />
@@ -51,7 +51,7 @@ const IssueSummary = ({
         ref={paystackWebViewRef}
       />
 
-      <View flex bottom marginH-30 marginB-10>
+      <View flex bottom marginH-30 marginB-50>
         <Button
           onPress={() => paystackWebViewRef.current.startTransaction()}
           label="Pay with Paystack"

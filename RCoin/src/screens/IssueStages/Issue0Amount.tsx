@@ -67,16 +67,16 @@ const IssueAmount = ({
       <Text text40 style={styles.title}>
         Making A Deposit
       </Text>
-      <View marginH-30>
+      <View margin-30>
+        <Text text60 marginB-10>
+          Exchange Rand for RCoin
+        </Text>
         <Text>
-          You can exchange any amount of Rand for RCoin.
-          {'\n'}
-          {'\n'}
-          The transaction will appear in your transaction history and on the Real-Time Audit.
+          The transaction will appear in your transaction history and on the real-time audit.
         </Text>
       </View>
       <Image
-        source={require('../../style/RCoin-ZAR.png')}
+        source={require('../../style/ZAR-RCoin.png')}
         style={{ width: '100%', height: 130, marginVertical: 30 }}
       />
       <View marginH-30>

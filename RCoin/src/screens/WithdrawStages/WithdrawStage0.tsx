@@ -44,19 +44,18 @@ const WithdrawStage0 = ({
       <Text text40 style={styles.title}>
         Make a Withdrawal
       </Text>
-      <View>
-        <Balance />
-      </View>
-      <View style={{ marginHorizontal: 30 }}>
+      <View margin-30>
+        <Text text60 marginB-10>
+          Withdraw RCoin and receive Rand
+        </Text>
         <Text>
-          You can withdraw RCoin to Rand at any time.
-          {'\n'}
-          {'\n'}
-          The transaction will appear in your transaction history as well as on
-          the Real-Time Audit.
+          The transaction will appear in your transaction history and on the real-time audit.
         </Text>
       </View>
 
+      <View margin-30>
+        <Balance />
+      </View>
       <Image
         source={require('../../style/RCoin-ZAR.png')}
         style={{ width: '100%', height: 130, marginVertical: 30 }}
@@ -65,7 +64,7 @@ const WithdrawStage0 = ({
       <View flex bottom marginH-30 marginB-10>
         <Button
           onPress={nextStage}
-          label="Continue"
+          label="Continue to Choose Amount"
           backgroundColor={styles.rcoin}
         />
       </View>

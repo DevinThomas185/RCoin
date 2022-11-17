@@ -2,9 +2,7 @@ import React from "react";
 import { Text, View } from "react-native-ui-lib";
 import styles from "../../style/style"
 
-
-// Select the amount
-const Reciept = ({ email, amount }: { email: String, amount: number }) => {
+const TransferReciept = ({ email, amount }: { email: String, amount: number }) => {
     const numberWithCommas = (x: number) => {
         const options = {
             minimumFractionDigits: 2,
@@ -14,7 +12,7 @@ const Reciept = ({ email, amount }: { email: String, amount: number }) => {
     }
 
     return (
-        <View>
+        <View center>
             <Text>
                 You are sending
             </Text>
@@ -31,4 +29,4 @@ const Reciept = ({ email, amount }: { email: String, amount: number }) => {
     );
 }
 
-export default Reciept
+export default TransferReciept

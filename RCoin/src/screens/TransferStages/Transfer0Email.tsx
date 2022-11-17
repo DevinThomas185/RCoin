@@ -66,21 +66,15 @@ const Transfer0Email = ({
       <Text text40 style={styles.title}>
         Make a Transfer
       </Text>
-      <View style={{marginHorizontal: 30}}>
+      <View margin-30>
+        <Text text60 marginB-10>
+          Send RCoin to someone
+        </Text>
         <Text>
           You can send RCoin to any other user. Simply enter the email of the
           recipient and choose the amount.
-          {'\n'}
-          {'\n'}
-          The transaction will appear in both of your transaction histories as
-          well as the Real-Time Audit.
         </Text>
       </View>
-
-      <Image
-        source={require('../../style/RCoin-RCoin.png')}
-        style={{width: '100%', height: 130}}
-      />
 
       <View margin-30>
         <Text>Who would you like to send RCoin to?</Text>
@@ -105,7 +99,11 @@ const Transfer0Email = ({
           ]}
         />
       </View>
-      <View flex bottom marginH-30 marginB-50>
+      <Image
+        source={require('../../style/RCoin-RCoin.png')}
+        style={{width: '100%', height: 130}}
+      />
+      <View flex bottom marginH-30 marginB-50 >
         {continueButton()}
       </View>
     </View>
