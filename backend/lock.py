@@ -1,4 +1,4 @@
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 import os
 
 from aioredlock import Aioredlock, LockError, Sentinel
@@ -20,7 +20,7 @@ else:
 lock_manager = Aioredlock(redis_conf)
 
 
-@contextmanager
+@asynccontextmanager
 async def redis_lock(name: str, timeout: int = None):
     lock = await lock_manager.lock(name, lock_timeout=timeout)
     print(f"got lock for {name}")
