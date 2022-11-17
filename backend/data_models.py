@@ -47,6 +47,10 @@ class CompleteTradeTransaction(BaseModel):
     transaction_bytes: List[int]
 
 
+class TradeEmailValid(BaseModel):
+    email: str
+
+
 class RedeemTransaction(BaseModel):
     # email: str
     # wallet: str

@@ -47,6 +47,7 @@ from data_models import (
     CompleteTradeTransaction,
     LoginInformation,
     TokenResponse,
+    TradeEmailValid,
     UserInformation,
     IssueTransaction,
     TradeTransaction,
@@ -56,6 +57,8 @@ from data_models import (
 import database_api
 from database_api import Issue, User
 import paystack_api
+from lock import redis_lock
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
 JWT_SECRET = "secret"
@@ -328,6 +331,25 @@ async def trade(
     return res.to_json()
 
 
+@app.post("/api/trade-email-valid")
+async def is_trade_email_valid(
+    email_valid: TradeEmailValid,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+):
+    email = email_valid.email
+
+    if user.email == email:
+        return {"valid": False}
+
+    reciever = await database_api.get_user(email, db)
+
+    if not reciever:
+        return {"valid": False}
+
+    return {"valid": True}
+
+
 # REDEEM
 @app.post("/api/redeem")
 async def redeem(
@@ -455,15 +477,6 @@ async def token_balance(
     }
 
 
-from aioredlock import Aioredlock, LockError, Sentinel
-
-lock_manager = Aioredlock(
-    [
-        {"host": "localhost", "port": 6379, "db": 0},
-    ]
-)
-
-
 @app.post("/api/paystack-webhook")
 @from_paystack
 async def recieve_issue_webhook(
@@ -484,58 +497,56 @@ async def recieve_issue_webhook(
         user_id = data["data"]["metadata"]["custom_fields"][0]["variable_name"]
         user: User = await database_api.get_user_by_id(user_id, db=db)
 
+        if not user:
+            # Got paid and it was not from our app since no user
+            # how should we deal with this
+            response.status_code = 200
+            return "user not found"
+
         THIRTY_MINUTES = 60 * 30
         # Need to add timeout to other functions like waiting for blockchain
         lock_name = f"{user_id}"  # can we lock on amount too, less coarse?
-        lock = await lock_manager.lock(lock_name, lock_timeout=THIRTY_MINUTES)
-        print(f"got lock for user {lock_name}")
+        with redis_lock(lock_name, timeout=THIRTY_MINUTES):
 
-        issue_check = await get_should_issue_stage(transaction_id, user, amount, db)
-        if not issue_check:
-            response.status_code = 500
-            return "failed checking issue stage"
-
-        print(issue_check)
-
-        should_issue, associated_issue = issue_check
-
-        if should_issue == ShouldIssueStage.Already_Completed:
-            response.status_code = 200
-            await lock.release()
-            print(f"released lock for user {lock_name}")
-            return "already done"
-
-        if should_issue == ShouldIssueStage.Write_Issue_Write:
-            await database_api.create_issue_transaction(
-                issue=IssueTransaction(amount_in_rands=amount),
-                user_id=user_id,
-                bank_transaction_id=transaction_id,
-                date=datetime.now(),
-                db=db,
-            )
-
-        if (
-            should_issue == ShouldIssueStage._Issue_Write
-            or should_issue == ShouldIssueStage.Write_Issue_Write
-        ):
-            associated_issue_resp = issue_stablecoins(user.wallet_id, amount)
-            if not (associated_issue_resp).to_json()["success"]:
-                print("issue failed")
+            issue_check = await get_should_issue_stage(transaction_id, user, amount, db)
+            if not issue_check:
                 response.status_code = 500
-                await lock.release()
-                print(f"released lock for user {lock_name}")
-                return "not done"
+                return "failed checking issue stage"
 
-            associated_issue = associated_issue_resp.contents
-            print(associated_issue_resp)
+            print(issue_check)
 
-        # We always need to complete
-        await database_api.complete_issue_transaction(
-            transaction_id, associated_issue, db=db
-        )
+            should_issue, associated_issue = issue_check
 
-        await lock.release()
-        print(f"released lock for user {lock_name}")
+            if should_issue == ShouldIssueStage.Already_Completed:
+                response.status_code = 200
+                return "already done"
+
+            if should_issue == ShouldIssueStage.Write_Issue_Write:
+                await database_api.create_issue_transaction(
+                    issue=IssueTransaction(amount_in_rands=amount),
+                    user_id=user_id,
+                    bank_transaction_id=transaction_id,
+                    date=datetime.now(),
+                    db=db,
+                )
+
+            if (
+                should_issue == ShouldIssueStage._Issue_Write
+                or should_issue == ShouldIssueStage.Write_Issue_Write
+            ):
+                associated_issue_resp = issue_stablecoins(user.wallet_id, amount)
+                if not (associated_issue_resp).to_json()["success"]:
+                    print("issue failed")
+                    response.status_code = 500
+                    return "not done"
+
+                associated_issue = associated_issue_resp.contents
+                print(associated_issue_resp)
+
+            # We always need to complete
+            await database_api.complete_issue_transaction(
+                transaction_id, associated_issue, db=db
+            )
 
     # If issued, return 200
     response.status_code = 200
