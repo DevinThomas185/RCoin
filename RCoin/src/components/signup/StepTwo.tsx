@@ -12,13 +12,15 @@ export const StepTwo = ({
 }) => {
   return (
     <View>
-      <Text center text30>
+      <Text style={styles.title}>
         Bank Details
+      </Text>
+      <Text style={styles.subtext}>
+        This is where we will deposit and withdraw your Rand.
       </Text>
       <TextField
         style={styles.inputField}
         placeholder={'Bank Account Number'}
-        floatingPlaceholder
         onChangeText={(bnum: string) =>
           setSignUpDetails(prev => ({
             ...prev,
@@ -26,13 +28,11 @@ export const StepTwo = ({
           }))
         }
         value={signUpDetails.bankAccountNumber}
-        floatingPlaceholderStyle={{alignSelf: 'center'}}
       />
 
       <TextField
         style={styles.inputField}
         placeholder={'Bank Code'}
-        floatingPlaceholder
         onChangeText={(bcode: string) =>
           setSignUpDetails(prev => ({
             ...prev,
@@ -40,13 +40,11 @@ export const StepTwo = ({
           }))
         }
         value={signUpDetails.bankCode}
-        floatingPlaceholderStyle={{alignSelf: 'center'}}
       />
 
       <TextField
         style={styles.inputField}
         placeholder={'ID Number'}
-        floatingPlaceholder
         onChangeText={(id: string) =>
           setSignUpDetails(prev => ({
             ...prev,
@@ -54,23 +52,44 @@ export const StepTwo = ({
           }))
         }
         value={signUpDetails.IDNumber}
-        floatingPlaceholderStyle={{alignSelf: 'center'}}
       />
-
-      <Text>
+      <Text style={styles.subtext}>
         You can view and update your bank details at any time later on.
       </Text>
     </View>
   );
 };
 
+
 const styles = StyleSheet.create({
+  title: {
+    fontWeight: 'bold',
+    fontSize: 30,
+    textAlign: 'left',
+    marginLeft: 20
+  },
+
+  subtext: {
+    padding: 20,
+    color: 'grey',
+  },
+
+  floatingPlaceholder: {
+    zIndex: 0,
+    margin: 20,
+    fontSize: 20,
+  },
+
   inputField: {
     padding: 14,
     fontSize: 18,
-    width: '80%',
-    justifyContent: 'center',
-    alignSelf: 'center',
+    height: 50,
+    textAlign: 'left',
+    backgroundColor: '#f5f5f5',
+    borderColor: '#d1d1d1',
+    borderWidth: 1,
+    borderRadius: 5,
+    margin: 10,
   },
 
   button: {
@@ -86,3 +105,4 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
+

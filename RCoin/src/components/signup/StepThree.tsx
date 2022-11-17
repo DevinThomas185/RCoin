@@ -30,46 +30,66 @@ export const StepThree = ({
 
     const [key, setKey] = useState("")
     const [isValid, setIsValid] = useState(true)
+
+
+    const [passwordText, setPasswordText] = useState("Show")
+    const [showPassword, setShowPassword] = useState(false)
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword)
+        setPasswordText(passwordText === "Show" ? "Hide" : "Show")
+    }
+
+    const [confirmPasswordText, setConfirmPasswordText] = useState("Show")
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+    const toggleShowConfirmPassword = () => {
+        setShowConfirmPassword(!showConfirmPassword)
+        setConfirmPasswordText(confirmPasswordText === "Show" ? "Hide" : "Show")
+    }
+
     return (
         <View>
-            <Text center text30>
+            <Text style={styles.title}>
                 Enter a wallet password
             </Text>
-            <Text color='red'>
+            <Text color='red' style={styles.subtext}>
                 IT IS VERY IMPORTANT THAT YOU SAVE THIS PASSWORD OR YOU WILL LOSE ACCESS TO YOUR MONEY PERMANENTLY
             </Text>
-            <TextField
-                style={styles.inputField}
-                dasdad
-                placeholder={'Password'}
-                floatingPlaceholder
-                onChangeText={(password: string) => {
-                    setKey(password)
-                }}
-                value={key}
-                secureTextEntry
-                floatingPlaceholderStyle={{ alignSelf: 'center' }}
-            />
-            <TextField
-                style={styles.inputField}
-                dasdad
-                placeholder={'Confirm Password'}
-                floatingPlaceholder
-                onChangeText={(password: string) => {
-                    if (password !== key) {
-                        setIsValid(false)
-                        return;
-                    }
+            <View>
+                <TextField
+                    style={styles.inputField}
+                    dasdad
+                    placeholder={'Password'}
+                    onChangeText={(password: string) => {
+                        setKey(password)
+                    }}
+                    value={key}
+                    secureTextEntry={!showPassword}
+                />
+                <Text style={styles.passwordToggleButton} onPress={toggleShowPassword}>{passwordText}</Text>
+            </View>
+            <View>
+                <TextField
+                    style={styles.inputField}
+                    dasdad
+                    placeholder={'Confirm Password'}
+                    onChangeText={(password: string) => {
+                        if (password !== key) {
+                            setIsValid(false)
+                            return;
+                        }
 
-                    setIsValid(true)
-                    setSignUpDetails(prev => ({
-                        ...prev,
-                        encryption_password: password,
-                    }))
-                }}
-                secureTextEntry
-                floatingPlaceholderStyle={{ alignSelf: 'center' }}
-            />
+                        setIsValid(true)
+                        setSignUpDetails(prev => ({
+                            ...prev,
+                            encryption_password: password,
+                        }))
+                    }}
+                    secureTextEntry={!showConfirmPassword}
+                />
+                <Text style={styles.passwordToggleButton} onPress={toggleShowConfirmPassword}>{confirmPasswordText}</Text>
+            </View>
             {!isValid &&
                 <Text color='red'>
                     Passwords must match
@@ -79,12 +99,42 @@ export const StepThree = ({
 };
 
 const styles = StyleSheet.create({
+    title: {
+        fontWeight: 'bold',
+        fontSize: 30,
+        textAlign: 'left',
+        marginLeft: 20
+    },
+
+    subtext: {
+        padding: 20,
+        color: 'red',
+    },
+
+    floatingPlaceholder: {
+        zIndex: 0,
+        margin: 20,
+        fontSize: 20,
+    },
+
     inputField: {
         padding: 14,
         fontSize: 18,
-        width: '80%',
-        justifyContent: 'center',
-        alignSelf: 'center',
+        height: 50,
+        textAlign: 'left',
+        backgroundColor: '#f5f5f5',
+        borderColor: '#d1d1d1',
+        borderWidth: 1,
+        borderRadius: 5,
+        margin: 10,
+    },
+
+    passwordToggleButton: {
+        top: 25,
+        right: 20,
+        position: 'absolute',
+        fontSize: 16,
+        color: '#435C9C',
     },
 
     button: {
