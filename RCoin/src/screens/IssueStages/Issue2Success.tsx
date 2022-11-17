@@ -30,12 +30,11 @@ const IssueSuccess = ({
 
 
       <View margin-30>
-        <Text style={styles.buttonCaption}>
-          Your payment has been successful.
-          {'\n'}
-          {'\n'}
-          We have received {rand_to_pay} Rand and are now processing your
-          deposit. {'\n'}
+        <Text text60 center marginB-20>
+          Your payment has been successful!
+        </Text>
+        <Text center>
+          We have received R{rand_to_pay} and are now processing your deposit.
         </Text>
       </View>
       <View flex bottom marginH-30 marginB-20>

@@ -16,7 +16,7 @@ const Transfer2Confirm = ({
 }) => {
   return (
     <View flex>
-      <Text text40 color={styles.rcoin} style={{}} margin-30>
+      <Text text40 color={styles.rcoin} margin-30>
         Successful ✅
       </Text>
       <View margin-30>

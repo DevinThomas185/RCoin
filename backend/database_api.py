@@ -251,7 +251,10 @@ async def create_redeem_transaction(
 
 
 async def get_audit_transactions(
-    offset: int, limit: int, query_date: datetime, db: "Session"
+    offset: int,
+    limit: int,
+    query_date: datetime,
+    db: "Session",
 ) -> List[Tuple]:
     """Gets sorted (descending) issue and redeem transactions
 
@@ -281,3 +284,30 @@ async def get_audit_transactions(
         QUERY, {"query_date": query_date, "limit": limit, "offset": offset}
     )
     return list(res)
+
+
+# Change Account Details
+
+
+async def change_email(
+    user_id: int,
+    new_email: str,
+    db: "Session",
+) -> None:
+    db.query(User).filter(User.id == user_id).update(
+        {User.email: new_email}, synchronize_session=False
+    )
+    db.commit()
+
+
+async def change_name(
+    user_id: int,
+    new_first_name: str,
+    new_last_name: str,
+    db: "Session",
+) -> None:
+    db.query(User).filter(User.id == user_id).update(
+        {User.first_name: new_first_name, User.last_name: new_last_name},
+        synchronize_session=False,
+    )
+    db.commit()

@@ -32,9 +32,23 @@ const WithdrawStage1 = ({
     })
       .then(res => res.json())
       .then(data => {
-        data.forEach((element: { [key: string]: string }) => {
-          setBankAccount(data[0]);
-        });
+        console.log(data.bank_accounts[0])
+        setBankAccount(data.bank_accounts[0])
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    fetch('http://10.0.2.2:8000/api/get_token_balance', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.authData?.token}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setTokenBalance(data['token_balance']);
       })
       .catch(error => {
         console.log(error);

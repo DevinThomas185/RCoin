@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View } from "react-native-ui-lib";
-import { ScrollView } from "react-native"
+import { RefreshControl, ScrollView } from "react-native"
 import { useAuth } from '../contexts/Auth';
 import style from '../style/style'
 import History from './history.json'
@@ -9,6 +9,7 @@ import Balance from '../components/Balances/Balance';
 
 const TransactionHistory = () => {
     const auth = useAuth();
+    const [refreshing, setRefreshing] = useState(false);
 
     const initArr: any[] = []
     const [transaction_history, setTransactionHistory] = React.useState<any[]>(initArr);
@@ -32,14 +33,14 @@ const TransactionHistory = () => {
                 Authorization: `Bearer ${auth.authData?.token}`,
             },
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data['email'])
-                set_user_email(data['email']);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        .then(res => res.json())
+        .then(data => {
+            console.log(data['email'])
+            set_user_email(data['email']);
+        })
+        .catch(error => {
+            console.log(error);
+        });
 
         fetch('http://10.0.2.2:8000/api/get_token_balance', {
             method: 'GET',
@@ -48,14 +49,16 @@ const TransactionHistory = () => {
                 Authorization: `Bearer ${auth.authData?.token}`,
             },
         })
-            .then(res => res.json())
-            .then(data => {
-                setTokenBalance(data['token_balance']);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        .then(res => res.json())
+        .then(data => {
+            setTokenBalance(data['token_balance']);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }, []);
 
+    const updateTransactionHistory = () => {
         fetch('http://10.0.2.2:8000/api/transaction_history', {
             method: 'GET',
             headers: {
@@ -63,32 +66,49 @@ const TransactionHistory = () => {
                 Authorization: `Bearer ${auth.authData?.token}`,
             },
         })
-            .then(res => res.json())
-            .then(data => {
-                setTransactionHistory(data["transaction_history"])
-                console.log(data["transaction_history"])
-                console.log(data)
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        .then(res => res.json())
+        .then(data => {
+            setTransactionHistory(data["transaction_history"])
+            console.log(data["transaction_history"])
+            console.log(data)
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    };
+
+    useEffect(() => {
+        updateTransactionHistory();
+    }, []);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        updateTransactionHistory();
+        setRefreshing(false);
     }, []);
 
 
-
     return (
-        <ScrollView>
+        <View flex>
             <Balance />
             <Text text50 marginT-20 marginH-30>Transaction History</Text>
-            {transaction_history.map((transaction) => (
-
-                <View key={transaction.signature}>
-                    <Transaction amount={-transaction.amount / 1000000000} recipient={transaction.recipient} sender={transaction.sender} user_email={user_email} />
-                    <View style={style.thinDivider} />
-                </View>
-            ))}
-        </ScrollView>
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            >
+                {transaction_history.map((transaction) => (
+                    <View key={transaction.signature}>
+                        <Transaction amount={-transaction.amount / 1000000000} recipient={transaction.recipient} sender={transaction.sender} user_email={user_email} />
+                        <View style={style.thinDivider} />
+                    </View>
+                ))}
+            </ScrollView>
+        </View>
     );
-};
+}
 
 export default TransactionHistory;
