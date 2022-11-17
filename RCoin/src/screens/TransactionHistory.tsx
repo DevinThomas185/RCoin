@@ -11,8 +11,9 @@ const TransactionHistory = () => {
     const auth = useAuth();
 
     const initArr: any[] = []
-    const [transaction_history, setTransactionHistory] = React.useState<any[]>(initArr)
+    const [transaction_history, setTransactionHistory] = React.useState<any[]>(initArr);
     const [token_balance, setTokenBalance] = useState(0.0);
+    const [user_email, set_user_email] = useState("");
 
     const numberWithCommas = (x: number) => {
         const options = {
@@ -24,6 +25,21 @@ const TransactionHistory = () => {
 
     useEffect(() => {
 
+        fetch('http://10.0.2.2:8000/api/user', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${auth.authData?.token}`,
+            },
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data['email'])
+                set_user_email(data['email']);
+            })
+            .catch(error => {
+                console.log(error);
+            });
 
         fetch('http://10.0.2.2:8000/api/get_token_balance', {
             method: 'GET',
@@ -34,7 +50,6 @@ const TransactionHistory = () => {
         })
             .then(res => res.json())
             .then(data => {
-                // console.log(data)
                 setTokenBalance(data['token_balance']);
             })
             .catch(error => {
@@ -65,10 +80,10 @@ const TransactionHistory = () => {
         <ScrollView>
             <Balance />
             <Text text50 marginT-20 marginH-30>Transaction History</Text>
-            {History.transaction_history.map((transaction) => (
+            {transaction_history.map((transaction) => (
 
                 <View key={transaction.signature}>
-                    <Transaction amount={transaction.amount} recipient={transaction.recipient} sender={transaction.sender} />
+                    <Transaction amount={-transaction.amount / 1000000000} recipient={transaction.recipient} sender={transaction.sender} user_email={user_email} />
                     <View style={style.thinDivider} />
                 </View>
             ))}

@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View, Image } from "react-native-ui-lib";
 import style from '../style/style'
+import { useAuth } from '../../src/contexts/Auth';
 
 
-const Transaction = ({ amount, sender, recipient }: { amount: number, sender: string, recipient: string }) => {
+const Transaction = ({ amount, sender, recipient, user_email }: { amount: number, sender: string, recipient: string, user_email: string }) => {
+    const auth = useAuth();
+    const reserve = "HT8tRBub28NiMKHp7JeFBZQmepuSHD9Ai2NgivD7wyU"
 
-    const user_email = "adam@gmail.com"
+
+
 
     const numberWithCommas = (x: number) => {
         const options = {
@@ -84,9 +88,9 @@ const Transaction = ({ amount, sender, recipient }: { amount: number, sender: st
         <View>
             <View marginH-30 marginV-20 style={{ flexDirection: "row" }}>
                 {/* <View> */}
-                {recipient == 'reserve' ? deposit(amount, sender, recipient) : null}
-                {sender == 'reserve' ? withdraw(amount, sender, recipient) : null}
-                {sender != 'reserve' && recipient != 'reserve' ? transfer(amount, sender, recipient) : null}
+                {recipient == reserve ? deposit(amount, sender, recipient) : null}
+                {sender == reserve ? withdraw(amount, sender, recipient) : null}
+                {sender != reserve && recipient != reserve ? transfer(amount, sender, recipient) : null}
             </View>
         </View>
     );
