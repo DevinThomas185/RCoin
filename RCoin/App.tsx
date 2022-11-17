@@ -9,15 +9,16 @@ import {AuthProvider, useAuth} from './src/contexts/Auth';
 import {AuthStack} from './src/routes/AuthStack';
 import {KeypairProvider} from './src/contexts/Keypair';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import styles from './src/style/style'
-import { Image, LoaderScreen } from 'react-native-ui-lib';
+import styles from './src/style/style';
+import {Image, LoaderScreen} from 'react-native-ui-lib';
 import Home from './src/screens/Home';
+import {BalanceProvider} from './src/contexts/BalanceContext';
 
 const Tab = createBottomTabNavigator();
 
 const App = () => {
-  const AuthRouter = ({ children }: { children: React.ReactNode }) => {
-    const { authData, loading } = useAuth();
+  const AuthRouter = ({children}: {children: React.ReactNode}) => {
+    const {authData, loading} = useAuth();
 
     if (loading) {
       return (
@@ -26,7 +27,7 @@ const App = () => {
           backgroundColor={styles.rcoin}
           loaderColor="white"
           message="Loading Dashboard"
-          messageStyle={{ color: 'white' }}
+          messageStyle={{color: 'white'}}
         />
       );
     }
@@ -41,54 +42,53 @@ const App = () => {
   return (
     <KeypairProvider>
       <AuthProvider>
-        <AuthRouter>
-          <Tab.Navigator
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused, color, size }) => {
-                let iconName;
+        <BalanceProvider>
+          <AuthRouter>
+            <Tab.Navigator
+              screenOptions={({route}) => ({
+                tabBarIcon: ({focused, color, size}) => {
+                  let iconName;
 
-                if (route.name === 'Home') {
-                  iconName = focused ? 'home' : 'home-outline';
-                } else if (route.name === 'Deposit') {
-                  iconName = focused ? 'card' : 'card-outline';
-                } else if (route.name === 'Transfer') {
-                  iconName = focused ? 'send' : 'send-outline';
-                } else if (route.name === 'Withdraw') {
-                  iconName = focused
-                    ? 'cash'
-                    : 'cash-outline';
-                } else if (route.name === 'Account') {
-                  iconName = focused
-                    ? 'person'
-                    : 'person-outline';
-                }
+                  if (route.name === 'Home') {
+                    iconName = focused ? 'home' : 'home-outline';
+                  } else if (route.name === 'Deposit') {
+                    iconName = focused ? 'card' : 'card-outline';
+                  } else if (route.name === 'Transfer') {
+                    iconName = focused ? 'send' : 'send-outline';
+                  } else if (route.name === 'Withdraw') {
+                    iconName = focused ? 'cash' : 'cash-outline';
+                  } else if (route.name === 'Account') {
+                    iconName = focused ? 'person' : 'person-outline';
+                  }
 
-                return <Ionicons name={iconName} size={size} color={color} />;
-              },
-              headerLeft: () => (<Image
-                source={require('./src/style/Logo.png')}
-                style={styles.balanceLogo}
-              />),
-              tabBarActiveTintColor: styles.success,
-              tabBarInactiveTintColor: styles.rcoin,
-              headerStyle: {
-                backgroundColor: styles.rcoin,
-              },
-              headerTintColor: 'white',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-              headerTitleAlign: 'center',
-              // headerShown: false,
-            })}
-          >
-            <Tab.Screen name="Home" component={Home} />
-            <Tab.Screen name="Deposit" component={IssueScreen} />
-            <Tab.Screen name="Transfer" component={TransferScreen} />
-            <Tab.Screen name="Withdraw" component={WithdrawScreen} />
-            <Tab.Screen name="Account" component={AccountScreen} />
-          </Tab.Navigator>
-        </AuthRouter>
+                  return <Ionicons name={iconName} size={size} color={color} />;
+                },
+                headerLeft: () => (
+                  <Image
+                    source={require('./src/style/Logo.png')}
+                    style={styles.balanceLogo}
+                  />
+                ),
+                tabBarActiveTintColor: styles.success,
+                tabBarInactiveTintColor: styles.rcoin,
+                headerStyle: {
+                  backgroundColor: styles.rcoin,
+                },
+                headerTintColor: 'white',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+                headerTitleAlign: 'center',
+                // headerShown: false,
+              })}>
+              <Tab.Screen name="Home" component={Home} />
+              <Tab.Screen name="Deposit" component={IssueScreen} />
+              <Tab.Screen name="Transfer" component={TransferScreen} />
+              <Tab.Screen name="Withdraw" component={WithdrawScreen} />
+              <Tab.Screen name="Account" component={AccountScreen} />
+            </Tab.Navigator>
+          </AuthRouter>
+        </BalanceProvider>
       </AuthProvider>
     </KeypairProvider>
   );
