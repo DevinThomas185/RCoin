@@ -5,44 +5,42 @@ const CryptoJS = require('crypto-js');
 
 import {Keypair, Signer} from '@solana/web3.js';
 import ReactNativeBiometrics from 'react-native-biometrics';
-
+import {useAuth} from '../contexts/Auth';
 
 export type KeypairData = {
   sk: string;
   pk: string;
 };
 
-const SECRET_KEY_NAME = 'corn'
-const BIO_SECRET_KEY_NAME = 'cream'
+const SECRET_KEY_NAME = 'corn';
+const BIO_SECRET_KEY_NAME = 'cream';
 
-const rnBiometrics = new ReactNativeBiometrics()
+const rnBiometrics = new ReactNativeBiometrics();
 
 const handleCreateBioKeys = () => {
-  rnBiometrics.createKeys()
-    .then((resultObject) => {
-      const { publicKey } = resultObject
-      console.log(publicKey)
-    })
-}
+  rnBiometrics.createKeys().then(resultObject => {
+    const {publicKey} = resultObject;
+    console.log(publicKey);
+  });
+};
 
 const handleDeleteBioKeys = () => {
-  rnBiometrics.deleteKeys()
-    .then((resultObject) => {
-      const { keysDeleted } = resultObject
+  rnBiometrics.deleteKeys().then(resultObject => {
+    const {keysDeleted} = resultObject;
 
-      if (keysDeleted) {
-        console.log('Successful deletion')
-      } else {
-        console.log('Unsuccessful deletion because there were no keys to delete')
-      }
-    })
-}
+    if (keysDeleted) {
+      console.log('Successful deletion');
+    } else {
+      console.log('Unsuccessful deletion because there were no keys to delete');
+    }
+  });
+};
 
 const handleCheckBioKeys = async (): Promise<boolean> => {
   const resultObject = await rnBiometrics.biometricKeysExist();
-  const { keysExist } = resultObject;
+  const {keysExist} = resultObject;
   return keysExist;
-}
+};
 
 // TODO[pg1919] return success or truth or smth
 const _writePair = (kp: Keypair, encryptionKey: string, filename: string) => {
@@ -65,17 +63,24 @@ const _writePair = (kp: Keypair, encryptionKey: string, filename: string) => {
 };
 
 const writePair = (kp: Keypair, encryptionKey: string) => {
-  RNFS.unlink(RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`)
-  handleDeleteBioKeys()
-  
+  RNFS.unlink(RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`).catch(
+    e => {
+      console.log(`/${BIO_SECRET_KEY_NAME}.txt`, e);
+    },
+  );
+  handleDeleteBioKeys();
+
   _writePair(kp, encryptionKey, SECRET_KEY_NAME);
-}
+};
 
 const writePairBio = (kp: Keypair, encryptionKey: string) => {
   _writePair(kp, encryptionKey, BIO_SECRET_KEY_NAME);
-}
+};
 
-const readPair = (decryptionKey: string, filename: string = SECRET_KEY_NAME): Promise<Keypair | undefined> => {
+const readPair = (
+  decryptionKey: string,
+  filename: string = SECRET_KEY_NAME,
+): Promise<Keypair | undefined> => {
   const path = RNFS.DocumentDirectoryPath + `/${filename}.txt`;
 
   return new Promise(resolve => {
@@ -100,18 +105,29 @@ const readPair = (decryptionKey: string, filename: string = SECRET_KEY_NAME): Pr
 
 const readPairBio = (decryptionKey: string): Promise<Keypair | undefined> => {
   return readPair(decryptionKey, BIO_SECRET_KEY_NAME);
-}
+};
 
 const bioSecretKeyExitsts = async (): Promise<boolean> => {
   const keyExists = await handleCheckBioKeys();
-  if (!keyExists) {
-    handleCreateBioKeys();
-    RNFS.unlink(RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`);
+  const {available} = await rnBiometrics.isSensorAvailable();
+  if (!available) {
     return false;
   }
-  return RNFS.exists(RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`);
 
-}
+  if (!keyExists) {
+    handleCreateBioKeys();
+    RNFS.unlink(
+      RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`,
+    ).catch(e => {
+      console.log(`/${BIO_SECRET_KEY_NAME}.txt`, e);
+    });
+    return false;
+  }
+
+  return RNFS.exists(
+    RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`,
+  );
+};
 
 export const keypairService = {
   readPair,
