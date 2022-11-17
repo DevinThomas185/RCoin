@@ -24,14 +24,14 @@ const Balance = () => {
                 Authorization: `Bearer ${auth.authData?.token}`,
             },
         })
-        .then(res => res.json())
-        .then(data => {
-            setTokenBalance(data['token_balance']);
-            setLoading(false);
-        })
-        .catch(error => {
-            console.log(error);
-        });
+            .then(res => res.json())
+            .then(data => {
+                setTokenBalance(data['token_balance']);
+                setLoading(false);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     if (loading) {
@@ -45,7 +45,7 @@ const Balance = () => {
         return (
             <View center marginV-20>
                 <Text>Current RCoin Balance</Text>
-                <View row style={{justifyContent: "center", alignItems: "center"}}>
+                <View row style={{ justifyContent: "center", alignItems: "center" }}>
                     <BalanceFormat token_balance={token_balance} />
                     <Ionicons.Button
                         name="refresh-outline"

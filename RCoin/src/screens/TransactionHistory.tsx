@@ -33,14 +33,14 @@ const TransactionHistory = () => {
                 Authorization: `Bearer ${auth.authData?.token}`,
             },
         })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data['email'])
-            set_user_email(data['email']);
-        })
-        .catch(error => {
-            console.log(error);
-        });
+            .then(res => res.json())
+            .then(data => {
+                console.log(data['email'])
+                set_user_email(data['email']);
+            })
+            .catch(error => {
+                console.log(error);
+            });
 
         fetch('http://10.0.2.2:8000/api/get_token_balance', {
             method: 'GET',
@@ -49,13 +49,13 @@ const TransactionHistory = () => {
                 Authorization: `Bearer ${auth.authData?.token}`,
             },
         })
-        .then(res => res.json())
-        .then(data => {
-            setTokenBalance(data['token_balance']);
-        })
-        .catch(error => {
-            console.log(error);
-        });
+            .then(res => res.json())
+            .then(data => {
+                setTokenBalance(data['token_balance']);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }, []);
 
     const updateTransactionHistory = () => {
@@ -66,15 +66,15 @@ const TransactionHistory = () => {
                 Authorization: `Bearer ${auth.authData?.token}`,
             },
         })
-        .then(res => res.json())
-        .then(data => {
-            setTransactionHistory(data["transaction_history"])
-            console.log(data["transaction_history"])
-            console.log(data)
-        })
-        .catch(error => {
-            console.log(error);
-        });
+            .then(res => res.json())
+            .then(data => {
+                setTransactionHistory(data["transaction_history"])
+                console.log(data["transaction_history"])
+                console.log(data)
+            })
+            .catch(error => {
+                console.log(error);
+            });
     };
 
     useEffect(() => {
@@ -102,12 +102,12 @@ const TransactionHistory = () => {
             >
                 {transaction_history.map((transaction) => (
                     <View key={transaction.signature}>
-                        <Transaction amount={-transaction.amount / 1000000000} recipient={transaction.recipient} sender={transaction.sender} user_email={user_email} />
+                        <Transaction type={transaction.transaction_type} rcoin={-transaction.amount / 1000000000} recipient={transaction.recipient} sender={transaction.sender} user_email={user_email} />
                         <View style={style.thinDivider} />
                     </View>
                 ))}
             </ScrollView>
-        </View>
+        </View >
     );
 }
 

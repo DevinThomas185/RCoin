@@ -1,14 +1,14 @@
-import {useEffect, useState} from 'react';
-import {StyleSheet} from 'react-native';
-import {View, Button, Incubator, Text, LoaderScreen} from 'react-native-ui-lib'; //eslint-disable-line
-import {UserSignUp} from '../../types/SignUp';
-const {TextField} = Incubator;
-import {NavigationScreenProp} from 'react-navigation';
+import { useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { View, Button, Incubator, Text, LoaderScreen } from 'react-native-ui-lib'; //eslint-disable-line
+import { UserSignUp } from '../../types/SignUp';
+const { TextField } = Incubator;
+import { NavigationScreenProp } from 'react-navigation';
 
 // https://github.com/uuidjs/uuid/issues/416
-import {v4 as uuidv4} from 'uuid'; // Very important, do not remove plz!!!!!
+import { v4 as uuidv4 } from 'uuid'; // Very important, do not remove plz!!!!!
 
-import {useKeypair} from '../../contexts/Keypair';
+import { useKeypair } from '../../contexts/Keypair';
 import {
   Transaction,
   Connection,
