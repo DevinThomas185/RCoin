@@ -1,15 +1,16 @@
-import React from 'react';
-import { Text, View, Button } from 'react-native-ui-lib';
+import React, {useState} from 'react';
+import {Text, View, Button} from 'react-native-ui-lib';
 import ChangingBalance from '../../components/Balances/ChangingBalance';
 import styles from '../../style/style';
 import WithdrawReciept from './WithdrawReciept';
-import { useAuth } from '../../contexts/Auth';
-import { useKeypair } from '../../contexts/Keypair';
-import { Message, Transaction } from '@solana/web3.js';
+import {useAuth} from '../../contexts/Auth';
+import {useKeypair} from '../../contexts/Keypair';
+import {Message, Transaction} from '@solana/web3.js';
 import nacl from 'tweetnacl';
+import PasswordPopup from '../../components/PasswordPopup';
 
 // Confirmation
-const WithdrawStage1 = ({
+const WithdrawStage2 = ({
   nextStage,
   token_balance,
   coins_to_withdraw,
@@ -21,21 +22,23 @@ const WithdrawStage1 = ({
   token_balance: number;
   coins_to_withdraw: number;
   rands_being_credited: number;
-  current_bank_account: { [key: string]: string };
+  current_bank_account: {[key: string]: string};
   setTransactionId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const auth = useAuth();
   const keyPair = useKeypair();
   const new_balance = token_balance - coins_to_withdraw;
 
-  const handleSend = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleSend = (secretKey: Uint8Array) => {
     fetch('http://10.0.2.2:8000/api/redeem', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${auth.authData?.token}`,
       },
-      body: JSON.stringify({ amount_in_coins: coins_to_withdraw }, null, 2),
+      body: JSON.stringify({amount_in_coins: coins_to_withdraw}, null, 2),
     })
       .then(res => {
         if (!res.ok) {
@@ -49,43 +52,41 @@ const WithdrawStage1 = ({
             new Uint8Array(data['transaction_bytes']),
           );
 
-          keyPair.readPair('password').then(kp => {
-            if (kp != undefined) {
-              // Make signature
-              const message: Message = transaction.compileMessage();
-              const signData = message.serialize();
-              const signature = nacl.sign.detached(signData, kp.secretKey);
+          if (secretKey != undefined) {
+            // Make signature
+            const message: Message = transaction.compileMessage();
+            const signData = message.serialize();
+            const signature = nacl.sign.detached(signData, secretKey);
 
-              fetch('http://10.0.2.2:8000/api/complete-redeem', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${auth.authData?.token}`,
+            fetch('http://10.0.2.2:8000/api/complete-redeem', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${auth.authData?.token}`,
+              },
+              body: JSON.stringify(
+                {
+                  signature: Array.from(signature),
+                  transaction_bytes: Array.from(data['transaction_bytes']),
                 },
-                body: JSON.stringify(
-                  {
-                    signature: Array.from(signature),
-                    transaction_bytes: Array.from(data['transaction_bytes']),
-                  },
-                  null,
-                  2,
-                ),
+                null,
+                2,
+              ),
+            })
+              .then(res => {
+                if (!res.ok) {
+                  throw new Error('Complete redem failed');
+                }
+                return res.json();
               })
-                .then(res => {
-                  if (!res.ok) {
-                    throw new Error('Complete redem failed');
-                  }
-                  return res.json();
-                })
-                .then(data => {
-                  if (data['success']) {
-                    setTransactionId(data['transaction_id']);
-                    nextStage();
-                  }
-                })
-                .catch(error => console.log(error));
-            }
-          });
+              .then(data => {
+                if (data['success']) {
+                  setTransactionId(data['transaction_id']);
+                  nextStage();
+                }
+              })
+              .catch(error => console.log(error));
+          }
         }
       })
       .catch(error => console.log(error));
@@ -116,13 +117,20 @@ const WithdrawStage1 = ({
       </Text>
       <View flex bottom marginH-30 marginB-10>
         <Button
-          onPress={handleSend}
+          onPress={() => {
+            setIsModalVisible(true)
+          }}
           label="Continue"
           backgroundColor={styles.rcoin}
+        />
+        <PasswordPopup
+          isVisible={isModalVisible}
+          setIsVisible={setIsModalVisible}
+          onSuccess={handleSend}
         />
       </View>
     </View>
   );
 };
 
-export default WithdrawStage1;
+export default WithdrawStage2;
