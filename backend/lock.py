@@ -27,5 +27,5 @@ async def redis_lock(name: str, timeout: int = None):
     try:
         yield lock
     finally:
-        await lock.release(name)
+        await lock.release()
         print(f"released lock for {name}")
