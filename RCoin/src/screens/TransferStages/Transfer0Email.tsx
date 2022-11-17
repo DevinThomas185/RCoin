@@ -76,7 +76,7 @@ const Transfer0Email = ({
         </Text>
       </View>
 
-      <View margin-30>
+      <View marginH-30>
         <Text>Who would you like to send RCoin to?</Text>
         <TextField
           placeholder="Email of Recipient"
@@ -94,7 +94,8 @@ const Transfer0Email = ({
           validate={[
             'required',
             (email: string) => {
-              return !isEmailValid(email).then(res => res);
+              (async () => await isEmailValid(email))();
+              return !valid;
             },
           ]}
         />
@@ -103,7 +104,7 @@ const Transfer0Email = ({
         source={require('../../style/RCoin-RCoin.png')}
         style={{width: '100%', height: 130}}
       />
-      <View flex bottom marginH-30 marginB-50 >
+      <View flex bottom marginH-30 marginB-10>
         {continueButton()}
       </View>
     </View>

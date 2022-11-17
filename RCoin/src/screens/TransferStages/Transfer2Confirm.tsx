@@ -80,6 +80,7 @@ const Transfer2Confirm = ({
               })
               .then(data => {
                 if (data['success']) {
+                  setTransactionId(data['signature'])
                   nextStage();
                 }
               })

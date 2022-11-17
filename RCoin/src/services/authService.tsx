@@ -4,7 +4,7 @@ export type AuthData = {
   token_info: TokenInfo;
 };
 
-export type TokenInfo = {user_id: string; email: string; name: string};
+export type TokenInfo = { user_id: string; email: string; name: string };
 
 // Returns undefined promise if login is unsuccessful
 const signIn = (

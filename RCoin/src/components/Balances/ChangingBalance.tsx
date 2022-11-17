@@ -29,15 +29,15 @@ const ChangingBalance = ({
                 Authorization: `Bearer ${auth.authData?.token}`,
             },
         })
-        .then(res => res.json())
-        .then(data => {
-            setTokenBalance(data['token_balance']);
-            setNewTokenBalance(data['token_balance'] - deduction)
-            setLoading(false);
-        })
-        .catch(error => {
-            console.log(error);
-        });
+            .then(res => res.json())
+            .then(data => {
+                setTokenBalance(data['token_balance']);
+                setNewTokenBalance(data['token_balance'] - deduction)
+                setLoading(false);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     if (loading) {

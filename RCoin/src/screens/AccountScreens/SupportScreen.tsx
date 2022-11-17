@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Text, Incubator, View, Button, LoaderScreen } from "react-native-ui-lib";
 import styles from '../../style/style'
 import { NavigationScreenProp } from 'react-navigation';
-import {useAuth} from '../../contexts/Auth';
-const {TextField} = Incubator
+import { useAuth } from '../../contexts/Auth';
+const { TextField } = Incubator
 
 const SupportScreen = () => {
 
@@ -24,20 +24,20 @@ const SupportScreen = () => {
       },
       body: JSON.stringify(
         {
-          title: title, 
+          title: title,
           message: message
         },
         null,
         2,
       ),
     })
-    .then(res => {
-      if (!res.ok) {
-        setErrorReceived(true);
-      } else {
-        setMessageReceived(true);
-      }
-    })
+      .then(res => {
+        if (!res.ok) {
+          setErrorReceived(true);
+        } else {
+          setMessageReceived(true);
+        }
+      })
   }
 
   if (!messageSent && !messageReceived) {
@@ -55,16 +55,16 @@ const SupportScreen = () => {
             placeholder="A short title for us"
             style={styles.input}
             onChangeText={(title: string) => {
-                setTitle(title);
+              setTitle(title);
             }}
             multiline={true}
           />
-          <TextField 
+          <TextField
             center
             placeholder="What's happening?"
             style={styles.large_input}
             onChangeText={(title: string) => {
-                setMessage(title);
+              setMessage(title);
             }}
             multiline={true}
           />
@@ -77,9 +77,9 @@ const SupportScreen = () => {
   }
   else if (messageSent && !messageReceived && !errorReceived) {
     return (
-      <LoaderScreen 
-          loaderColor={styles.rcoin}
-          message="Sending Message"
+      <LoaderScreen
+        loaderColor={styles.rcoin}
+        message="Sending Message"
       />
     );
   }
