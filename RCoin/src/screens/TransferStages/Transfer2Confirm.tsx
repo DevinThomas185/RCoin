@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Text, View, Button } from 'react-native-ui-lib';
+import React, {useState} from 'react';
+import {Text, View, Button} from 'react-native-ui-lib';
 import ChangingBalance from '../../components/Balances/ChangingBalance';
 import TransferReceipt from './TransferReciept';
 import styles from '../../style/style';
-import { useAuth } from '../../contexts/Auth';
-import { useKeypair } from '../../contexts/Keypair';
-import { Message, Transaction } from '@solana/web3.js';
+import {useAuth} from '../../contexts/Auth';
+import {useKeypair} from '../../contexts/Keypair';
+import {Message, Transaction} from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
 
@@ -23,8 +23,8 @@ const Transfer2Confirm = ({
   const auth = useAuth();
   const keyPair = useKeypair();
 
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [secretKey, setSecretKey] = useState<Uint8Array>()
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [secretKey, setSecretKey] = useState<Uint8Array>();
 
   const handleSend = (secretKey: Uint8Array) => {
     fetch('http://10.0.2.2:8000/api/trade', {
@@ -34,7 +34,7 @@ const Transfer2Confirm = ({
         Authorization: `Bearer ${auth.authData?.token}`,
       },
       body: JSON.stringify(
-        { coins_to_transfer: amount, recipient_email: recipient },
+        {coins_to_transfer: amount, recipient_email: recipient},
         null,
         2,
       ),
@@ -80,7 +80,7 @@ const Transfer2Confirm = ({
               })
               .then(data => {
                 if (data['success']) {
-                  setTransactionId(data['signature'])
+                  setTransactionId(data['signature']);
                   nextStage();
                 }
               })
@@ -96,12 +96,12 @@ const Transfer2Confirm = ({
       <Text text40 style={styles.title} margin-30>
         Confirm your transaction
       </Text>
-      <View margin-30>
+      <View marginH-30>
         <ChangingBalance deduction={amount} />
         <TransferReceipt email={recipient} amount={amount} />
       </View>
 
-      <View flex bottom marginH-30 marginB-50>
+      <View flex bottom marginH-30 marginB-10>
         <Button
           onPress={() => setIsModalVisible(true)}
           label="Transfer RCoin"

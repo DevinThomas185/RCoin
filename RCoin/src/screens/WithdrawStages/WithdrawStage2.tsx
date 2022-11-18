@@ -118,7 +118,7 @@ const WithdrawStage2 = ({
       <View flex bottom marginH-30 marginB-10>
         <Button
           onPress={() => {
-            setIsModalVisible(true)
+            setIsModalVisible(true);
           }}
           label="Continue"
           backgroundColor={styles.rcoin}
