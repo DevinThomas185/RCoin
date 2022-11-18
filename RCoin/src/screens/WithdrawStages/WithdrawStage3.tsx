@@ -34,8 +34,13 @@ const WithdrawStage3 = ({
 
       <View margin-30>
         <Text style={styles.buttonCaption}>
-          {rands_being_credited} RCoin has successfuly been withdrawn from your
-          account {'\n'}
+          {coins_to_withdraw} RCoin has successfully been withdrawn from your
+          account.
+        </Text>
+        <Text style={styles.buttonCaption}>
+          You have received R{rands_being_credited}.
+        </Text>
+        <Text style={styles.buttonCaption}>
           Transaction ID = {transactionId}
         </Text>
       </View>

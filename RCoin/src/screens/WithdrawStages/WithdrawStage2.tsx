@@ -8,6 +8,7 @@ import {useKeypair} from '../../contexts/Keypair';
 import {Message, Transaction} from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
+import PendingLoader from '../../components/PendingLoader';
 
 // Confirmation
 const WithdrawStage2 = ({
@@ -28,10 +29,18 @@ const WithdrawStage2 = ({
   const auth = useAuth();
   const keyPair = useKeypair();
   const new_balance = token_balance - coins_to_withdraw;
-
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [confirm_clicked, setConfirmClicked] = useState(false);
+  const [response_state, setResponseState] = useState(0);
+  const [loading_page_message, setLoadingPageMessage] = useState(
+    'Initiating Withdraw',
+  );
 
   const handleSend = (secretKey: Uint8Array) => {
+    setLoading(true);
+    setConfirmClicked(true);
+    setResponseState(0);
     fetch('http://10.0.2.2:8000/api/redeem', {
       method: 'POST',
       headers: {
@@ -47,6 +56,7 @@ const WithdrawStage2 = ({
         return res.json();
       })
       .then(data => {
+        setLoadingPageMessage('Signing Withdrawal');
         if (data['success']) {
           const transaction = Transaction.from(
             new Uint8Array(data['transaction_bytes']),
@@ -80,16 +90,28 @@ const WithdrawStage2 = ({
                 return res.json();
               })
               .then(data => {
+                setLoadingPageMessage('Withdraw Successful!');
                 if (data['success']) {
                   setTransactionId(data['transaction_id']);
+                  setLoading(false);
+                  setConfirmClicked(false);
+                  setResponseState(0);
                   nextStage();
                 }
               })
-              .catch(error => console.log(error));
+              .catch(error => {
+                setResponseState(-1);
+                setLoading(false);
+                console.log(error);
+              });
           }
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        setResponseState(-1);
+        setLoading(false);
+        console.log(error);
+      });
   };
 
   return (
@@ -105,7 +127,7 @@ const WithdrawStage2 = ({
           bank_account={current_bank_account}
         />
       </View>
-      <View flex bottom marginH-30 marginB-5>
+      {/* <View flex bottom marginH-30 marginB-5>
         <Button
           onPress={nextStage}
           label="Account Settings"
@@ -114,13 +136,21 @@ const WithdrawStage2 = ({
       </View>
       <Text style={styles.buttonCaption}>
         Wrong bank info? Change in your account settings
-      </Text>
-      <View flex bottom marginH-30 marginB-10>
+      </Text> */}
+      <PendingLoader
+        loading={loading}
+        show={confirm_clicked}
+        response_state={response_state}
+        loading_page_message={loading_page_message}
+        custom_fail_message="Withdraw failed, please confirm again"
+      />
+      <View flex bottom marginH-30 marginB-50>
         <Button
           onPress={() => {
-            setIsModalVisible(true)
+            setIsModalVisible(true);
           }}
-          label="Continue"
+          disabled={loading}
+          label="Confirm Withdrawal"
           backgroundColor={styles.rcoin}
         />
         <PasswordPopup

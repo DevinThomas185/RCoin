@@ -14,7 +14,7 @@ const Transaction = ({
   rcoin: number;
   sender: string;
   recipient: string;
-  user_email: string;
+  user_email: string | undefined;
 }) => {
   const {authData} = useAuth();
 

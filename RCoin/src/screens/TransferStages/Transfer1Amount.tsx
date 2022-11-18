@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Text, View, Button, Colors } from 'react-native-ui-lib';
+import React, {useState} from 'react';
+import {Text, View, Button, Colors} from 'react-native-ui-lib';
 import AmountEntry from '../../components/AmountEntry';
 import styles from '../../style/style';
 import Balance from '../../components/Balances/Balance';
@@ -16,26 +16,6 @@ const Transfer1Amount = ({
 }) => {
   const [valid, setValid] = useState(false);
 
-  const continueButton = () => {
-    if (valid) {
-      return (
-        <Button
-          onPress={nextStage}
-          label="Continue to Confirmation"
-          backgroundColor={styles.rcoin}
-        />
-      );
-    } else {
-      return (
-        <Button
-          onPress={() => { }}
-          label="Continue to Confirmation"
-          backgroundColor={styles.grey}
-        />
-      );
-    }
-  }
-
   return (
     <View flex>
       <Text text40 style={styles.title} margin-30>
@@ -48,10 +28,20 @@ const Transfer1Amount = ({
         <Text>How much would you like to send?</Text>
       </View>
       <View marginH-30>
-        <AmountEntry setAmount={setAmount} least_limit={LEAST_LIMIT} max_limit={1000000} tellButton={setValid} />
+        <AmountEntry
+          setAmount={setAmount}
+          least_limit={LEAST_LIMIT}
+          max_limit={1000000}
+          tellButton={setValid}
+        />
       </View>
-      <View flex bottom marginH-30 marginB-50 >
-        {continueButton()}
+      <View flex bottom marginH-30 marginB-50>
+        <Button
+          onPress={nextStage}
+          disabled={!valid}
+          label="Continue to Confirmation"
+          backgroundColor={styles.rcoin}
+        />
       </View>
     </View>
   );

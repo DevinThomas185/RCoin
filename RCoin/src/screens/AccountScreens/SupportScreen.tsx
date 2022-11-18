@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { Text, Incubator, View, Button, LoaderScreen } from "react-native-ui-lib";
-import styles from '../../style/style'
-import { NavigationScreenProp } from 'react-navigation';
-import { useAuth } from '../../contexts/Auth';
-const { TextField } = Incubator
+import React, {useState} from 'react';
+import {Text, Incubator, View, Button, LoaderScreen} from 'react-native-ui-lib';
+import styles from '../../style/style';
+import {NavigationScreenProp} from 'react-navigation';
+import {useAuth} from '../../contexts/Auth';
+const {TextField} = Incubator;
 
 const SupportScreen = () => {
-
-  const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
   const [messageSent, setMessageSent] = useState(false);
   const [messageReceived, setMessageReceived] = useState(false);
   const [errorReceived, setErrorReceived] = useState(false);
@@ -25,20 +24,19 @@ const SupportScreen = () => {
       body: JSON.stringify(
         {
           title: title,
-          message: message
+          message: message,
         },
         null,
         2,
       ),
-    })
-      .then(res => {
-        if (!res.ok) {
-          setErrorReceived(true);
-        } else {
-          setMessageReceived(true);
-        }
-      })
-  }
+    }).then(res => {
+      if (!res.ok) {
+        setErrorReceived(true);
+      } else {
+        setMessageReceived(true);
+      }
+    });
+  };
 
   if (!messageSent && !messageReceived) {
     return (
@@ -48,7 +46,8 @@ const SupportScreen = () => {
         </Text>
         <View margin-30>
           <Text center text70 marginB-20>
-            Send us a message here and we will aim to reply to the email associated with your account within 48 hours!
+            Send us a message here and we will aim to reply to the email
+            associated with your account within 48 hours!
           </Text>
           <TextField
             center
@@ -70,20 +69,19 @@ const SupportScreen = () => {
           />
         </View>
         <View flex bottom marginH-30 marginB-50>
-          <Button onPress={sendMessage} label="Send Message" backgroundColor={styles.rcoin} />
+          <Button
+            onPress={sendMessage}
+            label="Send Message"
+            backgroundColor={styles.rcoin}
+          />
         </View>
       </View>
-    )
-  }
-  else if (messageSent && !messageReceived && !errorReceived) {
-    return (
-      <LoaderScreen
-        loaderColor={styles.rcoin}
-        message="Sending Message"
-      />
     );
-  }
-  else if (messageReceived) {
+  } else if (messageSent && !messageReceived && !errorReceived) {
+    return (
+      <LoaderScreen loaderColor={styles.rcoin} message="Sending Message" />
+    );
+  } else if (messageReceived) {
     return (
       <Text margin-50 text40 color={styles.success} center>
         Message Sent!
@@ -96,10 +94,8 @@ const SupportScreen = () => {
       </Text>
     );
   } else {
-    return (
-      <></>
-    );
+    return <></>;
   }
-}
+};
 
 export default SupportScreen;

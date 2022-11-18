@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, Button} from 'react-native-ui-lib';
+import {Text, View, Button, Image} from 'react-native-ui-lib';
 import styles from '../../style/style';
 
 // Select the amount
@@ -16,16 +16,27 @@ const Transfer2Confirm = ({
 }) => {
   return (
     <View flex>
-      <Text text40 color={styles.rcoin} margin-30>
-        Successful ✅
+      <View marginT-30 style={{alignSelf: 'center'}}>
+        <Image source={require('../../style/Success.png')} />
+      </View>
+      <Text
+        text40
+        color={styles.rcoin}
+        style={{
+          textAlign: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        Successful
       </Text>
+
       <View margin-30>
         <Text style={styles.buttonCaption}>
-          {amount} Rcoin has successfuly been sent to {recipient}
+          {amount} RCoin has successfully been sent to {recipient}
         </Text>
         <Text>Transaction ID = {transactionId}</Text>
       </View>
-      <View flex bottom marginH-30-0>
+      <View flex bottom marginH-30 marginB-20>
         <Text style={styles.buttonCaption}>
           You can now see your updated balance on the dashboard
         </Text>
