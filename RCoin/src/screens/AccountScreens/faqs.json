@@ -1,28 +1,28 @@
 {
-    "faqs": [
-        {
-            "question": "How does RCoin work?",
-            "answer": "RCoin utilises the power of blockchains to transfer money between users, benefitting from low transactional fees. Buying, withdrawing and transferring RCoin is all logged on the blockchain to provide total transparency and security of the ledger."
-        },
-        {
-            "question": "What is a blockchain?",
-            "answer": "A blockchain is a system for recording transactions in a ledger. It differs from a traditional bank format because it is decentralised and distributed, meaning it relies on the cooperation of others to maintain the ledger. This makes it more secure as many people maintain it, rather than one centralised authority."
-        },
-        {
-            "question": "Which blockchain does RCoin use?",
-            "answer": "RCoin utilises the power of Solana, providing fast transactions of 400 millisecond block times."
-        },
-        {
-            "question": "What is a stablecoin?",
-            "answer": "A stablecoin is a cryptocurrency that is pegged to another asset such as a commodity like gold, or another currency like the US Dollar. RCoin is pegged to the Rand. Stablecoins provide an avenue to reduce the high volatility experienced by traditional cryptocurrencies."
-        },
-        {
-            "question": "Why should I trust RCoin?",
-            "answer": "RCoin is fully backed at all times, meaning if everyone wanted to withdraw their money at the same time, we would be able to facilitate this. Our real-time audit gives proof of the 1-to-1 peg of RCoin to the Rand. Traditional cryptocurrencies such as Bitcoin are not backed and are consequently very unstable. It is this backing that makes RCoin stable."
-        },
-        {
-            "question": "Who built RCoin?",
-            "answer": "We are a group of students at Imperial College London. We are in our third year of studying MEng Computing / MEng Joint Maths and Computing. The group consists of Adam Alilou, Shiv Bhatia, Konstantinos Koupepas, Szymon Kubica, Karim Selif and Devin Thomas."
-        }
-    ]
+  "faqs": [
+    {
+      "question": "How does RCoin work?",
+      "answer": "RCoin utilises the power of blockchains to transfer money between users, benefitting from low transactional fees. Buying, withdrawing and transferring RCoin is all logged on the blockchain to provide total transparency and security of the ledger."
+    },
+    {
+      "question": "What is a blockchain?",
+      "answer": "A blockchain is a system for recording transactions in a ledger. It differs from a traditional bank format because it is decentralised and distributed, meaning it relies on the cooperation of others to maintain the ledger. This makes it more secure as many people maintain it, rather than one centralised authority."
+    },
+    {
+      "question": "Which blockchain does RCoin use?",
+      "answer": "RCoin utilises the power of Solana, providing fast transactions of 400 millisecond block times."
+    },
+    {
+      "question": "What is a stablecoin?",
+      "answer": "A stablecoin is a cryptocurrency that is pegged to another asset such as a commodity like gold, or another currency like the US Dollar. RCoin is pegged to the Rand. Stablecoins provide an avenue to reduce the high volatility experienced by traditional cryptocurrencies."
+    },
+    {
+      "question": "Why should I trust RCoin?",
+      "answer": "RCoin is fully backed at all times, meaning if everyone wanted to withdraw their money at the same time, we would be able to facilitate this. Our real-time audit gives proof of the 1-to-1 peg of RCoin to the Rand. Traditional cryptocurrencies such as Bitcoin are not backed and are consequently very unstable. It is this backing that makes RCoin stable."
+    },
+    {
+      "question": "Who built RCoin?",
+      "answer": "We are a group of students at Imperial College London. We are in our third year of studying MEng Computing / MEng Joint Maths and Computing. The group consists of Adam Alilou, Shiv Bhatia, Konstantinos Koupepas, Szymon Kubica, Karim Selih and Devin Thomas."
+    }
+  ]
 }
