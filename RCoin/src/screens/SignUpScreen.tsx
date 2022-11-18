@@ -37,18 +37,18 @@ export const SignUpScreen = ({
 
   function validPersonalDetails(): boolean {
     return (
-      signUpDetails.email != '' &&
-      signUpDetails.firstName != '' &&
-      signUpDetails.lastName != '' &&
+      signUpDetails.email != '' && //is in email format and not already used
+      signUpDetails.firstName != '' && //no numbers
+      signUpDetails.lastName != '' && //no numbers
       signUpDetails.password != ''
     );
   }
 
   function validBankDetails(): boolean {
     return (
-      signUpDetails.bankAccountNumber != '' &&
-      signUpDetails.bankCode != '' &&
-      signUpDetails.IDNumber != ''
+      signUpDetails.bankAccountNumber != '' && //no letters
+      signUpDetails.bankCode != '' && //no letters
+      signUpDetails.IDNumber != '' //no letters
     );
   }
 
@@ -64,6 +64,7 @@ export const SignUpScreen = ({
     ) {
       console.log(signUpDetails);
       return (
+        //Normal button
         <Button
           style={styles.button}
           label={'Continue'}
@@ -72,6 +73,7 @@ export const SignUpScreen = ({
       );
     } else {
       return (
+        //Greyed out button that doesn't let you continue
         <Button
           style={styles.blockedButton}
           label={'Continue'}
@@ -153,13 +155,6 @@ export const SignUpScreen = ({
 
   return (
     <View style={styles.outerView}>
-      {/* <Wizard activeIndex={stage}>
-        <Wizard.Step state={getStageState(0)} label={'Your Details'} circleColor={style.rcoin} color={style.rcoin} />
-        <Wizard.Step state={getStageState(1)} label={'Bank Details'} circleColor={style.rcoin} color={style.rcoin} />
-        <Wizard.Step state={getStageState(2)} label={'Key Password'} circleColor={style.rcoin} color={style.rcoin} />
-        <Wizard.Step state={getStageState(3)} label={'Confirmation'} circleColor={style.rcoin} color={style.rcoin} />
-      </Wizard> */}
-
       <Image href="../../style/Logo.png" />
       <View style={styles.steps}>{conditionalComponent()}</View>
       <View style={styles.controls}>
