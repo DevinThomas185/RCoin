@@ -1,15 +1,22 @@
 // @ts-ignore
-import { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Button, Image, LoaderScreen, Text, View, Wizard } from 'react-native-ui-lib';
-import { StepOne } from '../components/signup/StepOne';
-import { StepTwo } from '../components/signup/StepTwo';
-import { StepThree } from '../components/signup/StepThree';
-import { StepFour } from '../components/signup/StepFour';
-import { UserSignUp } from '../types/SignUp';
-import { NavigationScreenProp } from 'react-navigation';
-import { useBackHandler } from '../services/BackHandler';
-import style from "../style/style"
+import {useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {
+  Button,
+  Image,
+  LoaderScreen,
+  Text,
+  View,
+  Wizard,
+} from 'react-native-ui-lib';
+import {StepOne} from '../components/signup/StepOne';
+import {StepTwo} from '../components/signup/StepTwo';
+import {StepThree} from '../components/signup/StepThree';
+import {StepFour} from '../components/signup/StepFour';
+import {UserSignUp} from '../types/SignUp';
+import {NavigationScreenProp} from 'react-navigation';
+import {useBackHandler} from '../services/BackHandler';
+import style from '../style/style';
 
 export const SignUpScreen = ({
   navigation,
@@ -17,23 +24,76 @@ export const SignUpScreen = ({
   navigation: NavigationScreenProp<any, any>;
 }) => {
   const [stage, setStage] = useState(0);
-  const [signUpDetails, setSignUpDetails] = useState<UserSignUp>(
-    {} as UserSignUp,
-  );
+  const [signUpDetails, setSignUpDetails] = useState<UserSignUp>({
+    email: '',
+    firstName: '',
+    lastName: '',
+    password: '',
+    encryption_password: '',
+    bankAccountNumber: '',
+    bankCode: '',
+    IDNumber: '',
+  });
+
+  function validPersonalDetails(): boolean {
+    return (
+      signUpDetails.email != '' &&
+      signUpDetails.firstName != '' &&
+      signUpDetails.lastName != '' &&
+      signUpDetails.password != ''
+    );
+  }
+
+  function validBankDetails(): boolean {
+    return (
+      signUpDetails.bankAccountNumber != '' &&
+      signUpDetails.bankCode != '' &&
+      signUpDetails.IDNumber != ''
+    );
+  }
+
+  function validWalletPassword(): boolean {
+    return signUpDetails.encryption_password != '';
+  }
+
+  function continueButton(stage: number) {
+    if (
+      (stage == 0 && validPersonalDetails()) ||
+      (stage == 1 && validBankDetails()) ||
+      (stage == 2 && validWalletPassword())
+    ) {
+      console.log(signUpDetails);
+      return (
+        <Button
+          style={styles.button}
+          label={'Continue'}
+          onPress={handleContinue}
+        />
+      );
+    } else {
+      return (
+        <Button
+          style={styles.blockedButton}
+          label={'Continue'}
+          onPress={() => {}}
+        />
+      );
+    }
+  }
 
   // Without "dummy" final page which is the underlying signup component
   const NUM_PAGES = 3;
 
   const backHandlerAction = () => {
     if (stage > 0 && stage <= NUM_PAGES) {
-      setStage(stage - 1)
-      return true
+      setStage(stage - 1);
+      return true;
     }
 
-    return false
-  }
+    return false;
+  };
 
-  useBackHandler(backHandlerAction)
+  useBackHandler(backHandlerAction);
 
   const conditionalComponent = () => {
     switch (stage) {
@@ -103,13 +163,7 @@ export const SignUpScreen = ({
       <Image href="../../style/Logo.png" />
       <View style={styles.steps}>{conditionalComponent()}</View>
       <View style={styles.controls}>
-        {stage < NUM_PAGES && (
-          <Button
-            style={styles.button}
-            label={'Continue'}
-            onPress={handleContinue}
-          />
-        )}
+        {stage < NUM_PAGES && <>{continueButton(stage)}</>}
         {stage > 0 && (
           <Text
             style={styles.goback}
@@ -127,7 +181,7 @@ export const SignUpScreen = ({
 const styles = StyleSheet.create({
   outerView: {
     backgroundColor: '#435C9C',
-    height: '100%'
+    height: '100%',
   },
 
   steps: {
@@ -163,5 +217,9 @@ const styles = StyleSheet.create({
 
   button: {
     backgroundColor: '#5DB075',
+  },
+
+  blockedButton: {
+    backgroundColor: '#757575',
   },
 });
