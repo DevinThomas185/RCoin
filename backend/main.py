@@ -271,8 +271,16 @@ async def transactionHistory(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     wallet_id = user.wallet_id
-    return get_stablecoin_transactions(wallet_id).to_json()
-
+    transactions = get_stablecoin_transactions(wallet_id).to_json()["transaction_history"]
+    for transaction in transactions:
+        sender = await database_api.get_user_by_wallet_id(transaction["sender"], db=db)
+        recipient = await database_api.get_user_by_wallet_id(transaction["recipient"], db=db)
+        if sender is not None:
+            transaction["sender"] = sender.email
+        if recipient is not None:
+            transaction["recipient"] = recipient.email
+    
+    return {"transaction_history": transactions}
 
 # ISSUE
 @app.post("/api/issue")

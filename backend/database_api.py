@@ -145,6 +145,11 @@ async def get_user_by_id(id: str, db: "Session") -> User:
     user = db.query(User).filter(User.id == id).first()
     return user
 
+async def get_user_by_wallet_id(wallet_id: str, db: "Session") -> User:
+    user = db.query(User).filter(User.wallet_id == wallet_id).first()
+    return user
+
+
 
 async def get_user(
     email: str,
