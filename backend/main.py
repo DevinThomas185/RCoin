@@ -1,7 +1,4 @@
 # Should load here since this is entry point to system
-from dotenv import load_dotenv
-
-load_dotenv()
 
 from enum import Enum
 import functools
@@ -16,6 +13,7 @@ from jose import JWTError, jwt
 import smtplib
 import ssl
 from email.message import EmailMessage
+import environment
 
 # import datetime
 from datetime import timezone, datetime, timedelta
@@ -114,7 +112,7 @@ def from_paystack(func):
         data = await kwargs["request"].json()
 
         hash = hmac.new(
-            os.getenv("PAYSTACK_SECRET_KEY").encode(),
+            environment.getenv("PAYSTACK_SECRET_KEY").encode(),
             msg=json.dumps(data, separators=(",", ":")).encode(),
             digestmod=hashlib.sha512,
         ).hexdigest()
@@ -616,7 +614,7 @@ async def sendMessage(
     data = await request.json()
 
     ctx = ssl.create_default_context()
-    password = os.getenv("GMAIL_PASSWORD")
+    password = environment.getenv("GMAIL_PASSWORD")
     sender = "africanmicronation@gmail.com"
     recipient = "africanmicronation@proton.me"
 

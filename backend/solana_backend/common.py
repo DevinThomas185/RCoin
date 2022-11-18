@@ -1,13 +1,13 @@
-import os
+import environment
 
 # Solana dependencies
 from solana.publickey import PublicKey
 from solana.rpc.api import Client
 
-SOLANA_CLIENT = Client(str(os.getenv("SOLANA_CLIENT")))
-MINT_ACCOUNT = PublicKey(str(os.getenv("MINT_ACCOUNT")))
-TOKEN_OWNER = PublicKey(str(os.getenv("TOKEN_OWNER")))
-RESERVE_ACCOUNT_ADDRESS = PublicKey(str(os.getenv("RESERVE_ACCOUNT_ADDRESS")))
+SOLANA_CLIENT = Client(str(environment.getenv("SOLANA_CLIENT")))
+MINT_ACCOUNT = PublicKey(str(environment.getenv("MINT_ACCOUNT")))
+TOKEN_OWNER = PublicKey(str(environment.getenv("TOKEN_OWNER")))
+RESERVE_ACCOUNT_ADDRESS = PublicKey(str(environment.getenv("RESERVE_ACCOUNT_ADDRESS")))
 
 TOTAL_SUPPLY = 1000000000
 
@@ -19,7 +19,7 @@ def read_the_secret_key(key: str) -> list[int]:
 
 # Secret key of the account of the token owner. Used for issuing new tokens
 # for users who have provided equivalent collateral.
-SECRET_KEY = bytes(read_the_secret_key(str(os.getenv("SECRET_KEY"))))
+SECRET_KEY = bytes(read_the_secret_key(str(environment.getenv("SECRET_KEY"))))
 
 # The precision that we support in transactions involving our stablecoin token
 # is up to 9 decimal places.

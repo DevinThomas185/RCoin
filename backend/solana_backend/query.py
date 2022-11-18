@@ -1,4 +1,4 @@
-import os
+import environment
 from requests import post
 
 from solana.publickey import PublicKey
@@ -49,7 +49,7 @@ def has_token_account(public_key: PublicKey) -> bool:
 
 
 def get_token_balance(public_key: PublicKey) -> float:
-    solana_client = os.getenv("SOLANA_CLIENT")
+    solana_client = environment.getenv("SOLANA_CLIENT")
     assert solana_client is not None
 
     payload = {

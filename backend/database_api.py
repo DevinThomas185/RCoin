@@ -7,6 +7,7 @@ import sqlalchemy.orm as orm
 import data_models
 import uuid
 from typing import List, Optional, Tuple
+import environment
 import os
 
 
@@ -15,7 +16,7 @@ def get_dummy_id() -> str:
     return str(uuid.uuid4())
 
 
-DB_URL = os.getenv("DATABASE_URL")
+DB_URL = environment.getenv("DATABASE_URL")
 
 engine = sql.create_engine(DB_URL)
 

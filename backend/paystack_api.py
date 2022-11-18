@@ -1,11 +1,8 @@
-from dotenv import load_dotenv, find_dotenv
-import os
 import requests
+import environment
 
-load_dotenv(find_dotenv())
-
-PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
-PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY")
+PAYSTACK_SECRET_KEY = environment.getenv("PAYSTACK_SECRET_KEY")
+PAYSTACK_PUBLIC_KEY = environment.getenv("PAYSTACK_PUBLIC_KEY")
 
 
 def check_balance():
