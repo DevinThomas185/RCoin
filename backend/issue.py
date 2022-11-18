@@ -32,6 +32,7 @@ async def get_should_issue_stage(
     ] = await database_api.get_user_issue_for_bank_transaction(
         user.id, transaction_id, db
     )
+    print(f"issue write is {issue_write}")
     if not issue_write:
         # Just issue normally
         return (ShouldIssueStage.Write_Issue_Write, None)
@@ -84,7 +85,7 @@ async def get_should_issue_stage(
 
         else:
             # If there are missing transactions but not for this ammount, we are free to issue
-            same_amount = filter(lambda t: t["amount"] == None, missing_transactions)
+            same_amount = filter(lambda t: t["amount"] == amount, missing_transactions)
 
             if same_amount == []:
                 return (ShouldIssueStage._Issue_Write, None)
