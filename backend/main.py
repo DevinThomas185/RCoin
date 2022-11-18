@@ -537,7 +537,7 @@ async def recieve_issue_webhook(
                 response.status_code = 500
                 return "failed checking issue stage"
 
-            print(issue_check)
+            print(f"issue check returned {issue_check}")
 
             should_issue, associated_issue = issue_check
 
