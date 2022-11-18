@@ -161,6 +161,11 @@ async def get_user(
     return user
 
 
+async def get_user_by_wallet(wallet_id: str, db: "Session") -> User:
+    user = db.query(User).filter(User.wallet_id == wallet_id).first()
+    return user
+
+
 # Issue
 async def create_issue_transaction(
     issue: data_models.IssueTransaction,

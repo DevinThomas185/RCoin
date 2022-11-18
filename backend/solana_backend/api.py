@@ -61,6 +61,8 @@ from solana_backend.response import (
     CreateTransactionSuccess,
 )
 
+import database_api
+
 BLOCKCHAIN_RESPONSE_TIMEOUT = 30
 
 
@@ -349,15 +351,20 @@ class TransactionType(Enum):
     Recieve = "recieve"
 
 
-def get_stablecoin_transactions(public_key: str, limit: int = 10) -> Response:
+async def get_stablecoin_transactions(public_key: str, limit: int = 10, db: "Session") -> Response:
     try:
 
         associated_account = get_associated_token_account(PublicKey(public_key))
 
         transactions = get_processed_transactions_for_account(associated_account, limit)
 
+        async def get_email(wallet: str):
+            user = await database_api.get_user_by_wallet(wallet)
+            return user.email
+
+        
+        # THIS NEEDS TO BE REFACTORED BIG TIME
         # add metadata to transaction if it is issue, trade or redeem
-        # are these issues inverted, it seems I am always recipient when sending? why always negative
         for transaction in transactions:
 
             if transaction["amount"] < 0:
@@ -365,16 +372,16 @@ def get_stablecoin_transactions(public_key: str, limit: int = 10) -> Response:
                     if transaction["recipient"] == str(TOKEN_OWNER):
                         transaction_type = TransactionType.Deposit
                     else:
-                        print(transaction["recipient"], TOKEN_OWNER)
                         transaction_type = TransactionType.Recieve
+                        transaction["sender"] = await get_email(transaction["recipient"])
 
                 else:
                     if transaction["sender"] == str(TOKEN_OWNER):
                         transaction_type = TransactionType.Withdraw
                     else:
                         transaction_type = TransactionType.Send
+                        transaction["recipient"] = await get_email(transaction["sender"])
 
-            # This however failed, from doing manually?
             else:
                 # Flipped
                 if transaction["sender"] == public_key:
@@ -382,12 +389,14 @@ def get_stablecoin_transactions(public_key: str, limit: int = 10) -> Response:
                         transaction_type = TransactionType.Withdraw
                     else:
                         transaction_type = TransactionType.Send
+                        transaction["recipient"] = await get_email(transaction["recipient"])
 
                 else:
                     if transaction["sender"] == str(TOKEN_OWNER):
                         transaction_type = TransactionType.Deposit
                     else:
                         transaction_type = TransactionType.Recieve
+                        transaction["sender"] = await get_email(transaction["sender"])
 
             transaction["transaction_type"] = transaction_type
 

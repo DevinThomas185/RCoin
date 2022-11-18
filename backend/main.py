@@ -271,7 +271,7 @@ async def transactionHistory(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     wallet_id = user.wallet_id
-    return get_stablecoin_transactions(wallet_id).to_json()
+    return (await get_stablecoin_transactions(wallet_id, db=db)).to_json()
 
 
 # ISSUE
