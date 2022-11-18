@@ -1,22 +1,22 @@
 stages:
-  - build
+  # - build
   - deploy-dev
   - deploy-prod
 
-build-frontend:
-  image: node:alpine
-  stage: build
-  script:
-    - cd frontend
-    - npm install
-    - CI=false npm run build
+# build-frontend:
+#   image: node:alpine
+#   stage: build
+#   script:
+#     - cd frontend
+#     - npm install
+#     - CI=false npm run build
 
-# Need some way to check python compiles
-build-backend:
-  stage: build
-  script:
-    - cd backend
-    - echo "add build check and formatting"
+# # Need some way to check python compiles
+# build-backend:
+#   stage: build
+#   script:
+#     - cd backend
+#     - echo "add build check and formatting"
 
 deploy-dev:
   image: docker/compose:debian-1.29.2
@@ -38,8 +38,8 @@ deploy-dev:
     - if [[ $(echo $INFO | grep stablecoin_frontend_1 | wc -l) -ne 1 ]]; then echo "frontend container not running" && exit 1; else echo "frontend container check successful"; fi
     - if [[ $(echo $INFO | grep stablecoin_backend_1 | wc -l) -ne 1 ]]; then echo "backend container not running" && exit 1; else echo "backend container check successful"; fi
     - if [[ $(echo $INFO | grep stablecoin_db_1 | wc -l) -ne 1 ]]; then echo "db container not running" && exit 1; else echo "db container check successful"; fi
-  only:
-    - master
+  # only:
+  #   - master
 
 deploy-prod:
   image: docker/compose:debian-1.29.2
