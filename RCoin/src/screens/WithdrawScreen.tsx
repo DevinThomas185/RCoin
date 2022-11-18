@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { View, Wizard } from 'react-native-ui-lib';
+import React, {useState, useEffect} from 'react';
+import {View, Wizard} from 'react-native-ui-lib';
 import WithdrawStage0 from './WithdrawStages/WithdrawStage0';
 import WithdrawStage1 from './WithdrawStages/WithdrawStage1';
 import WithdrawStage2 from './WithdrawStages/WithdrawStage2';
 import WithdrawStage3 from './WithdrawStages/WithdrawStage3';
-import { useAuth } from '../contexts/Auth';
-import { useBackHandler } from '../services/BackHandler';
+import {useAuth} from '../contexts/Auth';
+import {useBackHandler} from '../services/BackHandler';
 import styles from '../style/style';
 
 const WithdrawScreen = () => {
   const [stage, setStage] = useState(0);
   const [coins_to_withdraw, setCoinstoWithdraw] = useState(0.0);
   const [rands_being_credited, setRandsBeingCredited] = useState(0.0);
-  const [bank_account, setBankAccount] = useState<{ [key: string]: string }>({
+  const [bank_account, setBankAccount] = useState<{[key: string]: string}>({
     bank_account: '',
     sort_code: '',
   });

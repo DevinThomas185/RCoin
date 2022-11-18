@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { Text, View, Button } from 'react-native-ui-lib';
+import React, {useState} from 'react';
+import {Text, View, Button, LoaderScreen} from 'react-native-ui-lib';
 import ChangingBalance from '../../components/Balances/ChangingBalance';
 import TransferReceipt from './TransferReciept';
 import styles from '../../style/style';
-import { useAuth } from '../../contexts/Auth';
-import { useKeypair } from '../../contexts/Keypair';
-import { Message, Transaction } from '@solana/web3.js';
+import {useAuth} from '../../contexts/Auth';
+import {useKeypair} from '../../contexts/Keypair';
+import {Message, Transaction} from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
+import PendingLoader from '../../components/PendingLoader';
 
 const Transfer2Confirm = ({
   nextStage,
@@ -23,10 +24,19 @@ const Transfer2Confirm = ({
   const auth = useAuth();
   const keyPair = useKeypair();
 
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [secretKey, setSecretKey] = useState<Uint8Array>()
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [secretKey, setSecretKey] = useState<Uint8Array>();
+  const [loading, setLoading] = useState(false);
+  const [confirm_clicked, setConfirmClicked] = useState(false);
+  const [response_state, setResponseState] = useState(0);
+  const [loading_page_message, setLoadingPageMessage] = useState(
+    'Initiating Transfer',
+  );
 
   const handleSend = (secretKey: Uint8Array) => {
+    setLoading(true);
+    setConfirmClicked(true);
+    setResponseState(0);
     fetch('http://10.0.2.2:8000/api/trade', {
       method: 'POST',
       headers: {
@@ -34,7 +44,7 @@ const Transfer2Confirm = ({
         Authorization: `Bearer ${auth.authData?.token}`,
       },
       body: JSON.stringify(
-        { coins_to_transfer: amount, recipient_email: recipient },
+        {coins_to_transfer: amount, recipient_email: recipient},
         null,
         2,
       ),
@@ -46,6 +56,7 @@ const Transfer2Confirm = ({
         return res.json();
       })
       .then(data => {
+        setLoadingPageMessage('Signing Transaction');
         if (data['success']) {
           const transaction = Transaction.from(
             new Uint8Array(data['transaction_bytes']),
@@ -74,21 +85,33 @@ const Transfer2Confirm = ({
             })
               .then(res => {
                 if (!res.ok) {
-                  throw new Error('Complete redem failed');
+                  throw new Error('Complete redeem failed');
                 }
                 return res.json();
               })
               .then(data => {
+                setLoadingPageMessage('Transfer Successful!');
                 if (data['success']) {
-                  setTransactionId(data['signature'])
+                  setTransactionId(data['signature']);
+                  setLoading(false);
+                  setConfirmClicked(false);
+                  setResponseState(0);
                   nextStage();
                 }
               })
-              .catch(error => console.log(error));
+              .catch(error => {
+                setResponseState(-1);
+                setLoading(false);
+                console.log(error);
+              });
           }
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        setResponseState(-1);
+        setLoading(false);
+        console.log(error);
+      });
   };
 
   return (
@@ -100,11 +123,18 @@ const Transfer2Confirm = ({
         <ChangingBalance deduction={amount} />
         <TransferReceipt email={recipient} amount={amount} />
       </View>
-
+      <PendingLoader
+        loading={loading}
+        show={confirm_clicked}
+        response_state={response_state}
+        loading_page_message={loading_page_message}
+        custom_fail_message="Transfer failed, please confirm again"
+      />
       <View flex bottom marginH-30 marginB-50>
         <Button
           onPress={() => setIsModalVisible(true)}
-          label="Transfer RCoin"
+          label="Confirm Transfer"
+          disabled={loading}
           backgroundColor={styles.rcoin}
         />
       </View>

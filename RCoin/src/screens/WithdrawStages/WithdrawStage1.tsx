@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Button, Picker } from 'react-native-ui-lib';
-import { useAuth } from '../../contexts/Auth';
+import React, {useEffect, useState} from 'react';
+import {Text, View, Button, Picker} from 'react-native-ui-lib';
+import {useAuth} from '../../contexts/Auth';
 import styles from '../../style/style';
 import Balance from '../../components/Balances/Balance';
 import AmountEntry from '../../components/AmountEntry';
@@ -15,7 +15,7 @@ const WithdrawStage1 = ({
   nextStage: React.Dispatch<void>;
   setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
   setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
-  setBankAccount: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
+  setBankAccount: React.Dispatch<React.SetStateAction<{[key: string]: string}>>;
 }) => {
   const auth = useAuth();
 
@@ -32,8 +32,8 @@ const WithdrawStage1 = ({
     })
       .then(res => res.json())
       .then(data => {
-        console.log(data.bank_accounts[0])
-        setBankAccount(data.bank_accounts[0])
+        console.log(data.bank_accounts[0]);
+        setBankAccount(data.bank_accounts[0]);
       })
       .catch(error => {
         console.log(error);
@@ -70,27 +70,6 @@ const WithdrawStage1 = ({
       });
   }, []);
 
-
-  const continueButton = () => {
-    if (valid) {
-      return (
-        <Button
-          onPress={nextStage}
-          label="Continue"
-          backgroundColor={styles.rcoin}
-        />
-      );
-    } else {
-      return (
-        <Button
-          onPress={() => { }}
-          label="Continue"
-          backgroundColor={styles.grey}
-        />
-      );
-    }
-  }
-
   return (
     <View flex>
       <Text text40 style={styles.title}>
@@ -102,7 +81,12 @@ const WithdrawStage1 = ({
 
       <View margin-30>
         <Text>How much would you like to send?</Text>
-        <AmountEntry setAmount={setCoinsToWithdraw} least_limit={0} max_limit={token_balance} tellButton={setValid} />
+        <AmountEntry
+          setAmount={setCoinsToWithdraw}
+          least_limit={0}
+          max_limit={token_balance}
+          tellButton={setValid}
+        />
       </View>
 
       {/* <View margin-30>
@@ -131,8 +115,13 @@ const WithdrawStage1 = ({
         </Picker>
       </View> */}
 
-      <View flex bottom marginH-30 marginB-50 >
-        {continueButton()}
+      <View flex bottom marginH-30 marginB-50>
+        <Button
+          onPress={nextStage}
+          disabled={!valid}
+          label="Continue"
+          backgroundColor={styles.rcoin}
+        />
       </View>
     </View>
   );

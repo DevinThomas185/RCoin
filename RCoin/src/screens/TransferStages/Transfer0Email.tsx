@@ -41,26 +41,6 @@ const Transfer0Email = ({
       });
   }
 
-  const continueButton = () => {
-    if (valid) {
-      return (
-        <Button
-          onPress={nextStage}
-          label="Continue to Choose Amount"
-          backgroundColor={styles.rcoin}
-        />
-      );
-    } else {
-      return (
-        <Button
-          onPress={() => {}}
-          label="Continue to Choose Amount"
-          backgroundColor={styles.grey}
-        />
-      );
-    }
-  };
-
   return (
     <View flex>
       <Text text40 style={styles.title}>
@@ -104,8 +84,13 @@ const Transfer0Email = ({
         source={require('../../style/RCoin-RCoin.png')}
         style={{width: '100%', height: 130}}
       />
-      <View flex bottom marginH-30 marginB-10>
-        {continueButton()}
+      <View flex bottom marginH-30 marginB-50>
+        <Button
+          onPress={nextStage}
+          disabled={!valid}
+          label="Continue to Choose Amount"
+          backgroundColor={styles.rcoin}
+        />
       </View>
     </View>
   );

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Text, View, Button, Image } from 'react-native-ui-lib';
+import React, {useEffect} from 'react';
+import {Text, View, Button, Image} from 'react-native-ui-lib';
 import Balance from '../../components/Balances/Balance';
-import { useAuth } from '../../contexts/Auth';
+import {useAuth} from '../../contexts/Auth';
 import styles from '../../style/style';
 
 const LEAST_LIMIT = 0;
@@ -21,7 +21,7 @@ const WithdrawStage0 = ({
   useEffect(() => {
     fetch(
       'http://10.0.2.2:8000/api/get_rand_to_return/?amount=' +
-      coins_to_withdraw.toString(),
+        coins_to_withdraw.toString(),
       {
         method: 'GET',
         headers: {
@@ -49,7 +49,8 @@ const WithdrawStage0 = ({
           Withdraw RCoin and receive Rand
         </Text>
         <Text>
-          The transaction will appear in your transaction history and on the real-time audit.
+          The transaction will appear in your transaction history and on the
+          real-time audit.
         </Text>
       </View>
 
@@ -58,10 +59,10 @@ const WithdrawStage0 = ({
       </View>
       <Image
         source={require('../../style/RCoin-ZAR.png')}
-        style={{ width: '100%', height: 130, marginVertical: 30 }}
+        style={{width: '100%', height: 130, marginVertical: 30}}
       />
 
-      <View flex bottom marginH-30 marginB-10>
+      <View flex bottom marginH-30 marginB-50>
         <Button
           onPress={nextStage}
           label="Continue to Choose Amount"
