@@ -61,7 +61,8 @@ const Transfer0Email = ({
         <TextField
           placeholder="Email of Recipient"
           style={styles.input}
-          keyboardType="email"
+          keyboardType="email-address"
+          autoCapitalize="none"
           onChangeText={(email: string) => {
             setRecipient(email);
           }}

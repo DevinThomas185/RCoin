@@ -7,7 +7,6 @@ import {useKeypair} from '../contexts/Keypair';
 import {Keypair} from '@solana/web3.js';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import {useAuth} from '../contexts/Auth';
-import {resolvePath} from 'react-router-dom';
 
 const PasswordPopup = ({
   isVisible,
@@ -23,7 +22,13 @@ const PasswordPopup = ({
   const keyPair = useKeypair();
   const rnBiometrics = new ReactNativeBiometrics();
   const auth = useAuth();
-  const [isBio, setBio] = useState(false);
+  const [isBio, setBio2] = useState(false);
+
+  const setBio = (v: boolean) => {
+    console.log('Setting bio:', v);
+    setBio2(v);
+  };
+
   const isSensorAvailable = rnBiometrics
     .isSensorAvailable()
     .then(({available}) => {
@@ -37,10 +42,13 @@ const PasswordPopup = ({
   };
 
   const onShow = () => {
-    isSensorAvailable.then((res: boolean) => setBio(res));
-    keyPair.bioSecretKeyExitsts().then((res: boolean) => setBio(isBio && res));
+    isSensorAvailable.then((isAvailable: boolean) => {
+      keyPair.bioSecretKeyExitsts().then((res: boolean) => {
+        setBio(isAvailable && res);
+      });
 
-    handleUseBiometrics();
+      handleUseBiometrics();
+    });
   };
 
   const createBio = async (kp: Keypair) => {
@@ -52,8 +60,6 @@ const PasswordPopup = ({
       if (password === undefined) {
         return;
       }
-
-      console.log(password);
 
       keyPair.writePairBio(kp, password);
       setBio(true);
@@ -70,6 +76,7 @@ const PasswordPopup = ({
         isSensorAvailable.then((res: boolean) => {
           if (res) {
             createBio(v);
+            setBio(true);
           }
         });
         handleClose();
@@ -78,23 +85,26 @@ const PasswordPopup = ({
   };
 
   const handleUseBiometrics = () => {
-    isSensorAvailable.then((res: boolean) => setBio(res));
-    keyPair.bioSecretKeyExitsts().then((res: boolean) => setBio(isBio && res));
+    isSensorAvailable.then((isAvailable: boolean) => {
+      keyPair.bioSecretKeyExitsts().then((res: boolean) => {
+        setBio(isAvailable && res);
 
-    if (!isBio) {
-      return;
-    }
-
-    handleBiometricLogin().then((password: string | undefined) => {
-      if (password === undefined) {
-        return;
-      }
-
-      keyPair.readPairBio(password).then((v: Keypair | undefined) => {
-        if (v !== undefined) {
-          onSuccess(v.secretKey);
-          handleClose();
+        if (!(isAvailable && res)) {
+          return;
         }
+
+        handleBiometricLogin().then((password: string | undefined) => {
+          if (password === undefined) {
+            return;
+          }
+
+          keyPair.readPairBio(password).then((v: Keypair | undefined) => {
+            if (v !== undefined) {
+              onSuccess(v.secretKey);
+              handleClose();
+            }
+          });
+        });
       });
     });
   };

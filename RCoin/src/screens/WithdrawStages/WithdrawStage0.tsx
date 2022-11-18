@@ -44,7 +44,7 @@ const WithdrawStage0 = ({
       <Text text40 style={styles.title}>
         Make a Withdrawal
       </Text>
-      <View margin-30>
+      <View marginH-30>
         <Text text60 marginB-10>
           Withdraw RCoin and receive Rand
         </Text>
@@ -54,7 +54,7 @@ const WithdrawStage0 = ({
         </Text>
       </View>
 
-      <View margin-30>
+      <View marginH-30>
         <Balance />
       </View>
       <Image
@@ -62,7 +62,7 @@ const WithdrawStage0 = ({
         style={{width: '100%', height: 130, marginVertical: 30}}
       />
 
-      <View flex bottom marginH-30 marginB-50>
+      <View flex bottom marginH-30 marginB-10>
         <Button
           onPress={nextStage}
           label="Continue to Choose Amount"

@@ -75,11 +75,11 @@ const WithdrawStage1 = ({
       <Text text40 style={styles.title}>
         Choose an Amount
       </Text>
-      <View margin-20>
+      <View marginH-20>
         <Balance />
       </View>
 
-      <View margin-30>
+      <View marginH-30>
         <Text>How much would you like to send?</Text>
         <AmountEntry
           setAmount={setCoinsToWithdraw}
@@ -115,7 +115,7 @@ const WithdrawStage1 = ({
         </Picker>
       </View> */}
 
-      <View flex bottom marginH-30 marginB-50>
+      <View flex bottom marginH-30 marginB-10>
         <Button
           onPress={nextStage}
           disabled={!valid}
