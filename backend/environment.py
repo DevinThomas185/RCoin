@@ -8,5 +8,5 @@ dev_state = os.getenv("DEV")
 def getenv(variable):
     if dev_state == "True":
         return os.getenv("DEV_" + variable)
-    else:
+    elif dev_state == "False":
         return os.getenv("PROD_" + variable)

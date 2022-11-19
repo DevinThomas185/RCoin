@@ -12,6 +12,7 @@ services:
   backend:
     build: ./backend
     environment:
+      - DEV=${DEV}
       - DEV_SOLANA_CLIENT=${DEV_SOLANA_CLIENT}
       - DEV_MINT_ACCOUNT=${DEV_MINT_ACCOUNT}
       - DEV_RESERVE_ACCOUNT_ADDRESS=${DEV_RESERVE_ACCOUNT_ADDRESS}
