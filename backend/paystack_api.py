@@ -13,6 +13,7 @@ def check_balance():
         },
     ).json()
     if response["status"] == True:
+        print(response)
         return response["data"][0]["balance"] / 100
     else:
         raise Exception
