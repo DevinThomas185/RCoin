@@ -4,6 +4,7 @@ import {View, Button, Incubator, Text, LoaderScreen} from 'react-native-ui-lib';
 import {UserSignUp} from '../../types/SignUp';
 const {TextField} = Incubator;
 import {NavigationScreenProp} from 'react-navigation';
+import Config from 'react-native-config';
 
 // https://github.com/uuidjs/uuid/issues/416
 import {v4 as uuidv4} from 'uuid'; // Very important, do not remove plz!!!!!
@@ -36,7 +37,7 @@ export const StepFour = ({
     keyPair.writePair(kp, signUpDetails.encryption_password);
     // console.log(keyPair.keypairData);
 
-    fetch('http://10.0.2.2:8000/api/signup', {
+    fetch(`${Config.API_URL}:8000/api/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

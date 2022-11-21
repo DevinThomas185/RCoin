@@ -1,3 +1,5 @@
+import Config from 'react-native-config';
+
 export type AuthData = {
   token: string;
   token_type: string;
@@ -13,7 +15,7 @@ const signIn = (
 ): Promise<AuthData | undefined> => {
   return new Promise(resolve => {
     setTimeout(() => {
-      fetch('http://10.0.2.2:8000/api/login', {
+      fetch(`${Config.API_URL}:8000/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,7 +36,7 @@ const signIn = (
           return res.json();
         })
         .then(data => {
-          fetch('http://10.0.2.2:8000/api/user', {
+          fetch(`${Config.API_URL}:8000/api/user`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

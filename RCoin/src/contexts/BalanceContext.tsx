@@ -1,6 +1,7 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import {useAuth} from './Auth';
 import dayjs, {Dayjs} from 'dayjs';
+import Config from 'react-native-config';
 
 type BalanceContextData = {
   balance: number;
@@ -72,7 +73,7 @@ const BalanceProvider = ({children}: {children: React.ReactNode}) => {
   const refresh = async () => {
     if (auth.authData?.token) {
       setLoading(true);
-      fetch('http://10.0.2.2:8000/api/get_token_balance', {
+      fetch(`${Config.API_URL}:8000/api/get_token_balance`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

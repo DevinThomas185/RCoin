@@ -23,32 +23,27 @@ export const LoginScreen = ({
       <View center>
         <Image
           marginB-100
-          source={require("../style/Logo.png")}
-          style={{height: 100, width:100}}
+          source={require('../style/Logo.png')}
+          style={{height: 100, width: 100}}
         />
-        <Text 
-          text30
-          color="white"
-        >
+        <Text text30 color="white">
           Log In
         </Text>
-
       </View>
 
-      <View 
+      <View
         marginH-10
         marginV-40
-        backgroundColor='white'
-        style={{borderRadius: 10}}
-      >
+        backgroundColor="white"
+        style={{borderRadius: 10}}>
         <TextField
           margin-10
           placeholder={'Email'}
           floatingPlaceholder
           onChangeText={(email: string) => setEmail(email)}
-          keyboardType='email-address'
+          keyboardType="email-address"
           floatingPlaceholderStyle={{alignSelf: 'center'}}
-          autoCapitalize='none'
+          autoCapitalize="none"
         />
         <TextField
           margin-10
@@ -60,7 +55,7 @@ export const LoginScreen = ({
         />
       </View>
       <Button
-        marginH-30 
+        marginH-30
         marginB-20
         backgroundColor={styles.paystack}
         label={'Log In'}
@@ -69,14 +64,14 @@ export const LoginScreen = ({
         }}
       />
       <Button
-        marginH-30 
+        marginH-30
         marginB-5
         backgroundColor={styles.tiffany_blue}
         label={'Create an Account'}
         onPress={() => {
           navigation.navigate('SignUp');
         }}
-      />    
+      />
     </View>
   );
 };

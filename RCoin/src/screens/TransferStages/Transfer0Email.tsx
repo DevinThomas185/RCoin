@@ -3,6 +3,7 @@ import {Text, View, Button, Incubator, Image} from 'react-native-ui-lib';
 import {useAuth} from '../../contexts/Auth';
 const {TextField} = Incubator;
 import styles from '../../style/style';
+import Config from 'react-native-config';
 
 // Select the recipient
 const Transfer0Email = ({
@@ -16,7 +17,7 @@ const Transfer0Email = ({
   const [valid, setValid] = useState(false);
 
   function isEmailValid(email: string): Promise<boolean> {
-    return fetch('http://10.0.2.2:8000/api/trade-email-valid', {
+    return fetch(`${Config.API_URL}:8000/api/trade-email-valid`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -9,6 +9,7 @@ import {Message, Transaction} from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
 import PendingLoader from '../../components/PendingLoader';
+import Config from 'react-native-config';
 
 // Confirmation
 const WithdrawStage2 = ({
@@ -41,7 +42,7 @@ const WithdrawStage2 = ({
     setLoading(true);
     setConfirmClicked(true);
     setResponseState(0);
-    fetch('http://10.0.2.2:8000/api/redeem', {
+    fetch(`${Config.API_URL}:8000/api/redeem`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +69,7 @@ const WithdrawStage2 = ({
             const signData = message.serialize();
             const signature = nacl.sign.detached(signData, secretKey);
 
-            fetch('http://10.0.2.2:8000/api/complete-redeem', {
+            fetch(`${Config.API_URL}:8000/api/complete-redeem`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

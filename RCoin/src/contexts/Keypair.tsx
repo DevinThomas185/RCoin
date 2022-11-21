@@ -43,7 +43,14 @@ const KeypairProvider = ({children}: {children: React.ReactNode}) => {
   };
 
   return (
-    <KeypairContext.Provider value={{writePair, writePairBio, readPair, readPairBio, bioSecretKeyExitsts}}>
+    <KeypairContext.Provider
+      value={{
+        writePair,
+        writePairBio,
+        readPair,
+        readPairBio,
+        bioSecretKeyExitsts,
+      }}>
       {children}
     </KeypairContext.Provider>
   );

@@ -1,15 +1,22 @@
 // @ts-ignore
-import { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Button, Image, LoaderScreen, Text, View, Wizard } from 'react-native-ui-lib';
-import { StepOne } from '../components/signup/StepOne';
-import { StepTwo } from '../components/signup/StepTwo';
-import { StepThree } from '../components/signup/StepThree';
-import { StepFour } from '../components/signup/StepFour';
-import { UserSignUp } from '../types/SignUp';
-import { NavigationScreenProp } from 'react-navigation';
-import { useBackHandler } from '../services/BackHandler';
-import style from "../style/style"
+import {useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {
+  Button,
+  Image,
+  LoaderScreen,
+  Text,
+  View,
+  Wizard,
+} from 'react-native-ui-lib';
+import {StepOne} from '../components/signup/StepOne';
+import {StepTwo} from '../components/signup/StepTwo';
+import {StepThree} from '../components/signup/StepThree';
+import {StepFour} from '../components/signup/StepFour';
+import {UserSignUp} from '../types/SignUp';
+import {NavigationScreenProp} from 'react-navigation';
+import {useBackHandler} from '../services/BackHandler';
+import style from '../style/style';
 
 export const SignUpScreen = ({
   navigation,
@@ -26,14 +33,14 @@ export const SignUpScreen = ({
 
   const backHandlerAction = () => {
     if (stage > 0 && stage <= NUM_PAGES) {
-      setStage(stage - 1)
-      return true
+      setStage(stage - 1);
+      return true;
     }
 
-    return false
-  }
+    return false;
+  };
 
-  useBackHandler(backHandlerAction)
+  useBackHandler(backHandlerAction);
 
   const conditionalComponent = () => {
     switch (stage) {
@@ -127,7 +134,7 @@ export const SignUpScreen = ({
 const styles = StyleSheet.create({
   outerView: {
     backgroundColor: '#435C9C',
-    height: '100%'
+    height: '100%',
   },
 
   steps: {

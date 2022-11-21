@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useState} from 'react';
 import styles from '../../style/style';
 const {TextField} = Incubator;
+import Config from 'react-native-config';
 
 const NameDetail = () => {
   const auth = useAuth();
@@ -15,7 +16,7 @@ const NameDetail = () => {
   const [success, setSuccess] = useState(false);
 
   const changeName = () => {
-    fetch('http://10.0.2.2:8000/api/change_name', {
+    fetch(`${Config.API_URL}:8000/api/change_name`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',

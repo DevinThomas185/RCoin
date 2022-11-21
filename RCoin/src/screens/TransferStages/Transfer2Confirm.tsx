@@ -9,6 +9,7 @@ import {Message, Transaction} from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
 import PendingLoader from '../../components/PendingLoader';
+import Config from 'react-native-config';
 
 const Transfer2Confirm = ({
   nextStage,
@@ -37,7 +38,7 @@ const Transfer2Confirm = ({
     setLoading(true);
     setConfirmClicked(true);
     setResponseState(0);
-    fetch('http://10.0.2.2:8000/api/trade', {
+    fetch(`${Config.API_URL}:8000/api/trade`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +69,7 @@ const Transfer2Confirm = ({
             const signData = message.serialize();
             const signature = nacl.sign.detached(signData, secretKey);
 
-            fetch('http://10.0.2.2:8000/api/complete-trade', {
+            fetch(`${Config.API_URL}:8000/api/complete-trade`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

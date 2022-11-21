@@ -11,6 +11,7 @@ import {
 import AmountEntry from '../../components/AmountEntry';
 import {useAuth} from '../../contexts/Auth';
 import styles from '../../style/style';
+import Config from 'react-native-config';
 
 const LEAST_LIMIT = 0;
 
@@ -32,7 +33,8 @@ const IssueAmount = ({
   // TODO: CHANGE TO GET RAND TO PAY
   const setRands = (coins: number) => {
     fetch(
-      'http://10.0.2.2:8000/api/get_rand_to_return/?amount=' + coins.toString(),
+      `${Config.API_URL}:8000/api/get_rand_to_return/?amount=` +
+        coins.toString(),
       {
         method: 'GET',
         headers: {

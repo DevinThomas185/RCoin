@@ -7,6 +7,7 @@ import WithdrawStage3 from './WithdrawStages/WithdrawStage3';
 import {useAuth} from '../contexts/Auth';
 import {useBackHandler} from '../services/BackHandler';
 import styles from '../style/style';
+import Config from 'react-native-config';
 
 const WithdrawScreen = () => {
   const [stage, setStage] = useState(0);
@@ -37,7 +38,7 @@ const WithdrawScreen = () => {
   useBackHandler(backHandlerAction);
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/api/get_token_balance', {
+    fetch(`${Config.API_URL}:8000/api/get_token_balance`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

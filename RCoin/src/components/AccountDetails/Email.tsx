@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useState} from 'react';
 import styles from '../../style/style';
 const {TextField} = Incubator;
+import Config from 'react-native-config';
 
 const EmailDetail = () => {
   const auth = useAuth();
@@ -14,7 +15,7 @@ const EmailDetail = () => {
   const [success, setSuccess] = useState(false);
 
   const changeEmail = () => {
-    fetch('http://10.0.2.2:8000/api/change_email', {
+    fetch(`${Config.API_URL}:8000/api/change_email`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
