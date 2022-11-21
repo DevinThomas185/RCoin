@@ -4,6 +4,7 @@ import {useAuth} from '../../contexts/Auth';
 import styles from '../../style/style';
 import Balance from '../../components/Balances/Balance';
 import AmountEntry from '../../components/AmountEntry';
+import Config from 'react-native-config';
 
 // Select Account
 const WithdrawStage1 = ({
@@ -23,7 +24,7 @@ const WithdrawStage1 = ({
   const [valid, setValid] = useState(false);
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/api/get_bank_accounts', {
+    fetch(`${Config.API_URL}:8000/api/get_bank_accounts`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
@@ -39,7 +40,7 @@ const WithdrawStage1 = ({
         console.log(error);
       });
 
-    fetch('http://10.0.2.2:8000/api/get_token_balance', {
+    fetch(`${Config.API_URL}:8000/api/get_token_balance`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +55,7 @@ const WithdrawStage1 = ({
         console.log(error);
       });
 
-    fetch('http://10.0.2.2:8000/api/get_token_balance', {
+    fetch(`${Config.API_URL}:8000/api/get_token_balance`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

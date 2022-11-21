@@ -12,9 +12,7 @@ export const StepTwo = ({
 }) => {
   return (
     <View>
-      <Text style={styles.title}>
-        Bank Details
-      </Text>
+      <Text style={styles.title}>Bank Details</Text>
       <Text style={styles.subtext}>
         This is where we will deposit and withdraw your Rand.
       </Text>
@@ -60,13 +58,12 @@ export const StepTwo = ({
   );
 };
 
-
 const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
     fontSize: 30,
     textAlign: 'left',
-    marginLeft: 20
+    marginLeft: 20,
   },
 
   subtext: {
@@ -105,4 +102,3 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
-

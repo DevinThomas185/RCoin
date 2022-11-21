@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { View, Button, Incubator, Text, Icon, Image } from 'react-native-ui-lib'; //eslint-disable-line
-import { UserSignUp } from '../../types/SignUp';
-const { TextField } = Incubator;
+import {useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {View, Button, Incubator, Text, Icon, Image} from 'react-native-ui-lib'; //eslint-disable-line
+import {UserSignUp} from '../../types/SignUp';
+const {TextField} = Incubator;
 
 export const StepOne = ({
   signUpDetails,
@@ -11,23 +11,18 @@ export const StepOne = ({
   signUpDetails: UserSignUp;
   setSignUpDetails: React.Dispatch<React.SetStateAction<UserSignUp>>;
 }) => {
-
-  const [passwordText, setPasswordText] = useState("Show")
-  const [showPassword, setShowPassword] = useState(false)
+  const [passwordText, setPasswordText] = useState('Show');
+  const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowPassword = () => {
-    setShowPassword(!showPassword)
-    setPasswordText(passwordText === "Show" ? "Hide" : "Show")
-  }
+    setShowPassword(!showPassword);
+    setPasswordText(passwordText === 'Show' ? 'Hide' : 'Show');
+  };
 
   return (
     <View>
-      <Text style={styles.title}>
-        Your Details
-      </Text>
-      <Text style={styles.subtext}>
-        Your email will be used to sign in.
-      </Text>
+      <Text style={styles.title}>Your Details</Text>
+      <Text style={styles.subtext}>Your email will be used to sign in.</Text>
       <TextField
         style={styles.inputField}
         placeholder={'Email'}
@@ -38,8 +33,8 @@ export const StepOne = ({
           }))
         }
         value={signUpDetails.email}
-        keyboardType='email-address'
-        autoCapitalize='none'
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
 
       <TextField
@@ -77,10 +72,10 @@ export const StepOne = ({
             }))
           }
           value={signUpDetails.password}
-          secureTextEntry={!showPassword}
-        >
-        </TextField>
-        <Text style={styles.passwordToggleButton} onPress={toggleShowPassword}>{passwordText}</Text>
+          secureTextEntry={!showPassword}></TextField>
+        <Text style={styles.passwordToggleButton} onPress={toggleShowPassword}>
+          {passwordText}
+        </Text>
       </View>
     </View>
   );
@@ -91,7 +86,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 30,
     textAlign: 'left',
-    marginLeft: 20
+    marginLeft: 20,
   },
 
   subtext: {

@@ -4,6 +4,7 @@ import styles from '../../style/style';
 import {NavigationScreenProp} from 'react-navigation';
 import {useAuth} from '../../contexts/Auth';
 const {TextField} = Incubator;
+import Config from 'react-native-config';
 
 const SupportScreen = () => {
   const [title, setTitle] = useState('');
@@ -15,7 +16,7 @@ const SupportScreen = () => {
 
   const sendMessage = () => {
     setMessageSent(true);
-    fetch('http://10.0.2.2:8000/api/send_message', {
+    fetch(`${Config.API_URL}:8000/api/send_message`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

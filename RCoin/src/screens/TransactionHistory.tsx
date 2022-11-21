@@ -7,6 +7,7 @@ import History from './history.json';
 import Transaction from '../components/Transaction';
 import Balance from '../components/Balances/Balance';
 import PendingLoader from '../components/PendingLoader';
+import Config from 'react-native-config';
 
 const TransactionHistory = () => {
   const auth = useAuth();
@@ -19,7 +20,7 @@ const TransactionHistory = () => {
 
   const updateTransactionHistory = () => {
     setLoading(true);
-    fetch('http://10.0.2.2:8000/api/transaction_history', {
+    fetch(`${Config.API_URL}:8000/api/transaction_history`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

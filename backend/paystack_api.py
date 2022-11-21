@@ -1,8 +1,10 @@
+from dotenv import load_dotenv, find_dotenv
+import os
 import requests
-import environment
 
-PAYSTACK_SECRET_KEY = environment.getenv("PAYSTACK_SECRET_KEY")
-PAYSTACK_PUBLIC_KEY = environment.getenv("PAYSTACK_PUBLIC_KEY")
+load_dotenv(find_dotenv())
+
+PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
 
 
 def check_balance():
@@ -13,7 +15,6 @@ def check_balance():
         },
     ).json()
     if response["status"] == True:
-        print(response)
         return response["data"][0]["balance"] / 100
     else:
         raise Exception

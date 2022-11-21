@@ -1,6 +1,6 @@
-import React from "react";
-import { Text, View, Button, Image } from "react-native-ui-lib";
-import styles from "../../style/style"
+import React from 'react';
+import {Text, View, Button, Image} from 'react-native-ui-lib';
+import styles from '../../style/style';
 
 // Confirm the issue
 const IssueSuccess = ({
@@ -12,10 +12,8 @@ const IssueSuccess = ({
 }) => {
   return (
     <View flex>
-      <View marginT-30 style={{ alignSelf: "center" }}>
-        <Image
-          source={require('../../style/Success.png')}
-        />
+      <View marginT-30 style={{alignSelf: 'center'}}>
+        <Image source={require('../../style/Success.png')} />
       </View>
       <Text
         text40
@@ -27,7 +25,6 @@ const IssueSuccess = ({
         }}>
         Successful
       </Text>
-
 
       <View margin-30>
         <Text text60 center marginB-20>
@@ -49,12 +46,11 @@ const IssueSuccess = ({
       </View>
       <View flex bottom marginH-30 marginB-50>
         <Button
-          onPress={() => { }} //navigate to transfer page
+          onPress={() => {}} //navigate to transfer page
           label="Make a transfer"
           backgroundColor={styles.rcoin}
         />
       </View>
-
     </View>
   );
 };

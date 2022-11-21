@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useEffect, useState} from 'react';
 import styles from '../../style/style';
 const {TextField} = Incubator;
+import Config from 'react-native-config';
 
 const BankAccounts = () => {
   const auth = useAuth();
@@ -18,7 +19,7 @@ const BankAccounts = () => {
   });
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/api/get_bank_accounts', {
+    fetch(`${Config.API_URL}:8000/api/get_bank_accounts`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
@@ -33,7 +34,7 @@ const BankAccounts = () => {
         console.log(error);
       });
 
-    fetch('http://10.0.2.2:8000/api/get_default_bank_account', {
+    fetch(`${Config.API_URL}:8000/api/get_default_bank_account`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',

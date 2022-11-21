@@ -1,10 +1,11 @@
-import React, { useRef } from 'react';
-import { Paystack, paystackProps } from 'react-native-paystack-webview';
-import { Text, View, Button } from 'react-native-ui-lib';
+import React, {useRef} from 'react';
+import {Paystack, paystackProps} from 'react-native-paystack-webview';
+import {Text, View, Button} from 'react-native-ui-lib';
 import ChangingBalance from '../../components/Balances/ChangingBalance';
 import IssueReceipt from './IssueReceipt';
 import styles from '../../style/style';
-import { useAuth } from '../../contexts/Auth';
+import {useAuth} from '../../contexts/Auth';
+import Config from 'react-native-config';
 
 // Show the summary
 const IssueSummary = ({
@@ -35,7 +36,7 @@ const IssueSummary = ({
       <Paystack
         billingEmail={auth.authData?.token_info.email}
         amount={rand_to_pay}
-        paystackKey="pk_test_74b1d55fbad5fc6c5bb27a7d6030a0e575aa75f4"
+        paystackKey={Config.PAYSTACK_PUBLIC_KEY}
         currency="ZAR"
         activityIndicatorColor={styles.rcoin}
         // This is used to hold user id because we can't pass in custom props

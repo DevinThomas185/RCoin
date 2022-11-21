@@ -3,6 +3,7 @@ import {Text, View, Button, Image} from 'react-native-ui-lib';
 import Balance from '../../components/Balances/Balance';
 import {useAuth} from '../../contexts/Auth';
 import styles from '../../style/style';
+import Config from 'react-native-config';
 
 const LEAST_LIMIT = 0;
 
@@ -20,7 +21,7 @@ const WithdrawStage0 = ({
 
   useEffect(() => {
     fetch(
-      'http://10.0.2.2:8000/api/get_rand_to_return/?amount=' +
+      `${Config.API_URL}:8000/api/get_rand_to_return/?amount=` +
         coins_to_withdraw.toString(),
       {
         method: 'GET',
