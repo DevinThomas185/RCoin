@@ -56,7 +56,7 @@ const Transaction = ({
           {numberWithCommas(-amount)} RCoin
         </Text>
         <Text text80 grey10 left>
-          <Text style={{fontWeight: 'bold'}}>Transfer</Text> to {sender}
+          <Text style={{fontWeight: 'bold'}}>Transfer</Text> to {recipient}
         </Text>
       </View>
     </View>

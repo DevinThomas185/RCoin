@@ -4,7 +4,7 @@ import sqlalchemy as sql
 from sqlalchemy.schema import Sequence
 import sqlalchemy.ext.declarative as declarative
 import sqlalchemy.orm as orm
-import data_models
+import rcoin.data_models as data_models
 import uuid
 from typing import List, Optional, Tuple
 import os
@@ -145,10 +145,10 @@ async def get_user_by_id(id: str, db: "Session") -> User:
     user = db.query(User).filter(User.id == id).first()
     return user
 
+
 async def get_user_by_wallet_id(wallet_id: str, db: "Session") -> User:
     user = db.query(User).filter(User.wallet_id == wallet_id).first()
     return user
-
 
 
 async def get_user(
@@ -213,7 +213,7 @@ async def get_user_issue_for_bank_transaction(
 ) -> Optional[Issue]:
     issue = (
         db.query(Issue)
-        .filter(Issue.id == user_id)
+        .filter(Issue.user_id == user_id)
         .filter(Issue.bank_transaction_id == bank_transaction_id)
         .first()
     )

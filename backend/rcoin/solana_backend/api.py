@@ -20,7 +20,7 @@ from spl.token.instructions import (
 )
 
 # Module dependencies
-from solana_backend.common import (
+from rcoin.solana_backend.common import (
     RESERVE_ACCOUNT_ADDRESS,
     SOLANA_CLIENT,
     MINT_ACCOUNT,
@@ -30,7 +30,7 @@ from solana_backend.common import (
     SECRET_KEY,
 )
 
-from solana_backend.exceptions import (
+from rcoin.solana_backend.exceptions import (
     BlockchainQueryFailedException,
     InvalidGetTransactionRespException,
     InvalidUserInputException,
@@ -39,13 +39,13 @@ from solana_backend.exceptions import (
     TransactionTimeoutException,
 )
 
-from solana_backend.transaction import (
+from rcoin.solana_backend.transaction import (
     construct_stablecoin_transfer,
     get_associated_token_account,
     transaction_to_bytes,
 )
 
-from solana_backend.query import (
+from rcoin.solana_backend.query import (
     get_processed_transactions_for_account,
     get_token_balance,
     get_transaction_details,
@@ -53,7 +53,7 @@ from solana_backend.query import (
     get_sol_balance,
 )
 
-from solana_backend.response import (
+from rcoin.solana_backend.response import (
     Response,
     Success,
     Failure,
@@ -342,11 +342,76 @@ def get_user_sol_balance(public_key: str) -> Response:
         return Failure("exception", exception)
 
 
-class TransactionType(Enum):
+class TransactionType(str, Enum):
     Withdraw = "withdraw"
     Send = "send"
     Deposit = "deposit"
     Recieve = "recieve"
+
+
+class TransactionLogItem:
+    def __init__(
+        self,
+        transaction_type: TransactionType,
+        sender: str,
+        recipient: str,
+        amount: float,
+        signature: str,
+    ):
+        self.transaction_type = transaction_type
+        self.sender = sender
+        self.recipient = recipient
+        self.amount = amount
+        self.signature = signature
+
+
+def _fix_transaction_format(transaction, public_key: str) -> TransactionLogItem:
+    amount = transaction["amount"] / (10 ** (TOKEN_DECIMALS))
+
+    if amount < 0:
+        if transaction["sender"] == public_key:
+            if transaction["recipient"] == str(TOKEN_OWNER):
+                transaction_type = TransactionType.Deposit
+            else:
+                transaction_type = TransactionType.Recieve
+
+        else:
+            if transaction["sender"] == str(TOKEN_OWNER):
+                transaction_type = TransactionType.Withdraw
+            else:
+                transaction_type = TransactionType.Send
+
+        fixed_transaction = TransactionLogItem(
+            transaction_type,
+            sender=transaction["recipient"],
+            recipient=transaction["sender"],
+            amount=(-amount),
+            signature=transaction["signature"],
+        )
+
+    else:
+        # Flipped
+        if transaction["sender"] == public_key:
+            if transaction["recipient"] == str(TOKEN_OWNER):
+                transaction_type = TransactionType.Withdraw
+            else:
+                transaction_type = TransactionType.Send
+
+        else:
+            if transaction["sender"] == str(TOKEN_OWNER):
+                transaction_type = TransactionType.Deposit
+            else:
+                transaction_type = TransactionType.Recieve
+
+        fixed_transaction = TransactionLogItem(
+            transaction_type,
+            sender=transaction["sender"],
+            recipient=transaction["recipient"],
+            amount=(transaction["amount"]),
+            signature=transaction["signature"],
+        )
+
+    return fixed_transaction
 
 
 def get_stablecoin_transactions(public_key: str, limit: int = 10) -> Response:
@@ -356,44 +421,13 @@ def get_stablecoin_transactions(public_key: str, limit: int = 10) -> Response:
 
         transactions = get_processed_transactions_for_account(associated_account, limit)
 
-        # add metadata to transaction if it is issue, trade or redeem
-        # are these issues inverted, it seems I am always recipient when sending? why always negative
-        for transaction in transactions:
-
-            if transaction["amount"] < 0:
-                if transaction["sender"] == public_key:
-                    if transaction["recipient"] == str(TOKEN_OWNER):
-                        transaction_type = TransactionType.Deposit
-                    else:
-                        print(transaction["recipient"], TOKEN_OWNER)
-                        transaction_type = TransactionType.Recieve
-
-                else:
-                    if transaction["sender"] == str(TOKEN_OWNER):
-                        transaction_type = TransactionType.Withdraw
-                    else:
-                        transaction_type = TransactionType.Send
-
-            # This however failed, from doing manually?
-            else:
-                # Flipped
-                if transaction["sender"] == public_key:
-                    if transaction["recipient"] == str(TOKEN_OWNER):
-                        transaction_type = TransactionType.Withdraw
-                    else:
-                        transaction_type = TransactionType.Send
-
-                else:
-                    if transaction["sender"] == str(TOKEN_OWNER):
-                        transaction_type = TransactionType.Deposit
-                    else:
-                        transaction_type = TransactionType.Recieve
-
-            transaction["transaction_type"] = transaction_type
+        corrected_transactions = list(
+            map(lambda t: _fix_transaction_format(t, public_key), transactions)
+        )
 
         return Success(
             "transaction_history",
-            transactions,
+            corrected_transactions,
         )
 
     except BlockchainQueryFailedException as exception:

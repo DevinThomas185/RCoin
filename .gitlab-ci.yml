@@ -1,6 +1,7 @@
 stages:
   - style
   - build
+  - test
   - deploy-dev
   - deploy-prod
 
@@ -25,6 +26,15 @@ build-backend:
   script:
     - cd backend
     - echo "add build check and formatting"
+
+test-backend:
+  stage: test
+  image: python:3.9
+  before_script:
+    - cd backend
+    - pip install -r requirements.txt
+  script:
+    - pytest -v
 
 deploy-dev:
   image: docker/compose:debian-1.29.2

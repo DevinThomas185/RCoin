@@ -1,9 +1,15 @@
 from enum import Enum
 from typing import Optional, Tuple
 
-from database_api import Issue, User
-import database_api
-from solana_backend.api import TransactionType, get_stablecoin_transactions
+from rcoin.database_api import (
+    Issue,
+    User,
+    get_user_issue_for_bank_transaction,
+    get_issue_transactions_for_user,
+)
+
+# import rcoin.database_api as database_api
+from rcoin.solana_backend.api import TransactionType, get_stablecoin_transactions
 
 import time
 
@@ -27,9 +33,7 @@ async def get_should_issue_stage(
     """
 
     # If this transaction is not in the db, we haven't yet attempted to issue so we are safe to
-    issue_write: Optional[
-        Issue
-    ] = await database_api.get_user_issue_for_bank_transaction(
+    issue_write: Optional[Issue] = await get_user_issue_for_bank_transaction(
         user.id, transaction_id, db
     )
     print(f"issue write is {issue_write}")
@@ -47,8 +51,8 @@ async def get_should_issue_stage(
         # According to this: https://solanacookbook.com/guides/retrying-transactions.html#handling-dropped-transactions
         # We will spin for 2 minutes, might need to change this
 
-        TWO_MINUTES = 120
-        time.sleep(TWO_MINUTES)
+        # TWO_MINUTES = 120
+        # time.sleep(TWO_MINUTES)
 
         # !!! We need to get ALL transactions for a user until a "certain" point, for now 1000
         blockchain_transactions_resp = get_stablecoin_transactions(
@@ -68,16 +72,14 @@ async def get_should_issue_stage(
 
         missing_transactions = []
 
-        database_transactions = database_api.get_issue_transactions_for_user(
-            user.id, db
-        )
+        database_transactions = await get_issue_transactions_for_user(user.id, db)
 
         database_blockchain_ids = set(
-            map(lambda t: t.bank_transaction_id, database_transactions)
+            map(lambda t: t.blockchain_transaction_id, database_transactions)
         )
 
         for issue_transaction in blockchain_issue_transactions:
-            if issue_transaction not in database_blockchain_ids:
+            if issue_transaction["signature"] not in database_blockchain_ids:
                 missing_transactions.append(issue_transaction)
 
         if missing_transactions == []:
@@ -85,7 +87,13 @@ async def get_should_issue_stage(
 
         else:
             # If there are missing transactions but not for this ammount, we are free to issue
-            same_amount = filter(lambda t: t["amount"] == amount, missing_transactions)
+            same_amount = list(
+                filter(lambda t: t["amount"] == amount, missing_transactions)
+            )
+
+            # print()
+
+            print(missing_transactions)
 
             if same_amount == []:
                 return (ShouldIssueStage._Issue_Write, None)
