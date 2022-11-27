@@ -16,14 +16,14 @@ from solders.transaction_status import (
 
 from spl.token.constants import TOKEN_PROGRAM_ID
 
-from solana_backend.common import (
+from rcoin.solana_backend.common import (
     SOLANA_CLIENT,
     LAMPORTS_PER_SOL,
     MINT_ACCOUNT,
     TOKEN_DECIMALS,
 )
 
-from solana_backend.exceptions import BlockchainQueryFailedException
+from rcoin.solana_backend.exceptions import BlockchainQueryFailedException
 
 
 def get_balance(public_key: PublicKey) -> int:
@@ -67,20 +67,24 @@ def get_token_balance(public_key: PublicKey) -> float:
 
         r = post(solana_client, json=payload)
         j = r.json()
-        amount = float(j["result"]["value"][0]["account"]["data"]["parsed"]["info"]["tokenAmount"][
+        amount = float(
+            j["result"]["value"][0]["account"]["data"]["parsed"]["info"]["tokenAmount"][
                 "amount"
-            ]) / (10**TOKEN_DECIMALS)
+            ]
+        ) / (10**TOKEN_DECIMALS)
 
     except Exception:
         raise BlockchainQueryFailedException
 
     return amount
 
+
 def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
     resp = get_raw_transactions_for_account(public_key, limit)
 
     transactions: list[GetTransactionResp] = [
-        (str(status.signature), get_transaction_details(status.signature)) for status in resp.value
+        (str(status.signature), get_transaction_details(status.signature))
+        for status in resp.value
     ]
 
     confirmed_transactions: list[EncodedTransactionWithStatusMeta] = [
@@ -153,12 +157,14 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
             )
 
         # processed_transactions.append((signature, sender, recipient, amount))
-        processed_transactions.append({
-            "signature": signature,
-            "sender": sender,
-            "recipient": recipient,
-            "amount": amount
-        })
+        processed_transactions.append(
+            {
+                "signature": signature,
+                "sender": sender,
+                "recipient": recipient,
+                "amount": amount,
+            }
+        )
 
     return processed_transactions
 

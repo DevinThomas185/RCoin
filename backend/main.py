@@ -19,9 +19,9 @@ from email.message import EmailMessage
 
 # import datetime
 from datetime import timezone, datetime, timedelta
-from issue import ShouldIssueStage, get_should_issue_stage
+from rcoin.issue import ShouldIssueStage, get_should_issue_stage
 
-from solana_backend.api import (
+from rcoin.solana_backend.api import (
     TransactionType,
     get_stablecoin_transactions,
     new_stablecoin_transfer,
@@ -36,16 +36,16 @@ from solana_backend.api import (
     create_token_account,
 )
 
-from solana_backend.transaction import (
+from rcoin.solana_backend.transaction import (
     send_transaction_from_signature,
 )
 
-from solana_backend.response import Success, Failure
+from rcoin.solana_backend.response import Success, Failure
 import sqlalchemy.orm as orm
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi import Depends, FastAPI, Response, Request, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from data_models import (
+from rcoin.data_models import (
     CompleteRedeemTransaction,
     CompleteTradeTransaction,
     LoginInformation,
@@ -57,10 +57,10 @@ from data_models import (
     RedeemTransaction,
     TokenBalance,
 )
-import database_api
-from database_api import Issue, User
-import paystack_api
-from lock import redis_lock
+import rcoin.database_api as database_api
+from rcoin.database_api import Issue, User
+import rcoin.paystack_api as paystack_api
+from rcoin.lock import redis_lock
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
@@ -271,16 +271,21 @@ async def transactionHistory(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     wallet_id = user.wallet_id
-    transactions = get_stablecoin_transactions(wallet_id).to_json()["transaction_history"]
+    transactions = get_stablecoin_transactions(wallet_id).to_json()[
+        "transaction_history"
+    ]
     for transaction in transactions:
         sender = await database_api.get_user_by_wallet_id(transaction["sender"], db=db)
-        recipient = await database_api.get_user_by_wallet_id(transaction["recipient"], db=db)
+        recipient = await database_api.get_user_by_wallet_id(
+            transaction["recipient"], db=db
+        )
         if sender is not None:
             transaction["sender"] = sender.email
         if recipient is not None:
             transaction["recipient"] = recipient.email
-    
+
     return {"transaction_history": transactions}
+
 
 # ISSUE
 @app.post("/api/issue")

@@ -14,9 +14,9 @@ from spl.token.instructions import (
     transfer_checked,
     TransferCheckedParams,
 )
-from solana_backend.response import Failure, Success
+from rcoin.solana_backend.response import Failure, Success
 
-from solana_backend.common import (
+from rcoin.solana_backend.common import (
     MINT_ACCOUNT,
     SECRET_KEY,
     TOKEN_DECIMALS,
@@ -25,7 +25,7 @@ from solana_backend.common import (
     TOKEN_OWNER,
 )
 
-from solana_backend.exceptions import (
+from rcoin.solana_backend.exceptions import (
     NoTokenAccountException,
     TransactionCreationFailedException,
 )

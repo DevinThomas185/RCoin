@@ -73,7 +73,7 @@ const TransactionHistory = () => {
             <View key={transaction.signature}>
               <Transaction
                 type={transaction.transaction_type}
-                rcoin={-transaction.amount / 1000000000}
+                rcoin={transaction.amount}
                 recipient={transaction.recipient}
                 sender={transaction.sender}
                 user_email={auth.authData?.token_info.email}
