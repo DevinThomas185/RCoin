@@ -3,7 +3,7 @@ import os
 
 from aioredlock import Aioredlock, LockError, Sentinel
 
-if os.getenv("DEV"):
+if os.getenv("ENV") == "local":
     redis_conf = [
         {"host": "localhost", "port": 6379, "db": 0},
     ]

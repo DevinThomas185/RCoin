@@ -113,15 +113,17 @@ def from_paystack(func):
     async def secure_function(*args, **kwargs):
         data = await kwargs["request"].json()
 
-        hash = hmac.new(
-            os.getenv("PAYSTACK_SECRET_KEY").encode(),
-            msg=json.dumps(data, separators=(",", ":")).encode(),
-            digestmod=hashlib.sha512,
-        ).hexdigest()
+        if not (os.getenv("ENV") == "local" or os.getenv("ENV") == "dev"):
 
-        if hash != kwargs["request"].headers["x-paystack-signature"]:
-            kwargs["response"].status_code = 401
-            return {"error": "unauthorised"}
+            hash = hmac.new(
+                os.getenv("PAYSTACK_SECRET_KEY").encode(),
+                msg=json.dumps(data, separators=(",", ":")).encode(),
+                digestmod=hashlib.sha512,
+            ).hexdigest()
+
+            if hash != kwargs["request"].headers["x-paystack-signature"]:
+                kwargs["response"].status_code = 401
+                return {"error": "unauthorised"}
 
         print("from paystack")
         return await func(*args, **kwargs)
