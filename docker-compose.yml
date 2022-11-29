@@ -8,6 +8,8 @@ services:
       - backend
     volumes:
       - /etc/certs:/etc/nginx/certs
+    profiles:
+      - main
   
   backend:
     build: ./backend
@@ -27,6 +29,9 @@ services:
       - db
     volumes:
       - /etc/certs:/etc/nginx/certs
+    profiles:
+      - main
+    
 
   db:
     image: postgres:alpine
@@ -39,6 +44,8 @@ services:
       - POSTGRES_HOST=localhost
     volumes:
       - db:/var/lib/postgresql/data/
+    profiles:
+      - main
   
   redis:
     image: redis:6.2-alpine
@@ -48,6 +55,22 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASS}
     volumes: 
       - redis:/data
+    profiles:
+      - main
+
+  signer-backend:
+    build: ./signer
+    profiles:
+      - signer
+    
+  signer-proxy:
+    build: ./signer/nginx
+    ports:
+      - 80:80
+    depends_on:
+      - signer-backend
+    profiles:
+      - signer
 
 
 volumes:

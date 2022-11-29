@@ -43,20 +43,27 @@ deploy-dev:
     - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
     - eval $(ssh-agent -s)
     - echo "$ID_RSA_DEV" | tr -d '\r' | ssh-add -
+    - echo "$ID_RSA_SIGNER_DEV" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$KNOWN_HOSTS_DEV" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    # Docker Compose
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" MINT_ACCOUNT=$MINT_ACCOUNT SOLANA_CLIENT=$SOLANA_CLIENT RESERVE_ACCOUNT_ADDRESS=$RESERVE_ACCOUNT_ADDRESS TOKEN_OWNER=$TOKEN_OWNER SECRET_KEY=${SECRET_KEY} PAYSTACK_SECRET_KEY=${DEV_PAYSTACK_SECRET_KEY} DATABASE_URL=${DATABASE_URL} REDIS_PASS=${REDIS_PASS} GMAIL_PASSWORD=${DEV_GMAIL_PASSWORD} docker-compose up --remove-orphans -d --build
-    # Remove old images
+    # Docker Compose Main backend
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" MINT_ACCOUNT=$MINT_ACCOUNT SOLANA_CLIENT=$SOLANA_CLIENT RESERVE_ACCOUNT_ADDRESS=$RESERVE_ACCOUNT_ADDRESS TOKEN_OWNER=$TOKEN_OWNER SECRET_KEY=${SECRET_KEY} PAYSTACK_SECRET_KEY=${DEV_PAYSTACK_SECRET_KEY} DATABASE_URL=${DATABASE_URL} REDIS_PASS=${REDIS_PASS} GMAIL_PASSWORD=${DEV_GMAIL_PASSWORD} docker-compose --profile main up --remove-orphans -d --build
     - yes y | COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" docker system prune --all || true
-    # Ensure all containers running
+    # Docker Compose signer
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_SIGNER_DEV" docker-compose --profile signer up --remove-orphans -d --build
+    - yes y | COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_SIGNER_DEV" docker system prune --all || true
+    # Ensure all containers running on main backend
     - INFO=$(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_DEV" docker ps)
     - if [[ $(echo $INFO | grep stablecoin_frontend_1 | wc -l) -ne 1 ]]; then echo "frontend container not running" && exit 1; else echo "frontend container check successful"; fi
     - if [[ $(echo $INFO | grep stablecoin_backend_1 | wc -l) -ne 1 ]]; then echo "backend container not running" && exit 1; else echo "backend container check successful"; fi
     - if [[ $(echo $INFO | grep stablecoin_db_1 | wc -l) -ne 1 ]]; then echo "db container not running" && exit 1; else echo "db container check successful"; fi  
     - if [[ $(echo $INFO | grep stablecoin_redis_1 | wc -l) -ne 1 ]]; then echo "redis container not running" && exit 1; else echo "redis container check successful"; fi
+    # Ensure all containers running on signer backend
+    - INFO=$(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_SIGNER_DEV" docker ps)
+    - if [[ $(echo $INFO | grep stablecoin_signer-proxy_1 | wc -l) -ne 1 ]]; then echo "signer nginx container not running" && exit 1; else echo "signer nginx container check successful"; fi
+    - if [[ $(echo $INFO | grep stablecoin_signer-backend_1 | wc -l) -ne 1 ]]; then echo "signer backend container not running" && exit 1; else echo "signer backend container check successful"; fi
   only:
     - master
 
@@ -72,7 +79,7 @@ deploy-prod:
     - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
     # Docker Compose
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" MINT_ACCOUNT=$MINT_ACCOUNT SOLANA_CLIENT=$SOLANA_CLIENT RESERVE_ACCOUNT_ADDRESS=$RESERVE_ACCOUNT_ADDRESS TOKEN_OWNER=$TOKEN_OWNER SECRET_KEY=${SECRET_KEY} PAYSTACK_SECRET_KEY=${PROD_PAYSTACK_SECRET_KEY} DATABASE_URL=${DATABASE_URL} REDIS_PASS=${REDIS_PASS} GMAIL_PASSWORD=${PROD_GMAIL_PASSWORD} docker-compose up --remove-orphans -d --build
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" MINT_ACCOUNT=$MINT_ACCOUNT SOLANA_CLIENT=$SOLANA_CLIENT RESERVE_ACCOUNT_ADDRESS=$RESERVE_ACCOUNT_ADDRESS TOKEN_OWNER=$TOKEN_OWNER SECRET_KEY=${SECRET_KEY} PAYSTACK_SECRET_KEY=${PROD_PAYSTACK_SECRET_KEY} DATABASE_URL=${DATABASE_URL} REDIS_PASS=${REDIS_PASS} GMAIL_PASSWORD=${PROD_GMAIL_PASSWORD} docker-compose --profile main up --remove-orphans -d --build
     # Remove old images
     - yes y | COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker system prune --all || true
     # Ensure all containers running
