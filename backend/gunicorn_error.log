@@ -1,0 +1,37 @@
+[2022-11-28 12:37:39 +0000] [48545] [INFO] Handling signal: int
+[2022-11-28 13:45:16 +0000] [39352] [WARNING] Worker with pid 39399 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [WARNING] Worker with pid 36950 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [WARNING] Worker with pid 37374 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [39352] [WARNING] Worker with pid 39400 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [WARNING] Worker with pid 37383 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [39352] [WARNING] Worker with pid 39401 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [WARNING] Worker with pid 37437 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [39352] [WARNING] Worker with pid 39402 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [WARNING] Worker with pid 37514 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [39352] [WARNING] Worker with pid 39405 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [WARNING] Worker with pid 37518 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [39352] [WARNING] Worker with pid 39406 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [WARNING] Worker with pid 37667 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [39352] [WARNING] Worker with pid 39427 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [WARNING] Worker with pid 37772 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [39352] [WARNING] Worker with pid 39439 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [35241] [INFO] Shutting down: Master
+[2022-11-28 13:45:16 +0000] [39352] [INFO] Shutting down: Master
+[2022-11-28 13:45:16 +0000] [38726] [WARNING] Worker with pid 38814 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [38726] [WARNING] Worker with pid 38815 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [38726] [WARNING] Worker with pid 38816 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [38726] [WARNING] Worker with pid 38817 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [38726] [WARNING] Worker with pid 38818 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [38726] [WARNING] Worker with pid 38819 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [38726] [WARNING] Worker with pid 38820 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [38726] [WARNING] Worker with pid 38821 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [38726] [INFO] Shutting down: Master
+[2022-11-28 13:45:16 +0000] [48545] [WARNING] Worker with pid 48672 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [48545] [WARNING] Worker with pid 48673 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [48545] [WARNING] Worker with pid 48674 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [48545] [WARNING] Worker with pid 48675 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [48545] [WARNING] Worker with pid 48676 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [48545] [WARNING] Worker with pid 48677 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [48545] [WARNING] Worker with pid 48678 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [48545] [WARNING] Worker with pid 48679 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [48545] [INFO] Shutting down: Master

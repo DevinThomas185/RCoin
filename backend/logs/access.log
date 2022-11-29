@@ -1,0 +1,15 @@
+127.0.0.1:37336 - "POST /api/signup HTTP/1.1" 500
+127.0.0.1:37340 - "POST /api/signup HTTP/1.1" 500
+127.0.0.1:37342 - "POST /api/signup HTTP/1.1" 500
+127.0.0.1:37356 - "POST /api/login HTTP/1.1" 200
+127.0.0.1:37356 - "GET /api/user HTTP/1.1" 200
+127.0.0.1:37358 - "POST /api/signup HTTP/1.1" 500
+127.0.0.1:37370 - "POST /api/signup HTTP/1.1" 500
+127.0.0.1:37378 - "POST /api/login HTTP/1.1" 200
+127.0.0.1:37378 - "GET /api/user HTTP/1.1" 200
+127.0.0.1:48220 - "POST /api/signup HTTP/1.1" 500
+127.0.0.1:48224 - "POST /api/signup HTTP/1.1" 500
+127.0.0.1:48232 - "POST /api/login HTTP/1.1" 200
+127.0.0.1:48232 - "GET /api/user HTTP/1.1" 200
+127.0.0.1:48246 - "POST /api/signup HTTP/1.1" 500
+127.0.0.1:48260 - "POST /api/signup HTTP/1.1" 500

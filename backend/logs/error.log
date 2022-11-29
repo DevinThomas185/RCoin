@@ -1,0 +1,615 @@
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Ronald Grimes', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:40.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:40 +0000] [74595] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Geneva Waldecker', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:42.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Charles Jones', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:42.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+hello sir here
+SolanaRpcException()
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:42 +0000] [74592] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+[2022-11-28 13:15:42 +0000] [74588] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Sara Shelton', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:44.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Sara Shelton', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:44.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:44 +0000] [74592] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:44 +0000] [74590] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Amy Tookes', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:46.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+hello sir here
+SolanaRpcException()
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Sara Reyes', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:47.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:47 +0000] [74590] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+[2022-11-28 13:15:47 +0000] [74590] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Christopher Gregson', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:48.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Donna Connelly', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:48.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:48 +0000] [74591] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:48 +0000] [74593] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Karen Mccants', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:50.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Loretta Voeks', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:50.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+Creating a new token account for user
+Sending transaction...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> {'status': True, 'message': 'Transfer recipient created successfully', 'data': {'active': True, 'createdAt': '2022-10-31T12:33:35.000Z', 'currency': 'ZAR', 'description': None, 'domain': 'test', 'email': None, 'id': 41772038, 'integration': 863008, 'metadata': None, 'name': 'Loretta Voeks', 'recipient_code': 'RCP_9fhyvxahkxhago8', 'type': 'basa', 'updatedAt': '2022-11-28T13:15:50.000Z', 'is_deleted': False, 'isDeleted': False, 'details': {'authorization_code': None, 'account_number': '08100000000', 'account_name': None, 'bank_code': '632005', 'bank_name': 'Absa Bank Limited, South Africa'}}}
+Creating a new token account for user
+Sending transaction...
+hello sir here
+SolanaRpcException()
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:50 +0000] [74591] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+[2022-11-28 13:15:50 +0000] [74594] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+hello sir here
+SolanaRpcException()
+[2022-11-28 13:15:50 +0000] [74592] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/applications.py", line 270, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/sessions.py", line 86, in __call__
+    await self.app(scope, receive, send_wrapper)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 75, in __call__
+    raise exc
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 64, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 680, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 275, in handle
+    await self.app(scope, receive, send)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/starlette/routing.py", line 65, in app
+    response = await func(request)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 231, in app
+    raw_response = await run_endpoint_function(
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/env/lib/python3.10/site-packages/fastapi/routing.py", line 160, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/home/karim/Documents/Imperial/3rdyear/swe-group-project/stablecoin/backend/main.py", line 164, in signup
+    return create_token_account(user.wallet_id).to_json()
+AttributeError: 'NoneType' object has no attribute 'to_json'
+[2022-11-28 13:45:16 +0000] [52894] [WARNING] Worker with pid 52942 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [52894] [WARNING] Worker with pid 52946 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [52894] [WARNING] Worker with pid 52947 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [52894] [WARNING] Worker with pid 52948 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [52894] [WARNING] Worker with pid 52949 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [52894] [WARNING] Worker with pid 52950 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [52894] [WARNING] Worker with pid 52951 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [52894] [WARNING] Worker with pid 52952 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [52894] [INFO] Shutting down: Master
+[2022-11-28 13:45:16 +0000] [56911] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2022-11-28 13:45:16 +0000] [56911] [DEBUG] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use
+[2022-11-28 13:45:16 +0000] [56911] [ERROR] Retrying in 1 second.
+[2022-11-28 13:45:16 +0000] [64421] [WARNING] Worker with pid 64468 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [61774] [WARNING] Worker with pid 61822 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [61774] [WARNING] Worker with pid 61823 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [74541] [INFO] Handling signal: term
+[2022-11-28 13:45:16 +0000] [61774] [WARNING] Worker with pid 61824 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [61774] [WARNING] Worker with pid 61825 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [61774] [WARNING] Worker with pid 61826 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [61774] [WARNING] Worker with pid 61827 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [61774] [WARNING] Worker with pid 61829 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [61774] [WARNING] Worker with pid 61831 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [61774] [INFO] Shutting down: Master
+[2022-11-28 13:45:16 +0000] [60009] [WARNING] Worker with pid 60056 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [60009] [WARNING] Worker with pid 60057 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [60009] [WARNING] Worker with pid 60058 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [60009] [WARNING] Worker with pid 60059 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [60009] [WARNING] Worker with pid 60060 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [60009] [WARNING] Worker with pid 60061 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [60009] [WARNING] Worker with pid 60064 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [60009] [WARNING] Worker with pid 60066 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [60009] [INFO] Shutting down: Master
+[2022-11-28 13:45:16 +0000] [64421] [WARNING] Worker with pid 64469 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [64421] [WARNING] Worker with pid 64470 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [64421] [WARNING] Worker with pid 64471 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [64421] [WARNING] Worker with pid 64472 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [64421] [WARNING] Worker with pid 64473 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [64421] [WARNING] Worker with pid 64474 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [64421] [WARNING] Worker with pid 64475 was terminated due to signal 3
+[2022-11-28 13:45:16 +0000] [64421] [INFO] Shutting down: Master
+[2022-11-28 13:45:16 +0000] [74592] [INFO] Shutting down
+[2022-11-28 13:45:16 +0000] [74589] [INFO] Shutting down
+[2022-11-28 13:45:16 +0000] [74591] [INFO] Shutting down
+[2022-11-28 13:45:16 +0000] [74588] [INFO] Shutting down
+[2022-11-28 13:45:16 +0000] [74590] [INFO] Shutting down
+[2022-11-28 13:45:16 +0000] [74595] [INFO] Shutting down
+[2022-11-28 13:45:16 +0000] [74594] [INFO] Shutting down
+[2022-11-28 13:45:16 +0000] [74593] [INFO] Shutting down
+[2022-11-28 13:45:16 +0000] [74592] [INFO] Waiting for application shutdown.
+[2022-11-28 13:45:16 +0000] [74592] [INFO] Application shutdown complete.
+[2022-11-28 13:45:16 +0000] [74592] [INFO] Finished server process [74592]
+[2022-11-28 13:45:16 +0000] [74588] [INFO] Waiting for application shutdown.
+[2022-11-28 13:45:16 +0000] [74588] [INFO] Application shutdown complete.
+[2022-11-28 13:45:16 +0000] [74592] [INFO] Worker exiting (pid: 74592)
+[2022-11-28 13:45:16 +0000] [74588] [INFO] Finished server process [74588]
+[2022-11-28 13:45:16 +0000] [74589] [INFO] Waiting for application shutdown.
+[2022-11-28 13:45:16 +0000] [74589] [INFO] Application shutdown complete.
+[2022-11-28 13:45:16 +0000] [74589] [INFO] Finished server process [74589]
+[2022-11-28 13:45:16 +0000] [74588] [INFO] Worker exiting (pid: 74588)
+[2022-11-28 13:45:16 +0000] [74589] [INFO] Worker exiting (pid: 74589)
+[2022-11-28 13:45:16 +0000] [74591] [INFO] Waiting for application shutdown.
+[2022-11-28 13:45:16 +0000] [74591] [INFO] Application shutdown complete.
+[2022-11-28 13:45:16 +0000] [74591] [INFO] Finished server process [74591]
+[2022-11-28 13:45:16 +0000] [74591] [INFO] Worker exiting (pid: 74591)
+[2022-11-28 13:45:16 +0000] [74595] [INFO] Waiting for application shutdown.
+[2022-11-28 13:45:16 +0000] [74595] [INFO] Application shutdown complete.
+[2022-11-28 13:45:16 +0000] [74595] [INFO] Finished server process [74595]
+[2022-11-28 13:45:16 +0000] [74595] [INFO] Worker exiting (pid: 74595)
+[2022-11-28 13:45:16 +0000] [74594] [INFO] Waiting for application shutdown.
+[2022-11-28 13:45:16 +0000] [74594] [INFO] Application shutdown complete.
+[2022-11-28 13:45:16 +0000] [74594] [INFO] Finished server process [74594]
+[2022-11-28 13:45:16 +0000] [74594] [INFO] Worker exiting (pid: 74594)
+[2022-11-28 13:45:16 +0000] [74593] [INFO] Waiting for application shutdown.
+[2022-11-28 13:45:16 +0000] [74593] [INFO] Application shutdown complete.
+[2022-11-28 13:45:16 +0000] [74593] [INFO] Finished server process [74593]
+[2022-11-28 13:45:16 +0000] [74593] [INFO] Worker exiting (pid: 74593)
+[2022-11-28 13:45:16 +0000] [74590] [INFO] Waiting for application shutdown.
+[2022-11-28 13:45:16 +0000] [74590] [INFO] Application shutdown complete.
+[2022-11-28 13:45:16 +0000] [74590] [INFO] Finished server process [74590]
+[2022-11-28 13:45:16 +0000] [74590] [INFO] Worker exiting (pid: 74590)
+[2022-11-28 13:45:16 +0000] [74541] [WARNING] Worker with pid 74591 was terminated due to signal 1
+[2022-11-28 13:45:16 +0000] [74541] [WARNING] Worker with pid 74594 was terminated due to signal 1
+[2022-11-28 13:45:16 +0000] [74541] [WARNING] Worker with pid 74593 was terminated due to signal 1
+[2022-11-28 13:45:16 +0000] [74541] [WARNING] Worker with pid 74589 was terminated due to signal 1
+[2022-11-28 13:45:16 +0000] [74541] [WARNING] Worker with pid 74592 was terminated due to signal 1
+[2022-11-28 13:45:16 +0000] [74541] [WARNING] Worker with pid 74595 was terminated due to signal 1
+[2022-11-28 13:45:16 +0000] [74541] [WARNING] Worker with pid 74588 was terminated due to signal 1
+[2022-11-28 13:45:16 +0000] [74541] [WARNING] Worker with pid 74590 was terminated due to signal 1
+[2022-11-28 13:45:16 +0000] [74541] [INFO] Shutting down: Master
+[2022-11-28 13:45:17 +0000] [56911] [DEBUG] Arbiter booted
+[2022-11-28 13:45:17 +0000] [56911] [INFO] Listening at: http://127.0.0.1:8000 (56911)
+[2022-11-28 13:45:17 +0000] [56911] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2022-11-28 13:45:17 +0000] [77221] [INFO] Booting worker with pid: 77221
+[2022-11-28 13:45:17 +0000] [77222] [INFO] Booting worker with pid: 77222
+[2022-11-28 13:45:17 +0000] [77223] [INFO] Booting worker with pid: 77223
+[2022-11-28 13:45:17 +0000] [77232] [INFO] Booting worker with pid: 77232
+[2022-11-28 13:45:17 +0000] [77233] [INFO] Booting worker with pid: 77233
+[2022-11-28 13:45:17 +0000] [77234] [INFO] Booting worker with pid: 77234
+[2022-11-28 13:45:17 +0000] [77236] [INFO] Booting worker with pid: 77236
+[2022-11-28 13:45:17 +0000] [77237] [INFO] Booting worker with pid: 77237
+[2022-11-28 13:45:17 +0000] [56911] [DEBUG] 8 workers
+[2022-11-28 13:45:17 +0000] [56911] [INFO] Handling signal: term
+[2022-11-28 13:45:17 +0000] [56911] [WARNING] Worker with pid 77237 was terminated due to signal 15
+[2022-11-28 13:45:17 +0000] [56911] [WARNING] Worker with pid 77236 was terminated due to signal 15
+[2022-11-28 13:45:17 +0000] [56911] [WARNING] Worker with pid 77233 was terminated due to signal 15
+[2022-11-28 13:45:17 +0000] [56911] [WARNING] Worker with pid 77234 was terminated due to signal 15
+[2022-11-28 13:45:17 +0000] [56911] [WARNING] Worker with pid 77232 was terminated due to signal 15
+[2022-11-28 13:45:17 +0000] [56911] [WARNING] Worker with pid 77223 was terminated due to signal 15
+[2022-11-28 13:45:17 +0000] [56911] [WARNING] Worker with pid 77222 was terminated due to signal 15
+[2022-11-28 13:45:17 +0000] [56911] [WARNING] Worker with pid 77221 was terminated due to signal 15
+[2022-11-28 13:45:17 +0000] [56911] [INFO] Shutting down: Master

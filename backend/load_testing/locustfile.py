@@ -18,13 +18,14 @@ import nacl.bindings
 
 
 class RCoinUser(HttpUser):
-    # wait_time = between(0.5, 2.5)
+    wait_time = between(0.5, 10)
 
     # @task
     # def hello_world(self):
     #     self.client.get("/api/hello")
-    fake_user = FakeUser()
-    balance = 0
+
+    fake_user: FakeUser
+    balance: float
 
     def signup(self):
         self.client.post(
@@ -53,6 +54,9 @@ class RCoinUser(HttpUser):
                 print("DO SOMETHING??")
 
     def on_start(self):
+        self.fake_user = FakeUser()
+        self.balance = 0
+
         self.signup()
         print("Signed up")
         self.login()
