@@ -44,6 +44,7 @@ from rcoin.solana_backend.response import Success, Failure
 import sqlalchemy.orm as orm
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi import Depends, FastAPI, Response, Request, HTTPException, status
+from fastapi_utils.tasks import repeat_every
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from rcoin.data_models import (
     CompleteRedeemTransaction,
@@ -61,12 +62,58 @@ import rcoin.database_api as database_api
 from rcoin.database_api import Issue, User
 import rcoin.paystack_api as paystack_api
 from rcoin.lock import redis_lock
+import redis
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
 JWT_SECRET = "secret"
 
 app = FastAPI()
+
+if os.getenv("DEV"):
+    r = redis.Redis(host="localhost", port=6379, db=0)
+else:
+    r = redis.Redis(host="localhost", port=6379, db=0, password=os.getenv("REDIS_PASS"))
+
+
+def update_reserve_ratio():
+    resp = get_total_tokens_issued()
+    issued_coins = round(resp.contents, 2)
+    rands_in_reserve = paystack_api.check_balance()
+    reserve_ratio = rands_in_reserve / issued_coins
+    r.set("reserve_ratio", reserve_ratio)
+
+
+def send_ratio_email():
+    ctx = ssl.create_default_context()
+    password = os.getenv("GMAIL_PASSWORD")
+    sender = "africanmicronation@gmail.com"
+    recipient = "africanmicronation@proton.me"
+
+    edited_message = """
+    RATIO DROPPED!
+    CHECK IMMEDIATELY!
+    """
+
+    msg = EmailMessage()
+    msg.set_content(edited_message)
+    msg["Subject"] = "!!! RATIO DROPPED !!!"
+    msg["From"] = sender
+    msg["To"] = recipient
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
+        server.login(sender, password)
+        server.send_message(msg)
+
+
+@app.on_event("startup")
+@repeat_every(seconds=60)
+def ratio_check() -> None:
+    update_reserve_ratio()
+    if float(r.get("reserve_ratio")) < 1:
+        send_ratio_email()
+    print("Checked ratio")
+
 
 # Password functions
 def hash_password(
@@ -127,6 +174,23 @@ def from_paystack(func):
         return await func(*args, **kwargs)
 
     return secure_function
+
+
+def checkReserveRatio(func):
+    """Decorator to check reserve ratio ever 10 api calls"""
+
+    def inner(*args, **kwargs):
+        reserve_ratio_recalculation_count += 1
+        if reserve_ratio_recalculation_count >= 10:
+            update_reserve_ratio()
+            reserve_ratio_recalculation_count = 0
+        if float(r.get("reserve_ratio")) >= 1:
+            return func(*args, **kwargs)
+        else:
+            send_ratio_email()
+            return Failure().to_json()
+
+    return inner
 
 
 @app.post("/api/create-sol-account")
@@ -243,10 +307,14 @@ async def audit() -> dict[str, Any]:
     issued_coins = round(resp.contents, 2)
     rands_in_reserve = paystack_api.check_balance()
 
+    # Set global variable used to lock app in emergency
+    reserve_ratio = rands_in_reserve / issued_coins
+    r.set("reserve_ratio", reserve_ratio)
+
     return {
         "rand_in_reserve": "{:,.2f}".format(rands_in_reserve),
         "issued_coins": "{:,.2f}".format(issued_coins),
-        "rand_per_coin": "{:,.2f}".format(round(rands_in_reserve / issued_coins, 2)),
+        "rand_per_coin": "{:,.2f}".format(round(reserve_ratio, 2)),
     }
 
 
@@ -289,6 +357,7 @@ async def transactionHistory(
 
 # ISSUE
 @app.post("/api/issue")
+@checkReserveRatio
 async def issue(
     issue_transaction: IssueTransaction,
     user: User = Depends(get_current_user),
@@ -312,6 +381,7 @@ async def issue(
 
 # TRADE
 @app.post("/api/trade")
+@checkReserveRatio
 async def trade(
     trade_transaction: TradeTransaction,
     sender: User = Depends(get_current_user),
@@ -334,12 +404,12 @@ async def trade(
 
 
 @app.post("/api/complete-trade")
+@checkReserveRatio
 async def trade(
     trade_transaction: CompleteTradeTransaction,
     sender: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-
     signature = bytes(trade_transaction.signature)
     transaction = bytes(trade_transaction.transaction_bytes)
 
@@ -368,6 +438,7 @@ async def is_trade_email_valid(
 
 # REDEEM
 @app.post("/api/redeem")
+@checkReserveRatio
 async def redeem(
     redeem_transaction: RedeemTransaction,
     user: User = Depends(get_current_user),
@@ -383,12 +454,12 @@ async def redeem(
 # TODO[sk4520]: Do we want to wait for the transaction to appear on the blockchain
 # and check its health before returning?
 @app.post("/api/complete-redeem")
+@checkReserveRatio
 async def complete_redeem(
     redeem_transaction: CompleteRedeemTransaction,
     user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-
     signature = bytes(redeem_transaction.signature)
     transaction = bytes(redeem_transaction.transaction_bytes)
 
