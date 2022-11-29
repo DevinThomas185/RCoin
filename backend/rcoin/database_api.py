@@ -143,11 +143,13 @@ async def create_user(
 
 async def get_user_by_id(id: str, db: "Session") -> User:
     user = db.query(User).filter(User.id == id).first()
+    db.commit()
     return user
 
 
 async def get_user_by_wallet_id(wallet_id: str, db: "Session") -> User:
     user = db.query(User).filter(User.wallet_id == wallet_id).first()
+    db.commit()
     return user
 
 
@@ -163,6 +165,7 @@ async def get_user(
     :return: The user information found
     """
     user = db.query(User).filter(User.email == email).first()
+    db.commit()
     return user
 
 
@@ -217,6 +220,8 @@ async def get_user_issue_for_bank_transaction(
         .filter(Issue.bank_transaction_id == bank_transaction_id)
         .first()
     )
+
+    db.commit()
     return issue
 
 
@@ -225,6 +230,7 @@ async def get_issue_transactions_for_user(
 ) -> Optional[List[Issue]]:
 
     issues = db.query(Issue).filter(Issue.id == user_id)
+    db.commit()
 
     return issues
 
@@ -288,6 +294,7 @@ async def get_audit_transactions(
     res = db.execute(
         QUERY, {"query_date": query_date, "limit": limit, "offset": offset}
     )
+    db.commit()
     return list(res)
 
 
