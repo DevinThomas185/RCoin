@@ -19,6 +19,11 @@ from jose import JWTError, jwt
 import smtplib
 import ssl
 from email.message import EmailMessage
+
+import redis
+r = redis.StrictRedis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+
+# import datetime
 from datetime import timezone, datetime, timedelta
 
 # Database imports
@@ -580,6 +585,107 @@ def get_rand_to_return(
     amount_in_coins: float,
 ) -> int:
     return int(amount_in_coins)  # TODO[dt120]: Add in trust calculations
+
+# GET A NEW TRANSACTION ID FOR A MERCHANT TRANSACTION
+@app.get("/api/create_merchant_transaction")
+async def get_merchant_transaction_api(
+    amount: float,
+    user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    s = []
+    s.append(user.email + 'X')
+    s.append(str(amount))
+    s.append('X')
+    s.append(datetime.now().strftime('%H:%M:%S'))
+    code = ''.join(s)
+    transaction_id = ''.join(str(ord(c)) for c in code)[::-1]
+    mydict = {
+        'transaction_id' : transaction_id,
+        'merchant' : user.email,
+        'amount': amount,
+        'complete': 'false',
+        'signature': 'null'
+    }
+    rval = json.dumps(mydict)
+    r.set(transaction_id, rval)
+    
+    return {"transaction_id": transaction_id}
+
+@app.get("/api/merchant_transaction_status")
+async def merchant_transaction_status_api(
+    transaction_id: str,
+    user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    id = transaction_id
+    print("<<<<<<<" + transaction_id)
+    print("<<<<<<<" + id)
+    # if r.exists(id):
+    data = r.get(id)
+    print("data from get end: " + str(data))
+    result = json.loads(str(data))
+    print("data from get end: " + str(result))
+
+    return {"complete" : result["complete"]}
+    # else:
+    #     for key in r.scan_iter():
+    #         print("IMPORTANT!! key is " + key)
+    #     return {"complete" : "false, transaction cannot be found"}
+
+
+@app.get("/api/complete_merchant_transaction")
+async def complete_merchant_transaction_api(
+    transaction_id: str,
+    user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    print("trans_id from get end: " + transaction_id)
+    id = transaction_id[2:]
+    if r.exists(id):
+        data = r.get(id)
+        print("data from get end: " + str(data))
+        print('why does this work then' + str(data))
+        result = json.loads(data.decode('utf8').replace("'", '"'))
+        print("data from get end: " + str(result))
+        return {"merchant" : result["merchant"], "amount": result["amount"]}
+    else:
+        for key in r.scan_iter():
+            print("IMPORTANT!! key is " + str(key))
+        return {"merchant" : "nothing", "amount": "more nothing"}
+
+# AFTER SENDER SIGNS THE TRANSACTION, SENDER UPDATAES THE REDIS
+@app.post("/api/sign_merchant_transaction")
+async def sign_merchant_transaction(
+    request: Request
+) -> dict[str, Any]:
+    input = await request.json()
+
+    transaction_id = input["transaction_id"]
+    signature = input["signature"]
+
+    print("tid: ", transaction_id)
+    
+    data = r.get(transaction_id)
+    print("data from get end: " + str(data))
+    result = json.loads(str(data))
+
+    print("before"  + str(data))
+
+    mydict = {
+        'transaction_id' : result['transaction_id'],
+        'merchant' : result['merchant'],
+        'amount': result['amount'],
+        'complete': 'true',
+        'signature': signature
+    }
+    rval = json.dumps(mydict)
+    r.set(transaction_id, rval)
+
+    data = r.get(transaction_id)
+    print("data from get end: " + str(data))
+    result = json.loads(str(data))
+
+    print("after"  + str(data))
+
+    return {"success": True}
 
 
 # GET TOKEN BALANCE
