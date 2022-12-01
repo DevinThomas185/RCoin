@@ -67,21 +67,28 @@ const PasswordPopup = ({
   };
 
   const handleSubmit = () => {
-    keyPair.readPair(input).then((v: Keypair | undefined) => {
-      if (v === undefined) {
-        setFailed(true);
-      } else {
-        setFailed(false);
-        onSuccess(v.secretKey);
-        isSensorAvailable.then((res: boolean) => {
-          if (res) {
-            createBio(v);
-            setBio(true);
-          }
-        });
-        handleClose();
-      }
-    });
+    if (auth.authData === undefined) {
+      setBio(false);
+      return;
+    }
+
+    keyPair
+      .readPair(input, auth.authData.token_info.wallet_id)
+      .then((v: Keypair | undefined) => {
+        if (v === undefined) {
+          setFailed(true);
+        } else {
+          setFailed(false);
+          onSuccess(v.secretKey);
+          isSensorAvailable.then((res: boolean) => {
+            if (res) {
+              createBio(v);
+              setBio(true);
+            }
+          });
+          handleClose();
+        }
+      });
   };
 
   const handleUseBiometrics = () => {

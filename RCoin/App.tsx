@@ -13,8 +13,10 @@ import styles from './src/style/style';
 import {Image, LoaderScreen} from 'react-native-ui-lib';
 import Home from './src/screens/Home';
 import {BalanceProvider} from './src/contexts/BalanceContext';
+import {LogBox} from 'react-native';
 
 const Tab = createBottomTabNavigator();
+LogBox.ignoreLogs(['Invalid prop textStyle of type array supplied to Cell']);
 
 const App = () => {
   const AuthRouter = ({children}: {children: React.ReactNode}) => {

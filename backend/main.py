@@ -283,6 +283,7 @@ async def get_user(user: User = Depends(get_current_user)):
         "user_id": user.id,
         "email": user.email,
         "name": f"{user.first_name} {user.last_name}",
+        "walled_id": user.wallet_id,
     }
 
 
