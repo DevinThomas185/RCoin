@@ -130,7 +130,7 @@ def await_transaction_commitment(signature: Signature):
     if count == BLOCKCHAIN_RESPONSE_TIMEOUT:
         raise TransactionTimeoutException()
 
-    print("Transaction successfully commited to the blockchain!")
+    print("Transaction successfully committed to the blockchain!")
 
 
 def transaction_to_bytes(transaction: Transaction) -> list[int]:
