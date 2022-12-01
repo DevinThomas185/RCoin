@@ -1,7 +1,9 @@
 import React from 'react';
 import {Text, View, Image, TouchableOpacity} from 'react-native-ui-lib';
+import {RefreshControl, ScrollView} from 'react-native';
 import Balance from '../components/Balances/Balance';
 import ServiceLink from '../components/ServiceLink';
+import Code from '../components/QRCode';
 import style from '../style/style';
 import {NavigationScreenProp} from 'react-navigation';
 
@@ -15,7 +17,7 @@ const HomeScreen = ({
   return (
     <View flex>
       <TouchableOpacity onPress={() => navigation.navigate('Balance')}>
-        <View margin-30>
+        <View marginH-30 marginT-15>
           <Text text40>RCoin Balance</Text>
           <Balance margin-30 />
           <View style={style.divider}>
@@ -24,38 +26,59 @@ const HomeScreen = ({
         </View>
       </TouchableOpacity>
 
-      <Text marginH-30 text40 marginB-20>
+      <TouchableOpacity onPress={() => navigation.navigate('Code')}>
+        <Code title="QR Code" message={'View your own QR Code'} />
+      </TouchableOpacity>
+
+      <Text marginH-30 text40>
         Services
       </Text>
+      <View style={style.divider}>
+        <Image source={require('../style/Divider.png')} />
+      </View>
 
-      {divider}
-      <TouchableOpacity onPress={() => navigation.navigate('Deposit')}>
-        <ServiceLink
-          title="Deposit"
-          message={
-            'Make a payment to acquire your RCoin.\nCompleted securely through Paystack.'
-          }
-        />
-      </TouchableOpacity>
-      {divider}
-      <TouchableOpacity onPress={() => navigation.navigate('Transfer')}>
-        <ServiceLink
-          title="Transfer"
-          message={
-            'Send your RCoin to another user.\nYour transfer will be signed on the blockchain.'
-          }
-        />
-      </TouchableOpacity>
-      {divider}
-      <TouchableOpacity onPress={() => navigation.navigate('Withdraw')}>
-        <ServiceLink
-          title="Withdraw"
-          message={
-            'Withdraw your RCoin as Rand.\nCompleted securely through Paystack.'
-          }
-        />
-      </TouchableOpacity>
-      {divider}
+      <ScrollView
+      // refreshControl={
+      //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      // }
+      >
+        <TouchableOpacity onPress={() => navigation.navigate('Merchant')}>
+          <ServiceLink
+            title="Request a transfer"
+            message={
+              'A quick and easy way to accept payments. Enter the amount and show your sender the code.'
+            }
+          />
+        </TouchableOpacity>
+        {divider}
+        <TouchableOpacity onPress={() => navigation.navigate('Deposit')}>
+          <ServiceLink
+            title="Deposit"
+            message={
+              'Make a payment to acquire your RCoin.\nCompleted securely through Paystack.'
+            }
+          />
+        </TouchableOpacity>
+        {divider}
+        <TouchableOpacity onPress={() => navigation.navigate('Transfer')}>
+          <ServiceLink
+            title="Transfer"
+            message={
+              'Send your RCoin to another user.\nYour transfer will be signed on the blockchain.'
+            }
+          />
+        </TouchableOpacity>
+        {divider}
+        <TouchableOpacity onPress={() => navigation.navigate('Withdraw')}>
+          <ServiceLink
+            title="Withdraw"
+            message={
+              'Withdraw your RCoin as Rand.\nCompleted securely through Paystack.'
+            }
+          />
+        </TouchableOpacity>
+        {divider}
+      </ScrollView>
     </View>
   );
 };
