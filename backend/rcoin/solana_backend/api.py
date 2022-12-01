@@ -68,6 +68,7 @@ from rcoin.solana_backend.response import (
 
 BLOCKCHAIN_RESPONSE_TIMEOUT = 30
 
+
 def sign_transaction(transaction: Transaction, secret_key: bytes) -> Transaction:
     """Signs a transaction given an appropriate secret key."""
 
@@ -148,7 +149,7 @@ def send_transaction_from_bytes(txn: bytes) -> CustomResponse:
 
 def add_signature_and_send(
     transaction_bytes: bytes, signer: bytes, signer_wallet: str
-) -> CustomResponse :
+) -> CustomResponse:
     try:
         transaction = transaction_from_bytes(transaction_bytes)
 
@@ -201,6 +202,7 @@ def construct_create_account_transaction(public_key: str) -> CustomResponse:
 
     return TransactionConstructionSuccess(transaction)
 
+
 ### Constructing a transaction to issue tokens to a user ###
 def construct_issue_transaction(recipient: str, amount: float) -> CustomResponse:
     """Constructs a transaction to issue stablecoins and sends it directly
@@ -225,6 +227,7 @@ def construct_issue_transaction(recipient: str, amount: float) -> CustomResponse
         )
     )
 
+
 ### Constructing a transfer between users ###
 def construct_token_transfer_transaction(
     sender: str, amount: float, recipient: str
@@ -240,6 +243,7 @@ def construct_token_transfer_transaction(
         )
     )
 
+
 ### Constructing a withdrawal ###
 def construct_withdraw_transaction(user_key: str, amount: float) -> CustomResponse:
     print(
@@ -253,27 +257,32 @@ def construct_withdraw_transaction(user_key: str, amount: float) -> CustomRespon
         )
     )
 
+
 ### Query the Blockchain ###
 def get_total_tokens_issued() -> CustomResponse:
     return execute_query(
         lambda: Success("amount", TOTAL_SUPPLY - get_token_balance(TOKEN_OWNER))
     )
 
+
 def get_user_token_balance(public_key: str) -> CustomResponse:
     return execute_query(
         lambda: Success("account_balance", get_token_balance(PublicKey(public_key)))
     )
+
 
 def get_user_sol_balance(public_key: str) -> CustomResponse:
     return execute_query(
         lambda: Success("account_balance", get_sol_balance(PublicKey(public_key)))
     )
 
+
 class TransactionType(str, Enum):
     Withdraw = "withdraw"
     Send = "send"
     Deposit = "deposit"
     Recieve = "recieve"
+
 
 class TransactionLogItem:
     def __init__(
@@ -337,7 +346,7 @@ def _fix_transaction_format(transaction, public_key: str) -> TransactionLogItem:
             signature=transaction["signature"],
         )
 
-    return fixed_transaction
+    return fixed_transaction.__dict__
 
 
 def get_stablecoin_transactions(public_key: str, limit: int = 10) -> CustomResponse:
@@ -413,3 +422,35 @@ def get_transfer_amount_for_transaction(signature: str) -> CustomResponse:
         )
 
     return Success("amount", amount / 10**TOKEN_DECIMALS)
+
+
+def get_recipient_for_trade_transaction(signature: str) -> CustomResponse:
+    resp = GetTransactionResp(None)
+    counter = 0
+    try:
+
+        while (
+            resp == GetTransactionResp(None) and counter < BLOCKCHAIN_RESPONSE_TIMEOUT
+        ):
+            resp = get_transaction_details(Signature.from_string(signature))
+            counter += 1
+            sleep(1)
+
+    except BlockchainQueryFailedException as exception:
+        return Failure("exception", exception)
+
+    if resp == GetTransactionResp(None):
+        return Failure("exception", TransactionTimeoutException())
+
+    if resp.value is None:
+        return Failure("exception", InvalidGetTransactionRespException())
+
+    confirmed_transaction: EncodedTransactionWithStatusMeta = resp.value.transaction
+
+    if confirmed_transaction.meta is None:
+        return Failure("exception", InvalidGetTransactionRespException())
+
+    # Can this change?
+    return Success(
+        "public_key", confirmed_transaction.meta.post_token_balances[0].owner
+    )

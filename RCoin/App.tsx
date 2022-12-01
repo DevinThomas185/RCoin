@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import IssueScreen from './src/screens/IssueScreen';
@@ -14,13 +14,14 @@ import styles from './src/style/style';
 import {Image, LoaderScreen} from 'react-native-ui-lib';
 import Home from './src/screens/Home';
 import {BalanceProvider} from './src/contexts/BalanceContext';
+import {NotificationContainer} from './src/components/NotificationContainer';
 import {LogBox} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 LogBox.ignoreLogs(['Invalid prop textStyle of type array supplied to Cell']);
 
 const App = () => {
-  const AuthRouter = ({children}: {children: React.ReactNode}) => {
+  const AuthRouter = ({children}: {children: JSX.Element}) => {
     const {authData, loading} = useAuth();
     if (loading) {
       return (
@@ -36,7 +37,11 @@ const App = () => {
 
     return (
       <NavigationContainer>
-        {authData ? children : <AuthStack />}
+        {authData ? (
+          <NotificationContainer>{children}</NotificationContainer>
+        ) : (
+          <AuthStack />
+        )}
       </NavigationContainer>
     );
   };
