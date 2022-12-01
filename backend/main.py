@@ -1,7 +1,7 @@
 # Should load here since this is entry point to system
 from dotenv import load_dotenv
 
-from rcoin.solana_backend.common import SIGNER_1, SIGNER_2
+from rcoin.solana_backend.common import SIGNER_1
 import httpx
 
 load_dotenv()
