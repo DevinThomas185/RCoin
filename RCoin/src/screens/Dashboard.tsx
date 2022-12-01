@@ -6,6 +6,8 @@ import ServiceLink from '../components/ServiceLink';
 import Code from '../components/QRCode';
 import style from '../style/style';
 import {NavigationScreenProp} from 'react-navigation';
+import {Linking} from 'react-native';
+import Config from 'react-native-config';
 
 const HomeScreen = ({
   navigation,
@@ -15,7 +17,7 @@ const HomeScreen = ({
   const divider = <View style={style.thinDivider} />;
 
   return (
-    <View flex>
+    <ScrollView>
       <TouchableOpacity onPress={() => navigation.navigate('Balance')}>
         <View marginH-30 marginT-15>
           <Text text40>RCoin Balance</Text>
@@ -78,8 +80,17 @@ const HomeScreen = ({
           />
         </TouchableOpacity>
         {divider}
+        <TouchableOpacity onPress={() => Linking.openURL(Config.AUDIT_URL!)}>
+          <ServiceLink
+            title="View Audit"
+            message={
+              'Visit our Audit website to ensure the each RCoin is backed up by a ZAR'
+            }
+          />
+        </TouchableOpacity>
+        {divider}
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 

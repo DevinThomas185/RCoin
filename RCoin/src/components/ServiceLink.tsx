@@ -6,7 +6,7 @@ const Service = ({title, message}: {title: string; message: string}) => {
   return (
     <View>
       <View marginH-30 marginV-20 style={{flexDirection: 'row'}}>
-        <View>
+        <View style={{width: '90%'}}>
           <Text text60>{title}</Text>
           <Text>{message}</Text>
         </View>
