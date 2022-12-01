@@ -71,7 +71,7 @@ def test_issue_tokens(username: str, amount: int):
     transaction: Transaction = api.transaction_from_bytes(transaction_bytes)
 
     # Second step: the 'signer' backend signs.
-    api.sign_transaction(transaction, SIGNER_2)
+    api.sign_transaction(transaction, SIGNER_1)
 
     # Third step: we send the transaction an wait to see it on the blockchain.
     result: CustomResponse = api.send_and_confirm_transaction(transaction)
@@ -117,7 +117,7 @@ def finalise_trisig_transaction(transaction: Transaction, secret_key: bytes):
     transaction_bytes: bytes = bytes(api.transaction_to_bytes(transaction))
     transaction = api.transaction_from_bytes(transaction_bytes)
 
-    api.sign_transaction(transaction, SIGNER_2)
+    api.sign_transaction(transaction, SIGNER_1)
 
     # Simulate serialising the transaction and sending it to the app frontend.
     transaction_bytes: bytes = bytes(api.transaction_to_bytes(transaction))
