@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Union, Any
 from pydantic import BaseModel
 
@@ -29,6 +30,11 @@ class IssueTransaction(BaseModel):
     # email: str
     # wallet: str
     amount_in_rands: float
+
+class AuditTransactionsRequest(BaseModel):
+    offset: int
+    limit: int
+    first_query_time: datetime
 
 
 class TradeTransaction(BaseModel):

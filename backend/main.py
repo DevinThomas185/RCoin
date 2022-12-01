@@ -41,6 +41,7 @@ from rcoin.data_models import (
     UserInformation,
     IssueTransaction,
     TradeTransaction,
+    AuditTransactionsRequest,
     RedeemTransaction,
 )
 
@@ -329,14 +330,28 @@ async def audit() -> dict[str, Any]:
 
 
 # AUDIT TRANSACTIONS
+
+DEFAULT_INITIAL_AUDIT_TRANSACTIONS = 20
 @app.get("/api/audit/transactions")
 async def auditTransactions(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     transactions = await database_api.get_audit_transactions(
-        0, 1000, datetime.now(), db
+        0, DEFAULT_INITIAL_AUDIT_TRANSACTIONS, datetime.now(), db
     )
 
+    print(transactions)
+    print("\n")
+    return {"transactions": transactions}
+
+@app.post("/api/audit/more_transactions")
+async def moreAuditTransactions(
+    audit_transactions_request: AuditTransactionsRequest,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> dict:
+    transactions = await database_api.get_audit_transactions(
+      audit_transactions_request.offset, audit_transactions_request.limit, audit_transactions_request.first_query_time, db
+    )
     print(transactions)
     print("\n")
     return {"transactions": transactions}
