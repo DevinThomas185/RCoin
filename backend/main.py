@@ -21,12 +21,21 @@ import ssl
 from email.message import EmailMessage
 
 import redis
-r = redis.StrictRedis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+
+r = redis.StrictRedis(
+    host="localhost", port=6379, db=0, charset="utf-8", decode_responses=True
+)
 
 # import datetime
 from datetime import timezone, datetime, timedelta
 
-# Database imports
+from rcoin.solana_backend.api import (
+    get_recipient_for_trade_transaction,
+    get_total_tokens_issued,
+    get_transfer_amount_for_transaction,
+)
+
+from rcoin.solana_backend.response import Success, Failure
 import sqlalchemy.orm as orm
 import rcoin.database_api as database_api
 from rcoin.database_api import User
@@ -41,6 +50,7 @@ from rcoin.data_models import (
     CompleteRedeemTransaction,
     CompleteTradeTransaction,
     LoginInformation,
+    RegisterDeviceToken,
     TokenResponse,
     TradeEmailValid,
     UserInformation,
@@ -55,6 +65,7 @@ from rcoin.data_models import (
 from rcoin.issue import ShouldIssueStage, get_should_issue_stage
 import rcoin.paystack_api as paystack_api
 from rcoin.lock import redis_lock
+from rcoin.mobile_notification import notify_transacted, notify_issued, notify_withdrawn
 import redis
 
 # Solana backend imports
@@ -204,6 +215,17 @@ async def create_sol_account():
     return {"pk": kp.public_key.__str__(), "sk": kp.secret_key.hex()}
 
 
+@app.post("/api/register-device-token")
+async def device_token(
+    register_device_token: RegisterDeviceToken,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+):
+    await database_api.add_device_to_user(register_device_token, user.id, db)
+    # What to return
+    return {}
+
+
 # Do check if already created token account (incase failure)
 
 # SIGNUP
@@ -338,6 +360,8 @@ async def audit() -> dict[str, Any]:
 # AUDIT TRANSACTIONS
 
 DEFAULT_INITIAL_AUDIT_TRANSACTIONS = 20
+
+
 @app.get("/api/audit/transactions")
 async def auditTransactions(
     db: orm.Session = Depends(database_api.connect_to_DB),
@@ -350,13 +374,17 @@ async def auditTransactions(
     print("\n")
     return {"transactions": transactions}
 
+
 @app.post("/api/audit/more_transactions")
 async def moreAuditTransactions(
     audit_transactions_request: AuditTransactionsRequest,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     transactions = await database_api.get_audit_transactions(
-      audit_transactions_request.offset, audit_transactions_request.limit, audit_transactions_request.first_query_time, db
+        audit_transactions_request.offset,
+        audit_transactions_request.limit,
+        audit_transactions_request.first_query_time,
+        db,
     )
     print(transactions)
     print("\n")
@@ -409,6 +437,7 @@ async def trade(
     final_response = await handle_transaction_construction_response(response)
     return final_response.to_json()
 
+
 # REDEEM
 @app.post("/api/redeem")
 async def redeem(
@@ -428,7 +457,10 @@ async def redeem(
     final_response = await handle_transaction_construction_response(response)
     return final_response.to_json()
 
-async def handle_transaction_construction_response(response: CustomResponse) -> CustomResponse:
+
+async def handle_transaction_construction_response(
+    response: CustomResponse,
+) -> CustomResponse:
     try:
         transaction: Transaction = response.unwrap()
         solana_api.sign_transaction(transaction, SIGNER_1)
@@ -440,14 +472,17 @@ async def handle_transaction_construction_response(response: CustomResponse) -> 
         print(e)
         return Failure(e)
 
+
 async def get_second_signature(transaction: Transaction) -> Transaction:
     transaction_bytes = solana_api.transaction_to_bytes(transaction)
     async with httpx.AsyncClient() as client:
         response = await client.post(
-                SIGNER_BACKEND_URL + "/api/sign-transaction", json={"transaction_bytes": transaction_bytes}
+            SIGNER_BACKEND_URL + "/api/sign-transaction",
+            json={"transaction_bytes": transaction_bytes},
         )
         signed_transaction_bytes = bytes(response.json()["transaction_bytes"])
         return solana_api.transaction_from_bytes(signed_transaction_bytes)
+
 
 @app.post("/api/complete-trade")
 @checkReserveRatio
@@ -462,8 +497,39 @@ async def complete_trade(
     # Here we expect that the transaction has been successfully processed in the
     # earlier stages of the workflow and already has both required multisig
     # signatures obtained from both servers.
-    response = solana_api.add_signature_and_send(transaction, signature, sender.wallet_id)
-    return response.to_json()
+    res = solana_api.add_signature_and_send(transaction, signature, sender.wallet_id)
+
+    recipient_res = get_recipient_for_trade_transaction(str(res.to_json()["signature"]))
+
+    if isinstance(recipient_res, Failure):
+        return recipient_res.to_json()
+
+    recipient_wallet = str(recipient_res.contents)
+
+    recipient_user: User = await database_api.get_user_by_wallet_id(
+        recipient_wallet, db=db
+    )
+
+    sender_devices = await database_api.get_user_devices(sender.id, db=db)
+    reciever_devices = await database_api.get_user_devices(recipient_user.id, db=db)
+
+    sender_tokens = list(map(lambda d: d.device_token, sender_devices))
+    reciever_tokens = list(map(lambda d: d.device_token, reciever_devices))
+
+    amount_resp = get_transfer_amount_for_transaction(res.contents)
+
+    if isinstance(amount_resp, Failure):
+        return amount_resp.to_json()
+
+    notify_transacted(
+        sender_tokens,
+        sender.email,
+        reciever_tokens,
+        recipient_user.email,
+        abs(amount_resp.contents),
+    )
+
+    return res.to_json()
 
 
 @app.post("/api/trade-email-valid")
@@ -483,6 +549,7 @@ async def is_trade_email_valid(
         return {"valid": False}
 
     return {"valid": True}
+
 
 # TODO[ks1020]: We need a way of reconciling if this fails
 @app.post("/api/complete-redeem")
@@ -521,6 +588,10 @@ async def complete_redeem(
         amount=amount_resp.contents,
         db=db,
     )
+
+    devices = await database_api.get_user_devices(user.id, db=db)
+    device_tokens = list(map(lambda d: d.device_token, devices))
+    notify_withdrawn(device_tokens, amount_resp.contents)
 
     final_resp = amount_resp.to_json()
     final_resp["transaction_id"] = reference
@@ -586,6 +657,7 @@ def get_rand_to_return(
 ) -> int:
     return int(amount_in_coins)  # TODO[dt120]: Add in trust calculations
 
+
 # GET A NEW TRANSACTION ID FOR A MERCHANT TRANSACTION
 @app.get("/api/create_merchant_transaction")
 async def get_merchant_transaction_api(
@@ -593,23 +665,24 @@ async def get_merchant_transaction_api(
     user: User = Depends(get_current_user),
 ) -> dict[str, str]:
     s = []
-    s.append(user.email + 'X')
+    s.append(user.email + "X")
     s.append(str(amount))
-    s.append('X')
-    s.append(datetime.now().strftime('%H:%M:%S'))
-    code = ''.join(s)
-    transaction_id = ''.join(str(ord(c)) for c in code)[::-1]
+    s.append("X")
+    s.append(datetime.now().strftime("%H:%M:%S"))
+    code = "".join(s)
+    transaction_id = "".join(str(ord(c)) for c in code)[::-1]
     mydict = {
-        'transaction_id' : transaction_id,
-        'merchant' : user.email,
-        'amount': amount,
-        'complete': 'false',
-        'signature': 'null'
+        "transaction_id": transaction_id,
+        "merchant": user.email,
+        "amount": amount,
+        "complete": "false",
+        "signature": "null",
     }
     rval = json.dumps(mydict)
     r.set(transaction_id, rval)
-    
+
     return {"transaction_id": transaction_id}
+
 
 @app.get("/api/merchant_transaction_status")
 async def merchant_transaction_status_api(
@@ -625,7 +698,7 @@ async def merchant_transaction_status_api(
     result = json.loads(str(data))
     print("data from get end: " + str(result))
 
-    return {"complete" : result["complete"]}
+    return {"complete": result["complete"]}
     # else:
     #     for key in r.scan_iter():
     #         print("IMPORTANT!! key is " + key)
@@ -642,39 +715,38 @@ async def complete_merchant_transaction_api(
     if r.exists(id):
         data = r.get(id)
         print("data from get end: " + str(data))
-        print('why does this work then' + str(data))
-        result = json.loads(data.decode('utf8').replace("'", '"'))
+        print("why does this work then" + str(data))
+        result = json.loads(data.decode("utf8").replace("'", '"'))
         print("data from get end: " + str(result))
-        return {"merchant" : result["merchant"], "amount": result["amount"]}
+        return {"merchant": result["merchant"], "amount": result["amount"]}
     else:
         for key in r.scan_iter():
             print("IMPORTANT!! key is " + str(key))
-        return {"merchant" : "nothing", "amount": "more nothing"}
+        return {"merchant": "nothing", "amount": "more nothing"}
+
 
 # AFTER SENDER SIGNS THE TRANSACTION, SENDER UPDATAES THE REDIS
 @app.post("/api/sign_merchant_transaction")
-async def sign_merchant_transaction(
-    request: Request
-) -> dict[str, Any]:
+async def sign_merchant_transaction(request: Request) -> dict[str, Any]:
     input = await request.json()
 
     transaction_id = input["transaction_id"]
     signature = input["signature"]
 
     print("tid: ", transaction_id)
-    
+
     data = r.get(transaction_id)
     print("data from get end: " + str(data))
     result = json.loads(str(data))
 
-    print("before"  + str(data))
+    print("before" + str(data))
 
     mydict = {
-        'transaction_id' : result['transaction_id'],
-        'merchant' : result['merchant'],
-        'amount': result['amount'],
-        'complete': 'true',
-        'signature': signature
+        "transaction_id": result["transaction_id"],
+        "merchant": result["merchant"],
+        "amount": result["amount"],
+        "complete": "true",
+        "signature": signature,
     }
     rval = json.dumps(mydict)
     r.set(transaction_id, rval)
@@ -683,7 +755,7 @@ async def sign_merchant_transaction(
     print("data from get end: " + str(data))
     result = json.loads(str(data))
 
-    print("after"  + str(data))
+    print("after" + str(data))
 
     return {"success": True}
 
@@ -707,6 +779,7 @@ async def token_balance(
         "token_balance": token_balance_resp.contents,
         "sol_balance": sol_balance_resp.contents,
     }
+
 
 @app.post("/api/paystack-webhook")
 @from_paystack
@@ -765,21 +838,23 @@ async def recieve_issue_webhook(
                 should_issue == ShouldIssueStage._Issue_Write
                 or should_issue == ShouldIssueStage.Write_Issue_Write
             ):
-                associated_issue_resp: CustomResponse = solana_api.construct_issue_transaction(
-                    user.wallet_id, amount
+                associated_issue_resp: CustomResponse = (
+                    solana_api.construct_issue_transaction(user.wallet_id, amount)
                 )
                 if isinstance(associated_issue_resp, Failure):
                     print("issue failed")
                     response.status_code = 500
                     return "not done"
 
-                transaction : Transaction = associated_issue_resp.unwrap()
+                transaction: Transaction = associated_issue_resp.unwrap()
 
-                solana_api.sign_transaction(transaction , SIGNER_1)
+                solana_api.sign_transaction(transaction, SIGNER_1)
                 # Now need to send the partially signed transaction to the signer backend
                 # to obtain the second signature.
                 transaction = await get_second_signature(transaction)
-                solana_response: CustomResponse = solana_api.send_and_confirm_transaction(transaction)
+                solana_response: CustomResponse = (
+                    solana_api.send_and_confirm_transaction(transaction)
+                )
 
                 if isinstance(solana_response, Failure):
                     response.status_code = 500
@@ -791,6 +866,10 @@ async def recieve_issue_webhook(
             await database_api.complete_issue_transaction(
                 transaction_id, associated_issue, db=db
             )
+
+        devices = await database_api.get_user_devices(user_id, db=db)
+        device_tokens = list(map(lambda d: d.device_token, devices))
+        notify_issued(device_tokens, amount)
 
     # If issued, return 200
     response.status_code = 200

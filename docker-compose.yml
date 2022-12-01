@@ -27,6 +27,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_PASS=${REDIS_PASS}
       - GMAIL_PASS=${GMAIL_PASS}
+      - FIREBASE_JSON=${FIREBASE_JSON}
     ports:
       - 8000:8000
     depends_on:

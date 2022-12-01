@@ -75,3 +75,7 @@ class TokenBalance(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
+
+
+class RegisterDeviceToken(BaseModel):
+    device_token: str

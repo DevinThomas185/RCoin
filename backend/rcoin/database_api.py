@@ -2,6 +2,7 @@
 from datetime import datetime
 import sqlalchemy as sql
 from sqlalchemy.schema import Sequence
+from sqlalchemy.dialects.sqlite import insert
 import sqlalchemy.ext.declarative as declarative
 import sqlalchemy.orm as orm
 import rcoin.data_models as data_models
@@ -42,6 +43,14 @@ class User(Base):
     sort_code = sql.Column(sql.Text, index=True)
     document_number = sql.Column(sql.Text, index=True)
     recipient_code = sql.Column(sql.Text, index=True)
+
+
+class Device(Base):
+    __tablename__ = "device"
+    user_id = sql.Column(sql.Integer, sql.ForeignKey("users.id"), primary_key=True)
+    device_token = sql.Column(sql.Text, primary_key=True)
+    # have device type
+    date_registered = sql.Column(sql.DateTime)
 
 
 class Redeem(Base):
@@ -166,6 +175,50 @@ async def get_user(
     return user
 
 
+# Device
+async def add_device_to_user(
+    register: data_models.RegisterDeviceToken, user_id: str, db: "Session"
+) -> None:
+    current_time = datetime.now()
+    device = Device(
+        device_token=register.device_token,
+        user_id=user_id,
+        date_registered=current_time,
+    )
+
+    statement = (
+        insert(Device)
+        .values(
+            [
+                {
+                    "device_token": device.device_token,
+                    "date_registered": device.date_registered,
+                    "user_id": device.user_id,
+                }
+            ]
+        )
+        .on_conflict_do_update(
+            index_elements=["user_id", "device_token"],
+            set_=dict(date_registered=device.date_registered),
+        )
+    )
+    res = db.execute(statement)
+
+    # Remove old account device if exists
+    db.query(Device).filter(Device.device_token == register.device_token).filter(
+        Device.user_id != user_id
+    ).delete()
+
+    db.commit()
+    return res
+
+
+async def get_user_devices(user_id: str, db: "Session") -> Optional[List[Device]]:
+    devices = db.query(Device).filter(Device.user_id == user_id)
+
+    return devices
+
+
 # Issue
 async def create_issue_transaction(
     issue: data_models.IssueTransaction,
@@ -288,6 +341,7 @@ async def get_audit_transactions(
     res = db.execute(
         QUERY, {"query_date": query_date, "limit": limit, "offset": offset}
     )
+    db.commit()
     return list(res)
 
 
