@@ -6,7 +6,12 @@ export type AuthData = {
   token_info: TokenInfo;
 };
 
-export type TokenInfo = {user_id: string; email: string; name: string};
+export type TokenInfo = {
+  user_id: string;
+  email: string;
+  name: string;
+  wallet_id: string;
+};
 
 // Returns undefined promise if login is unsuccessful
 const signIn = (
@@ -57,6 +62,7 @@ const signIn = (
                   user_id: data_['user_id'],
                   email: data_['email'],
                   name: data_['name'],
+                  wallet_id: data_['walled_id'],
                 },
               });
             })

@@ -26,6 +26,7 @@ export const StepOne = ({
       <TextField
         style={styles.inputField}
         placeholder={'Email'}
+        placeholderTextColor={'gray'}
         onChangeText={(email: string) =>
           setSignUpDetails(prev => ({
             ...prev,
@@ -39,6 +40,7 @@ export const StepOne = ({
 
       <TextField
         style={styles.inputField}
+        placeholderTextColor={'gray'}
         placeholder={'First Name'}
         onChangeText={(fname: string) =>
           setSignUpDetails(prev => ({
@@ -52,6 +54,7 @@ export const StepOne = ({
       <TextField
         style={styles.inputField}
         placeholder={'Last Name'}
+        placeholderTextColor={'gray'}
         onChangeText={(lname: string) =>
           setSignUpDetails(prev => ({
             ...prev,
@@ -65,6 +68,7 @@ export const StepOne = ({
           style={styles.inputField}
           dasdad
           placeholder={'Password'}
+          placeholderTextColor={'gray'}
           onChangeText={(password: string) =>
             setSignUpDetails(prev => ({
               ...prev,
@@ -72,7 +76,8 @@ export const StepOne = ({
             }))
           }
           value={signUpDetails.password}
-          secureTextEntry={!showPassword}></TextField>
+          secureTextEntry={!showPassword}
+        />
         <Text style={styles.passwordToggleButton} onPress={toggleShowPassword}>
           {passwordText}
         </Text>

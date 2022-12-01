@@ -19,6 +19,7 @@ export const StepTwo = ({
       <TextField
         style={styles.inputField}
         placeholder={'Bank Account Number'}
+        placeholderTextColor={'gray'}
         onChangeText={(bnum: string) =>
           setSignUpDetails(prev => ({
             ...prev,
@@ -31,6 +32,7 @@ export const StepTwo = ({
       <TextField
         style={styles.inputField}
         placeholder={'Bank Code'}
+        placeholderTextColor={'gray'}
         onChangeText={(bcode: string) =>
           setSignUpDetails(prev => ({
             ...prev,
@@ -43,6 +45,7 @@ export const StepTwo = ({
       <TextField
         style={styles.inputField}
         placeholder={'ID Number'}
+        placeholderTextColor={'gray'}
         onChangeText={(id: string) =>
           setSignUpDetails(prev => ({
             ...prev,
