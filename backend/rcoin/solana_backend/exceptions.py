@@ -47,7 +47,7 @@ class BlockchainQueryFailedException(Exception):
     def __str__(self):
         return "Query sent to the blockchain was unsuccessful."
 
-class InvalidUserInputException(Exception):
+class InvalidInputException(Exception):
     """Raised when we receive invalid/malformed input from the frontend."""
     def __init__(self, message: str):
         self.message = message
@@ -55,4 +55,9 @@ class InvalidUserInputException(Exception):
     def __str__(self):
         return self.message
 
-
+class UnwrapOnFailureException(Exception):
+    """Raised when we try to unwrap a SolanaBackendResponse which is a Failure."""
+    def __init__(self, cause: str):
+        self.cause = cause
+    def __str__(self):
+        return "Tried to unwrap a Failure object: \n {}".format(self.cause)

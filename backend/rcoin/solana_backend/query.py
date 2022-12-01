@@ -3,6 +3,7 @@ from requests import post
 
 from solana.publickey import PublicKey
 from solana.rpc.types import TokenAccountOpts
+from typing import Callable
 
 from solders.signature import Signature
 from solders.rpc.responses import (
@@ -23,7 +24,16 @@ from rcoin.solana_backend.common import (
     TOKEN_DECIMALS,
 )
 
+from rcoin.solana_backend.response import CustomResponse, Failure
+
 from rcoin.solana_backend.exceptions import BlockchainQueryFailedException
+
+def execute_query(query_function: Callable[[], CustomResponse]) -> CustomResponse:
+    try:
+        return query_function()
+
+    except BlockchainQueryFailedException as exception:
+        return Failure("exception", exception)
 
 
 def get_balance(public_key: PublicKey) -> int:

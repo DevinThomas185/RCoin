@@ -1,11 +1,14 @@
 # Should load here since this is entry point to system
 from dotenv import load_dotenv
 
+from rcoin.solana_backend.common import SIGNER_1, SIGNER_2
+import httpx
+
 load_dotenv()
 
-from enum import Enum
+# Standard library imports
 import functools
-from typing import Any, Optional
+from typing import Any
 import bcrypt
 from datetime import datetime
 import hmac
@@ -16,36 +19,19 @@ from jose import JWTError, jwt
 import smtplib
 import ssl
 from email.message import EmailMessage
-
-# import datetime
 from datetime import timezone, datetime, timedelta
-from rcoin.issue import ShouldIssueStage, get_should_issue_stage
 
-from rcoin.solana_backend.api import (
-    TransactionType,
-    get_stablecoin_transactions,
-    new_stablecoin_transfer,
-    issue_stablecoins,
-    burn_stablecoins,
-    get_total_tokens_issued,
-    get_user_token_balance,
-    get_user_sol_balance,
-    send_transaction_from_bytes,
-    get_transfer_amount_for_transaction,
-    create_and_fund_solana_account,
-    create_token_account,
-)
-
-from rcoin.solana_backend.transaction import (
-    send_transaction_from_signature,
-)
-
-from rcoin.solana_backend.response import Success, Failure
+# Database imports
 import sqlalchemy.orm as orm
+import rcoin.database_api as database_api
+from rcoin.database_api import User
+
 from starlette.middleware.sessions import SessionMiddleware
+
+# Fastapi imports
 from fastapi import Depends, FastAPI, Response, Request, HTTPException, status
 from fastapi_utils.tasks import repeat_every
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from rcoin.data_models import (
     CompleteRedeemTransaction,
     CompleteTradeTransaction,
@@ -56,17 +42,30 @@ from rcoin.data_models import (
     IssueTransaction,
     TradeTransaction,
     RedeemTransaction,
-    TokenBalance,
 )
-import rcoin.database_api as database_api
-from rcoin.database_api import Issue, User
+
+
+# Custom module imports
+from rcoin.issue import ShouldIssueStage, get_should_issue_stage
 import rcoin.paystack_api as paystack_api
 from rcoin.lock import redis_lock
 import redis
 
+# Solana backend imports
+from rcoin.solana_backend.response import Failure, CustomResponse, Success
+
+import rcoin.solana_backend.api as solana_api
+
+from rcoin.solana_backend.exceptions import UnwrapOnFailureException
+
+# Solana imports
+from solana.keypair import Keypair
+from solana.transaction import Transaction
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
 JWT_SECRET = "secret"
+
+SIGNER_BACKEND_URL = str(os.getenv("SIGNER_BACKEND_URL"))
 
 app = FastAPI()
 
@@ -195,7 +194,7 @@ def checkReserveRatio(func):
 
 @app.post("/api/create-sol-account")
 async def create_sol_account():
-    kp = create_and_fund_solana_account(1)
+    kp: Keypair = Keypair.generate()
     return {"pk": kp.public_key.__str__(), "sk": kp.secret_key.hex()}
 
 
@@ -223,12 +222,23 @@ async def signup(
     )
     user.recipient_code = recipient_code
     await database_api.create_user(user=user, db=db)
-    return create_token_account(user.wallet_id).to_json()
+    response: CustomResponse = solana_api.construct_create_account_transaction(
+        user.wallet_id
+    )
+
+    if isinstance(response, Failure):
+        return response.to_json()
+
+    transaction: Transaction = response.unwrap()
+
+    solana_api.sign_transaction(transaction, SIGNER_1)
+
+    response: CustomResponse = solana_api.send_and_confirm_transaction(transaction)
+
+    return response.to_json()
 
 
 # LOGIN
-
-
 class JwtToken:
     iss = "imperial-server"
 
@@ -299,7 +309,7 @@ async def check_authenticated(request: Request):
 # AUDIT
 @app.get("/api/audit")
 async def audit() -> dict[str, Any]:
-    resp = get_total_tokens_issued()
+    resp = solana_api.get_total_tokens_issued()
 
     if isinstance(resp, Failure):
         return resp.to_json()
@@ -339,7 +349,7 @@ async def transactionHistory(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     wallet_id = user.wallet_id
-    transactions = get_stablecoin_transactions(wallet_id).to_json()[
+    transactions = solana_api.get_stablecoin_transactions(wallet_id).to_json()[
         "transaction_history"
     ]
     for transaction in transactions:
@@ -355,31 +365,6 @@ async def transactionHistory(
     return {"transaction_history": transactions}
 
 
-# ISSUE
-@app.post("/api/issue")
-@checkReserveRatio
-async def issue(
-    issue_transaction: IssueTransaction,
-    user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
-) -> dict[str, Any]:
-    issue_transac = await database_api.create_issue_transaction(
-        issue_transaction, user.email, database_api.get_dummy_id(), datetime.now(), db
-    )
-
-    # Below should be done in a background job once we verify the bank transaction
-    # has gone through - not pending
-
-    # 1:1 issuance of Rands to Coins
-    coins_to_issue = issue_transaction.amount_in_rands
-    resp = issue_stablecoins(user.wallet_id, coins_to_issue)
-
-    await database_api.complete_issue_transaction(issue_transac.id, resp.contents, db)
-
-    return resp.to_json()
-
-
-# TRADE
 @app.post("/api/trade")
 @checkReserveRatio
 async def trade(
@@ -387,25 +372,65 @@ async def trade(
     sender: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    # sender = await database_api.get_user(email=user.email, db=db)
     recipient = await database_api.get_user(
         email=trade_transaction.recipient_email, db=db
     )
 
     if recipient is None:
-        # return some error
-        pass
+        return Failure(ValueError("Recipient not present in the database!")).to_json()
 
-    return new_stablecoin_transfer(
+    response: CustomResponse = solana_api.construct_token_transfer_transaction(
         sender.wallet_id,
         trade_transaction.coins_to_transfer,
         recipient.wallet_id,
-    ).to_json()
+    )
 
+    final_response = await handle_transaction_construction_response(response)
+    return final_response.to_json()
+
+# REDEEM
+@app.post("/api/redeem")
+async def redeem(
+    redeem_transaction: RedeemTransaction,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> dict[str, Any]:
+    redeemer = await database_api.get_user(email=user.email, db=db)
+    if redeemer is None:
+        # return some error
+        pass
+
+    response: CustomResponse = solana_api.construct_withdraw_transaction(
+        redeemer.wallet_id, redeem_transaction.amount_in_coins
+    )
+
+    final_response = await handle_transaction_construction_response(response)
+    return final_response.to_json()
+
+async def handle_transaction_construction_response(response: CustomResponse) -> CustomResponse:
+    try:
+        transaction: Transaction = response.unwrap()
+        solana_api.sign_transaction(transaction, SIGNER_1)
+        signed_transaction = await get_second_signature(transaction)
+        transaction_bytes = solana_api.transaction_to_bytes(signed_transaction)
+        return Success("transaction_bytes", transaction_bytes)
+
+    except (UnwrapOnFailureException, Exception) as e:
+        print(e)
+        return Failure(e)
+
+async def get_second_signature(transaction: Transaction) -> Transaction:
+    transaction_bytes = solana_api.transaction_to_bytes(transaction)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+                SIGNER_BACKEND_URL + "/api/sign-transaction", json={"transaction_bytes": transaction_bytes}
+        )
+        signed_transaction_bytes = bytes(response.json()["transaction_bytes"])
+        return solana_api.transaction_from_bytes(signed_transaction_bytes)
 
 @app.post("/api/complete-trade")
 @checkReserveRatio
-async def trade(
+async def complete_trade(
     trade_transaction: CompleteTradeTransaction,
     sender: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
@@ -413,8 +438,11 @@ async def trade(
     signature = bytes(trade_transaction.signature)
     transaction = bytes(trade_transaction.transaction_bytes)
 
-    res = send_transaction_from_signature(transaction, signature, sender.wallet_id)
-    return res.to_json()
+    # Here we expect that the transaction has been successfully processed in the
+    # earlier stages of the workflow and already has both required multisig
+    # signatures obtained from both servers.
+    response = solana_api.add_signature_and_send(transaction, signature, sender.wallet_id)
+    return response.to_json()
 
 
 @app.post("/api/trade-email-valid")
@@ -435,24 +463,7 @@ async def is_trade_email_valid(
 
     return {"valid": True}
 
-
-# REDEEM
-@app.post("/api/redeem")
-@checkReserveRatio
-async def redeem(
-    redeem_transaction: RedeemTransaction,
-    user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
-) -> dict[str, Any]:
-    redeemer = await database_api.get_user(email=user.email, db=db)
-    return burn_stablecoins(
-        redeemer.wallet_id, redeem_transaction.amount_in_coins
-    ).to_json()
-
-
 # TODO[ks1020]: We need a way of reconciling if this fails
-# TODO[sk4520]: Do we want to wait for the transaction to appear on the blockchain
-# and check its health before returning?
 @app.post("/api/complete-redeem")
 @checkReserveRatio
 async def complete_redeem(
@@ -463,13 +474,12 @@ async def complete_redeem(
     signature = bytes(redeem_transaction.signature)
     transaction = bytes(redeem_transaction.transaction_bytes)
 
-    resp = send_transaction_from_signature(transaction, signature, user.wallet_id)
+    resp = solana_api.add_signature_and_send(transaction, signature, user.wallet_id)
 
-    # TODO[szymon] add more robust error handling.
     if isinstance(resp, Failure):
         return resp.to_json()
 
-    amount_resp = get_transfer_amount_for_transaction(resp.contents)
+    amount_resp = solana_api.get_transfer_amount_for_transaction(resp.contents)
 
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()
@@ -514,7 +524,7 @@ async def get_bank_accounts(
 
 # GET DEFAULT BANK ACCOUNTS FOR USER
 @app.get("/api/get_default_bank_account")
-async def get_bank_accounts(
+async def get_default_bank_accounts(
     user: User = Depends(get_current_user),
 ) -> list[dict[str, Any]]:
 
@@ -534,7 +544,7 @@ async def get_coins_to_issue_api(
 
 
 @app.get("/api/get_rand_to_return")
-async def get_coins_to_issue_api(
+async def get_rand_to_return_api(
     amount: float,
     user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
@@ -546,14 +556,14 @@ async def get_coins_to_issue_api(
 def get_coins_to_issue(
     amount_of_rand: float,
 ) -> int:
-    return amount_of_rand  # TODO[dt120]: Add in trust calculations
+    return int(amount_of_rand)  # TODO[dt120]: Add in trust calculations
 
 
 # GET AMOUNT OF RAND TO RETURN
 def get_rand_to_return(
     amount_in_coins: float,
 ) -> int:
-    return amount_in_coins  # TODO[dt120]: Add in trust calculations
+    return int(amount_in_coins)  # TODO[dt120]: Add in trust calculations
 
 
 # GET TOKEN BALANCE
@@ -563,11 +573,11 @@ async def token_balance(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
 
-    token_balance_resp = get_user_token_balance(user.wallet_id)
+    token_balance_resp = solana_api.get_user_token_balance(user.wallet_id)
     if isinstance(token_balance_resp, Failure):
         return token_balance_resp.to_json()
 
-    sol_balance_resp = get_user_sol_balance(user.wallet_id)
+    sol_balance_resp = solana_api.get_user_sol_balance(user.wallet_id)
     if isinstance(sol_balance_resp, Failure):
         return sol_balance_resp.to_json()
 
@@ -576,7 +586,6 @@ async def token_balance(
         "sol_balance": sol_balance_resp.contents,
     }
 
-
 @app.post("/api/paystack-webhook")
 @from_paystack
 async def recieve_issue_webhook(
@@ -584,7 +593,7 @@ async def recieve_issue_webhook(
     response: Response,
     # user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
-) -> None:
+) -> Any:
 
     data = await request.json()
 
@@ -634,14 +643,27 @@ async def recieve_issue_webhook(
                 should_issue == ShouldIssueStage._Issue_Write
                 or should_issue == ShouldIssueStage.Write_Issue_Write
             ):
-                associated_issue_resp = issue_stablecoins(user.wallet_id, amount)
-                if not (associated_issue_resp).to_json()["success"]:
+                associated_issue_resp: CustomResponse = solana_api.construct_issue_transaction(
+                    user.wallet_id, amount
+                )
+                if isinstance(associated_issue_resp, Failure):
                     print("issue failed")
                     response.status_code = 500
                     return "not done"
 
-                associated_issue = associated_issue_resp.contents
-                print(associated_issue_resp)
+                transaction : Transaction = associated_issue_resp.unwrap()
+
+                solana_api.sign_transaction(transaction , SIGNER_1)
+                # Now need to send the partially signed transaction to the signer backend
+                # to obtain the second signature.
+                transaction = await get_second_signature(transaction)
+                solana_response: CustomResponse = solana_api.send_and_confirm_transaction(transaction)
+
+                if isinstance(solana_response, Failure):
+                    response.status_code = 500
+                    return str(solana_response.contents)
+
+                associated_issue: str = solana_response.unwrap()
 
             # We always need to complete
             await database_api.complete_issue_transaction(
@@ -698,7 +720,7 @@ async def sendMessage(
 
     edited_message = """
     {}
-    
+
     {}
     """.format(
         data["title"], data["message"]

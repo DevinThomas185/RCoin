@@ -10,18 +10,23 @@ services:
       - /etc/certs:/etc/nginx/certs
     profiles:
       - main
-  
+
   backend:
     build: ./backend
     environment:
       - SOLANA_CLIENT=${SOLANA_CLIENT}
       - MINT_ACCOUNT=${MINT_ACCOUNT}
-      - RESERVE_ACCOUNT_ADDRESS=${RESERVE_ACCOUNT_ADDRESS}
+      - RESERVE_ACCOUNT=${RESERVE_ACCOUNT}
+      - MULTISIG_ACCOUNT=${MULTISIG_ACCOUNT}
+      - SIGNER_1=${SIGNER_1}
+      - SIGNER_2=${SIGNER_2}
+      - SIGNER_1_PUBKEY=${SIGNER_1_PUBKEY}
+      - SIGNER_2_PUBKEY=${SIGNER_2_PUBKEY}
+      - SIGNER_BACKEND_URL=${SIGNER_BACKEND_URL}
       - TOKEN_OWNER=${TOKEN_OWNER}
-      - SECRET_KEY=${SECRET_KEY}
       - PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY}
       - DATABASE_URL=${DATABASE_URL}
-      - REDIS_PASS=${REDIS_PASS}  
+      - REDIS_PASS=${REDIS_PASS}
       - GMAIL_PASS=${GMAIL_PASS}
     ports:
       - 8000:8000
@@ -31,7 +36,7 @@ services:
       - /etc/certs:/etc/nginx/certs
     profiles:
       - main
-    
+
 
   db:
     image: postgres:alpine
@@ -46,14 +51,14 @@ services:
       - db:/var/lib/postgresql/data/
     profiles:
       - main
-  
+
   redis:
     image: redis:6.2-alpine
     restart: always
     ports:
       - 6379:6379
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASS}
-    volumes: 
+    volumes:
       - redis:/data
     profiles:
       - main
@@ -62,7 +67,7 @@ services:
     build: ./signer
     profiles:
       - signer
-    
+
   signer-proxy:
     build: ./signer/nginx
     ports:
