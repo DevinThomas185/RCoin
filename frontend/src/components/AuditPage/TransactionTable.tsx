@@ -6,14 +6,17 @@ import {
   Grid,
   Skeleton,
 } from "@chakra-ui/react";
+import { UIEventHandler } from "react";
 import TransactionLog from "./TransactionLog";
 
 const TransactionTable = ({
   transactions,
   isLoaded,
+  onScroll,
 }: {
   transactions: any[];
   isLoaded: boolean;
+  onScroll: UIEventHandler<HTMLDivElement>;
 }) => {
   return (
     <Grid gap={2}>
@@ -32,7 +35,8 @@ const TransactionTable = ({
           minWidth="1150px"
           marginLeft="auto"
           marginRight="auto"
-          maxHeight="600px"
+          maxHeight="800px"
+          onScroll={onScroll}
         >
           <Grid gap={1} justifyItems="center">
             {transactions.map((transaction) => (

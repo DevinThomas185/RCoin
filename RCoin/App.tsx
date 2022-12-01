@@ -5,6 +5,7 @@ import IssueScreen from './src/screens/IssueScreen';
 import TransferScreen from './src/screens/TransferScreen';
 import WithdrawScreen from './src/screens/WithdrawScreen';
 import AccountScreen from './src/screens/AccountScreen';
+import QRScreen from './src/screens/QRScreen';
 import {AuthProvider, useAuth} from './src/contexts/Auth';
 import {AuthStack} from './src/routes/AuthStack';
 import {KeypairProvider} from './src/contexts/Keypair';
@@ -13,13 +14,14 @@ import styles from './src/style/style';
 import {Image, LoaderScreen} from 'react-native-ui-lib';
 import Home from './src/screens/Home';
 import {BalanceProvider} from './src/contexts/BalanceContext';
+import {LogBox} from 'react-native';
 
 const Tab = createBottomTabNavigator();
+LogBox.ignoreLogs(['Invalid prop textStyle of type array supplied to Cell']);
 
 const App = () => {
   const AuthRouter = ({children}: {children: React.ReactNode}) => {
     const {authData, loading} = useAuth();
-
     if (loading) {
       return (
         <LoaderScreen
@@ -69,6 +71,18 @@ const App = () => {
                     style={styles.balanceLogo}
                   />
                 ),
+                // headerRight: (props) => (
+                //   <TouchableOpacity
+                //     onPress={() =>
+                //       // navigation.navigate('Home')
+                //       console.log('need to navigate to qr code page')
+                //     }>
+                //     <Image
+                //       source={require('./src/style/QR-Icon.png')}
+                //       style={styles.qrLogo}
+                //     />
+                //   </TouchableOpacity>
+                // ),
                 tabBarActiveTintColor: styles.success,
                 tabBarInactiveTintColor: styles.rcoin,
                 headerStyle: {
@@ -83,7 +97,14 @@ const App = () => {
               })}>
               <Tab.Screen name="Home" component={Home} />
               <Tab.Screen name="Deposit" component={IssueScreen} />
-              <Tab.Screen name="Transfer" component={TransferScreen} />
+              <Tab.Screen
+                name="Transfer"
+                component={TransferScreen}
+                initialParams={{
+                  qr_amount: 0,
+                  qr_recipient: '',
+                }}
+              />
               <Tab.Screen name="Withdraw" component={WithdrawScreen} />
               <Tab.Screen name="Account" component={AccountScreen} />
             </Tab.Navigator>

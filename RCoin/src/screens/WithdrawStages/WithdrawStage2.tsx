@@ -28,7 +28,6 @@ const WithdrawStage2 = ({
   setTransactionId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const auth = useAuth();
-  const keyPair = useKeypair();
   const new_balance = token_balance - coins_to_withdraw;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);

@@ -8,16 +8,6 @@ import {NavigationScreenProp} from 'react-navigation';
 // https://github.com/uuidjs/uuid/issues/416
 import {v4 as uuidv4} from 'uuid'; // Very important, do not remove plz!!!!!
 
-import {useKeypair} from '../../contexts/Keypair';
-import {
-  Transaction,
-  Connection,
-  sendAndConfirmTransaction,
-  Keypair,
-  Signer,
-  PublicKey,
-} from '@solana/web3.js';
-
 export const StepThree = ({
   navigation,
   signUpDetails,
@@ -58,6 +48,7 @@ export const StepThree = ({
           style={styles.inputField}
           dasdad
           placeholder={'Password'}
+          placeholderTextColor={'gray'}
           onChangeText={(password: string) => {
             setKey(password);
           }}
@@ -73,6 +64,7 @@ export const StepThree = ({
           style={styles.inputField}
           dasdad
           placeholder={'Confirm Password'}
+          placeholderTextColor={'gray'}
           onChangeText={(password: string) => {
             if (password !== key) {
               setIsValid(false);

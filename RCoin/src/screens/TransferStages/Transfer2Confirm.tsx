@@ -23,7 +23,6 @@ const Transfer2Confirm = ({
   setTransactionId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const auth = useAuth();
-  const keyPair = useKeypair();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [secretKey, setSecretKey] = useState<Uint8Array>();

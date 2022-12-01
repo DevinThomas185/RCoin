@@ -20,7 +20,6 @@ services:
       - RESERVE_ACCOUNT=${RESERVE_ACCOUNT}
       - MULTISIG_ACCOUNT=${MULTISIG_ACCOUNT}
       - SIGNER_1=${SIGNER_1}
-      - SIGNER_2=${SIGNER_2}
       - SIGNER_1_PUBKEY=${SIGNER_1_PUBKEY}
       - SIGNER_2_PUBKEY=${SIGNER_2_PUBKEY}
       - SIGNER_BACKEND_URL=${SIGNER_BACKEND_URL}
@@ -66,6 +65,8 @@ services:
 
   signer-backend:
     build: ./signer
+    environment:
+      - SIGNER_2=${SIGNER_2}
     profiles:
       - signer
 
