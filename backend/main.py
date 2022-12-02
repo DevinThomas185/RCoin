@@ -83,7 +83,10 @@ app = FastAPI()
 if os.getenv("DEV"):
     r = redis.Redis(host="localhost", port=6379, db=0)
 else:
-    r = redis.Redis(host="localhost", port=6379, db=0, password=os.getenv("REDIS_PASS"))
+    r = redis.Redis(host="redis", port=6379, db=0, password=os.getenv("REDIS_PASS"))
+
+# Set recalculation count to 0
+r.set("reserve_ratio_count", 0)
 
 
 def update_reserve_ratio():
@@ -95,25 +98,26 @@ def update_reserve_ratio():
 
 
 def send_ratio_email():
-    ctx = ssl.create_default_context()
-    password = os.getenv("GMAIL_PASSWORD")
-    sender = "africanmicronation@gmail.com"
-    recipient = "africanmicronation@proton.me"
+    print("should have emailed, implement properly")
+    # ctx = ssl.create_default_context()
+    # password = os.getenv("GMAIL_PASSWORD")
+    # sender = "africanmicronation@gmail.com"
+    # recipient = "africanmicronation@proton.me"
 
-    edited_message = """
-    RATIO DROPPED!
-    CHECK IMMEDIATELY!
-    """
+    # edited_message = """
+    # RATIO DROPPED!
+    # CHECK IMMEDIATELY!
+    # """
 
-    msg = EmailMessage()
-    msg.set_content(edited_message)
-    msg["Subject"] = "!!! RATIO DROPPED !!!"
-    msg["From"] = sender
-    msg["To"] = recipient
+    # msg = EmailMessage()
+    # msg.set_content(edited_message)
+    # msg["Subject"] = "!!! RATIO DROPPED !!!"
+    # msg["From"] = sender
+    # msg["To"] = recipient
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
-        server.login(sender, password)
-        server.send_message(msg)
+    # with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
+    #     server.login(sender, password)
+    #     server.send_message(msg)
 
 
 @app.on_event("startup")
@@ -189,16 +193,20 @@ def from_paystack(func):
 def checkReserveRatio(func):
     """Decorator to check reserve ratio ever 10 api calls"""
 
-    def inner(*args, **kwargs):
-        reserve_ratio_recalculation_count += 1
-        if reserve_ratio_recalculation_count >= 10:
+    @functools.wraps(func)
+    async def inner(*args, **kwargs):
+        current_count = int(r.get("reserve_ratio_count"))
+        if current_count >= 10:
             update_reserve_ratio()
-            reserve_ratio_recalculation_count = 0
+            r.set("reserve_ratio_count", 0)
+        else:
+            r.set("reserve_ratio_count", current_count + 1)
+
         if float(r.get("reserve_ratio")) >= 1:
-            return func(*args, **kwargs)
+            return await func(*args, **kwargs)
         else:
             send_ratio_email()
-            return Failure().to_json()
+            return Failure("all transactions paused").to_json()
 
     return inner
 
@@ -434,6 +442,7 @@ async def trade(
 
 # REDEEM
 @app.post("/api/redeem")
+@checkReserveRatio
 async def redeem(
     redeem_transaction: RedeemTransaction,
     user: User = Depends(get_current_user),
