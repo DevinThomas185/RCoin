@@ -10,6 +10,7 @@ import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
 import PendingLoader from '../../components/PendingLoader';
 import Config from 'react-native-config';
+import SuspectedFraudError from '../../errors/SuspectedFraudError';
 
 const Transfer2Confirm = ({
   nextStage,
@@ -50,8 +51,10 @@ const Transfer2Confirm = ({
       ),
     })
       .then(res => {
-        if (!res.ok) {
-          throw new Error('initial redeem failed');
+        if (res.status == 409) {
+          throw new SuspectedFraudError();
+        } else if (!res.ok) {
+          throw new Error('Initial Trade Failed');
         }
         return res.json();
       })
@@ -108,7 +111,11 @@ const Transfer2Confirm = ({
         }
       })
       .catch(error => {
-        setResponseState(-1);
+        if (error instanceof SuspectedFraudError) {
+          setResponseState(-2);
+        } else {
+          setResponseState(-1);
+        }
         setLoading(false);
         console.log(error);
       });
@@ -133,8 +140,14 @@ const Transfer2Confirm = ({
       <View flex bottom marginH-30 marginB-50>
         <Button
           onPress={() => setIsModalVisible(true)}
-          label="Confirm Transfer"
-          disabled={loading}
+          label={
+            loading
+              ? 'Loading'
+              : response_state == -2
+              ? 'Account Suspended'
+              : 'Confirm Transfer'
+          }
+          disabled={loading || response_state == -2}
           backgroundColor={styles.rcoin}
         />
       </View>

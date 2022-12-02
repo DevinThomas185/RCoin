@@ -33,8 +33,7 @@ const IssueAmount = ({
   // TODO: CHANGE TO GET RAND TO PAY
   const setRands = (coins: number) => {
     fetch(
-      `${Config.API_URL}:8000/api/get_rand_to_return/?amount=` +
-        coins.toString(),
+      `${Config.API_URL}:8000/api/get_rand_to_pay?amount=` + coins.toString(),
       {
         method: 'GET',
         headers: {
@@ -45,8 +44,7 @@ const IssueAmount = ({
     )
       .then(res => res.json())
       .then(data => {
-        console.log(data);
-        setRandToPay(data['rand_to_return']);
+        setRandToPay(data['rand_to_pay']);
       })
       .catch(error => {
         console.log(error);

@@ -18,15 +18,18 @@ from solders.transaction_status import (
 from spl.token.constants import TOKEN_PROGRAM_ID
 
 from rcoin.solana_backend.common import (
+    RESERVE_ACCOUNT,
     SOLANA_CLIENT,
     LAMPORTS_PER_SOL,
     MINT_ACCOUNT,
     TOKEN_DECIMALS,
+    TOKEN_OWNER,
 )
 
 from rcoin.solana_backend.response import CustomResponse, Failure
 
 from rcoin.solana_backend.exceptions import BlockchainQueryFailedException
+
 
 def execute_query(query_function: Callable[[], CustomResponse]) -> CustomResponse:
     try:
@@ -82,6 +85,46 @@ def get_token_balance(public_key: PublicKey) -> float:
                 "amount"
             ]
         ) / (10**TOKEN_DECIMALS)
+
+    except Exception:
+        raise BlockchainQueryFailedException
+
+    return amount
+
+
+def get_reserve_balance() -> float:
+    solana_client = os.getenv("SOLANA_CLIENT")
+    assert solana_client is not None
+
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "getTokenAccountsByOwner",
+        "params": [
+            f"{str(TOKEN_OWNER)}",
+            {"programId": f"{TOKEN_PROGRAM_ID}"},
+            {"encoding": "jsonParsed"},
+        ],
+    }
+
+    try:
+
+        r = post(solana_client, json=payload)
+        j = r.json()
+        accounts = j["result"]["value"]
+        amount = None
+        for account in accounts:
+            if account["pubkey"] == str(RESERVE_ACCOUNT):
+                amount = float(
+                    account["account"]["data"]["parsed"]["info"]["tokenAmount"][
+                        "amount"
+                    ]
+                ) / (10**TOKEN_DECIMALS)
+
+                break
+
+        if amount is None:
+            raise BlockchainQueryFailedException
 
     except Exception:
         raise BlockchainQueryFailedException

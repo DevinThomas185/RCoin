@@ -15,5 +15,6 @@ launch.json
 node_modules
 stablecoin_env
 
+fraudulent_transactions_dataset.csv
 signer_1.json
 signer_2.json

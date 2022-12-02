@@ -21,7 +21,7 @@ const WithdrawStage0 = ({
 
   useEffect(() => {
     fetch(
-      `${Config.API_URL}:8000/api/get_rand_to_return/?amount=` +
+      `${Config.API_URL}:8000/api/get_rand_to_return?amount=` +
         coins_to_withdraw.toString(),
       {
         method: 'GET',

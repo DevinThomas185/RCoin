@@ -19,12 +19,10 @@ from jose import JWTError, jwt
 import smtplib
 import ssl
 from email.message import EmailMessage
+import math
+import time
+import pandas as pd
 
-import redis
-
-r = redis.StrictRedis(
-    host="localhost", port=6379, db=0, charset="utf-8", decode_responses=True
-)
 
 # import datetime
 from datetime import timezone, datetime, timedelta
@@ -66,6 +64,7 @@ from rcoin.issue import ShouldIssueStage, get_should_issue_stage
 import rcoin.paystack_api as paystack_api
 from rcoin.lock import redis_lock
 from rcoin.mobile_notification import notify_transacted, notify_issued, notify_withdrawn
+from rcoin.fraud_detection import fraud_detection
 import redis
 
 # Solana backend imports
@@ -89,7 +88,10 @@ app = FastAPI()
 if os.getenv("DEV"):
     r = redis.Redis(host="localhost", port=6379, db=0)
 else:
-    r = redis.Redis(host="localhost", port=6379, db=0, password=os.getenv("REDIS_PASS"))
+    r = redis.Redis(host="redis", port=6379, db=0, password=os.getenv("REDIS_PASS"))
+
+# Set recalculation count to 0
+r.set("reserve_ratio_count", 0)
 
 
 def update_reserve_ratio():
@@ -101,25 +103,26 @@ def update_reserve_ratio():
 
 
 def send_ratio_email():
-    ctx = ssl.create_default_context()
-    password = os.getenv("GMAIL_PASSWORD")
-    sender = "africanmicronation@gmail.com"
-    recipient = "africanmicronation@proton.me"
+    print("should have emailed, implement properly")
+    # ctx = ssl.create_default_context()
+    # password = os.getenv("GMAIL_PASSWORD")
+    # sender = "africanmicronation@gmail.com"
+    # recipient = "africanmicronation@proton.me"
 
-    edited_message = """
-    RATIO DROPPED!
-    CHECK IMMEDIATELY!
-    """
+    # edited_message = """
+    # RATIO DROPPED!
+    # CHECK IMMEDIATELY!
+    # """
 
-    msg = EmailMessage()
-    msg.set_content(edited_message)
-    msg["Subject"] = "!!! RATIO DROPPED !!!"
-    msg["From"] = sender
-    msg["To"] = recipient
+    # msg = EmailMessage()
+    # msg.set_content(edited_message)
+    # msg["Subject"] = "!!! RATIO DROPPED !!!"
+    # msg["From"] = sender
+    # msg["To"] = recipient
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
-        server.login(sender, password)
-        server.send_message(msg)
+    # with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
+    #     server.login(sender, password)
+    #     server.send_message(msg)
 
 
 @app.on_event("startup")
@@ -169,6 +172,7 @@ async def get_current_user(
     return user
 
 
+# DECORATORS
 def from_paystack(func):
     """Decorator for ensuring that a webhook comes from paystack"""
 
@@ -192,19 +196,126 @@ def from_paystack(func):
     return secure_function
 
 
+def not_fraudulent(func):
+    """Decorator for ensuring transactions are not fraudulent"""
+    
+    @functools.wraps(func)
+    async def check_function(*args, **kwargs):
+
+        user = kwargs["sender"]
+        db = kwargs["db"]
+        response = kwargs["response"]
+        assert(isinstance(user, User))
+        balance = get_user_token_balance(user.wallet_id).contents
+
+        if "issue_transaction" in kwargs:
+            data = kwargs["redeem_transaction"]
+            assert(isinstance(data, IssueTransaction))
+
+            transaction = pd.DataFrame(data={
+                "time": [time.time()],
+                "type": ["ISSUE"],
+                "amount": [data.amount_in_rands],
+                "sender": [0],  # ID for us
+                "balance_before": [balance],
+                "balance_after": [balance + data.amount_in_rands],
+                "receiver": [user.id],
+            })
+
+        elif "trade_transaction" in kwargs:
+            data = kwargs["trade_transaction"]
+            assert(isinstance(data, TradeTransaction))
+            receiver = await database_api.get_user(data.recipient_email, db=db)
+
+            transaction = pd.DataFrame(data={
+                "time": [time.time()],
+                "type": ["TRADE"],
+                "amount": [data.coins_to_transfer],
+                "sender": [user.id],
+                "balance_before": [balance],
+                "balance_after": [balance - data.coins_to_transfer],
+                "receiver": [receiver.id],
+            })
+
+        elif "redeem_transaction" in kwargs:
+            data = kwargs["issue_transaction"]
+            assert(isinstance(data, RedeemTransaction))
+
+            transaction = pd.DataFrame(data={
+                "time": [time.time()],
+                "type": ["REDEEM"],
+                "amount": [data.amount_in_coins],
+                "sender": [user.id],
+                "balance_before": [balance],
+                "balance_after": [balance - data.amount_in_coins],
+                "receiver": [0],  # ID for us
+            })
+        else:
+            raise Exception("How did we get here?")
+
+        result = fraud_detection.check_fraudulent(transaction)
+        if result == [0]:
+            print("NOT FRAUDULENT")
+        else:
+            print("FRAUDULENT - Sending Email")
+            now = datetime.now()
+            t = now.strftime('%X')
+            date = now.strftime("%A, %x")
+            subject = f"POSSIBLE FRAUD: {user.first_name} {user.last_name} at {t} on {date}"
+            message = f"""
+Details of transaction:
+
+User: {user.first_name} {user.last_name}
+User Email: {user.email}
+
+Transaction: {transaction["type"][0]}
+Amount: {"R" if isinstance(data, IssueTransaction) else "RCoin "} {transaction["amount"][0]}
+
+{"Recipient: " + receiver.first_name + " " + receiver.last_name if isinstance(data, TradeTransaction) else ""}
+{"Recipient Email: " + receiver.email if isinstance(data, TradeTransaction) else ""}
+
+Time: {t}
+Date: {date}
+            """
+            response.status_code = 409
+            database_api.suspend_user(user.id, db=db)
+            send_email(subject, message, user.email)
+            return {"status": "fraud"}
+
+        return await func(*args, **kwargs)
+
+    return check_function
+
+
+def not_suspended(func):
+    """Decorator for ensuring that a user is not currently suspended"""
+    @functools.wraps(func)
+    async def check_function(*args, **kwargs):
+        user = kwargs["sender"]
+        assert(isinstance(user, User))
+
+        if user.suspended:
+            return  # Do not continue if suspended
+        
+        return await func(*args, **kwargs)
+    return check_function
 def checkReserveRatio(func):
     """Decorator to check reserve ratio ever 10 api calls"""
 
-    def inner(*args, **kwargs):
-        reserve_ratio_recalculation_count += 1
-        if reserve_ratio_recalculation_count >= 10:
+    @functools.wraps(func)
+    async def inner(*args, **kwargs):
+        current_count = int(r.get("reserve_ratio_count"))
+        if current_count >= 10:
             update_reserve_ratio()
-            reserve_ratio_recalculation_count = 0
+            r.set("reserve_ratio_count", 0)
+        else:
+            r.set("reserve_ratio_count", current_count + 1)
+
         if float(r.get("reserve_ratio")) >= 1:
-            return func(*args, **kwargs)
+            return await func(*args, **kwargs)
         else:
             send_ratio_email()
-            return Failure().to_json()
+            return Failure("all transactions paused").to_json()
 
     return inner
 
@@ -270,12 +381,12 @@ async def signup(
 class JwtToken:
     iss = "imperial-server"
 
-    def __init__(self, user_id: str, email: str, name: str):
+    def __init__(self, user_id: str, email: str, name: str, trust_score: str, suspended: bool):
         current_time = datetime.now(tz=timezone.utc)
         self.iat = current_time
         self.exp = current_time + timedelta(days=31)
         self.jti = ""  # to uniquely identify, empty for now
-        self.context = {"user_id": user_id, "email": email, "name": name}
+        self.context = {"user_id": user_id, "email": email, "name": name, "trust_score": trust_score, "suspended": suspended}
 
     def get_jwt(self):
         return jwt.encode(self.__dict__, JWT_SECRET, algorithm="HS256")
@@ -296,7 +407,7 @@ async def login(
         )
 
     # Build the jwt
-    token = JwtToken(match.id, match.email, match.first_name)
+    token = JwtToken(match.id, match.email, match.first_name, str(match.trust_score), match.suspended)
     jwt_token = token.get_jwt()
     return {
         "access_token": jwt_token,
@@ -311,6 +422,8 @@ async def get_user(user: User = Depends(get_current_user)):
         "user_id": user.id,
         "email": user.email,
         "name": f"{user.first_name} {user.last_name}",
+        "trust_score": user.trust_score,
+        "suspended": user.suspended,
         "walled_id": user.wallet_id,
     }
 
@@ -415,9 +528,12 @@ async def transactionHistory(
 
 
 @app.post("/api/trade")
+@not_fraudulent
+@not_suspended
 @checkReserveRatio
 async def trade(
     trade_transaction: TradeTransaction,
+    response: Response,
     sender: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
@@ -440,6 +556,9 @@ async def trade(
 
 # REDEEM
 @app.post("/api/redeem")
+@not_fraudulent
+@not_suspended
+@checkReserveRatio
 async def redeem(
     redeem_transaction: RedeemTransaction,
     user: User = Depends(get_current_user),
@@ -485,6 +604,7 @@ async def get_second_signature(transaction: Transaction) -> Transaction:
 
 
 @app.post("/api/complete-trade")
+@not_suspended
 @checkReserveRatio
 async def complete_trade(
     trade_transaction: CompleteTradeTransaction,
@@ -553,6 +673,7 @@ async def is_trade_email_valid(
 
 # TODO[ks1020]: We need a way of reconciling if this fails
 @app.post("/api/complete-redeem")
+@not_suspended
 @checkReserveRatio
 async def complete_redeem(
     redeem_transaction: CompleteRedeemTransaction,
@@ -626,36 +747,55 @@ async def get_default_bank_accounts(
     }
 
 
-@app.get("/api/get_coins_to_issue")
+#### TRUST CALCULATIONS ON ISSUE AND WITHDRAW
+@app.get("/api/get_trust_score")
+async def get_trust_score(
+    user: User = Depends(get_current_user),
+) -> list[dict[str, Any]]:
+    # TODO[devin]: DO NOT REVEAL TO THE USER THEIR TRUST SCORES
+    return user.trust_score
+
+# GET AMOUNT OF RAND TO PAY - ISSUE
+@app.get("/api/get_rand_to_pay")
 async def get_coins_to_issue_api(
     amount: float,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
-) -> dict[str, int]:
-    return {"coins_to_issue": get_coins_to_issue(amount)}
+) -> dict[str, float]:
+    return {"rand_to_pay": get_rand_to_pay(amount, user)}
+
+def get_rand_to_pay(
+    amount_in_coins: float,
+    user: User,
+) -> float:
+    def receive_after_fee(a):
+        a *= 100
+        c = 0 if a < 1000 else 100
+        return round((a - (1.15 * (math.ceil(0.029 * a) + c)) ) / 100, 2)
+
+    res = amount_in_coins
+    after_fee = receive_after_fee(res)
+    print(after_fee)
+    while after_fee < amount_in_coins:
+        res += 1
+        after_fee = receive_after_fee(res)
+        print(after_fee, amount_in_coins - after_fee)
+
+    return res * user.trust_score
 
 
+# GET AMOUNT OF RAND TO RETURN - REDEEM
 @app.get("/api/get_rand_to_return")
 async def get_rand_to_return_api(
     amount: float,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
-) -> dict[str, int]:
+) -> dict[str, float]:
     return {"rand_to_return": get_rand_to_return(amount)}
 
-
-# GET AMOUNT OF COINS TO ISSUE
-def get_coins_to_issue(
-    amount_of_rand: float,
-) -> int:
-    return int(amount_of_rand)  # TODO[dt120]: Add in trust calculations
-
-
-# GET AMOUNT OF RAND TO RETURN
 def get_rand_to_return(
     amount_in_coins: float,
-) -> int:
-    return int(amount_in_coins)  # TODO[dt120]: Add in trust calculations
+) -> float:
+    return amount_in_coins
+
 
 
 # GET A NEW TRANSACTION ID FOR A MERCHANT TRANSACTION
@@ -907,38 +1047,48 @@ async def change_name(
 
 # SUPPORT MESSAGE
 @app.post("/api/send_message", status_code=status.HTTP_200_OK)
-async def sendMessage(
+async def send_support_message(
     request: Request,
-    response: Response,
     user: User = Depends(get_current_user),
 ) -> None:
     data = await request.json()
 
+    edited_message = """
+{}
+
+{}
+    """.format(
+        data["title"], data["message"]
+    )
+
+    subject = "Support for {} {} {}".format(
+        user.first_name,
+        user.last_name,
+        datetime.now().strftime("at %H:%M:%S on %d/%m/%Y"),
+    )
+
+    send_email(subject, edited_message, user.email)
+
+
+def send_email(
+    subject: str, 
+    message: str,
+    reply_to=None
+) -> None:
     ctx = ssl.create_default_context()
     password = os.getenv("GMAIL_PASSWORD")
     sender = "africanmicronation@gmail.com"
     recipient = "africanmicronation@proton.me"
 
-    edited_message = """
-    {}
-
-    {}
-    """.format(
-        data["title"], data["message"]
-    )
-
     msg = EmailMessage()
-    msg.set_content(edited_message)
-    msg.add_header("reply-to", user.email)
-    msg["Subject"] = "Support for {} {} {}".format(
-        user.first_name,
-        user.last_name,
-        datetime.now().strftime("at %H:%M:%S on %d/%m/%Y"),
-    )
+    msg.set_content(message)
+    if reply_to is not None:
+        msg.add_header('reply-to', reply_to)
+    msg["Subject"] = subject
     msg["From"] = sender
-    msg["To"] = recipient
+    msg["to"] = recipient
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
+    with smtplib.SMTP_SSL('smtp.gmail.com', port=465, context=ctx) as server:
         server.login(sender, password)
         server.send_message(msg)
 

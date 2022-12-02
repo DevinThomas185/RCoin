@@ -52,6 +52,7 @@ from rcoin.solana_backend.transaction import (
 from rcoin.solana_backend.query import (
     execute_query,
     get_processed_transactions_for_account,
+    get_reserve_balance,
     get_token_balance,
     get_transaction_details,
     has_token_account,
@@ -261,7 +262,7 @@ def construct_withdraw_transaction(user_key: str, amount: float) -> CustomRespon
 ### Query the Blockchain ###
 def get_total_tokens_issued() -> CustomResponse:
     return execute_query(
-        lambda: Success("amount", TOTAL_SUPPLY - get_token_balance(TOKEN_OWNER))
+        lambda: Success("amount", TOTAL_SUPPLY - get_reserve_balance())
     )
 
 

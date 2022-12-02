@@ -1600,7 +1600,7 @@
     "read-package-json-fast" "^3.0.0"
     "which" "^3.0.0"
 
-"@react-native-async-storage/async-storage@^1.13.4":
+"@react-native-async-storage/async-storage@^1.13.4", "@react-native-async-storage/async-storage@^1.17.11":
   "integrity" "sha512-bzs45n5HNcDq6mxXnSsOHysZWn1SbbebNxldBXCQs8dSvF8Aor9KCdpm+TpnnGweK3R6diqsT8lFhX77VX0NFw=="
   "resolved" "https://registry.npmjs.org/@react-native-async-storage/async-storage/-/async-storage-1.17.11.tgz"
   "version" "1.17.11"
@@ -8314,10 +8314,8 @@
     "prop-types" "^15.7.2"
     "yargs" "^16.1.1"
 
-"react-native-webview@*":
-  "integrity" "sha512-yq3con7vDQUQKAyl9a7pJaR3A1/cI0K2AeRhGugXfWQfdsne18pddJwQuOsc63khecipeCbB8pthCqw0UlsgVw=="
-  "resolved" "https://registry.npmjs.org/react-native-webview/-/react-native-webview-11.25.0.tgz"
-  "version" "11.25.0"
+"react-native-webview@*", "react-native-webview@^11.23.1":
+  "version" "11.23.1"
   dependencies:
     "escape-string-regexp" "2.0.0"
     "invariant" "2.2.4"
