@@ -21,6 +21,7 @@ const AccountSelect = ({
           {auth.authData?.token_info.name}
         </Text>
         <Text text70>{auth.authData?.token_info.email}</Text>
+        <Text>{auth.authData?.token_info.trust_score}</Text>
       </View>
 
       <View flex>

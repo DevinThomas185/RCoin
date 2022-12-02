@@ -24,7 +24,8 @@ const PendingLoader = ({
           />
         </View>
       );
-    } else {
+    } else if (response_state == -1) {
+      // Generic Failure
       return (
         <View flex margin-40 center>
           <Text center text60 color={Style.failed}>
@@ -32,6 +33,19 @@ const PendingLoader = ({
           </Text>
         </View>
       );
+    } else if (response_state == -2) {
+      // Suspected Fraud
+      return (
+        <View flex margin-20 center>
+          <Text center text70 color={Style.failed}>
+            This transaction has been flagged for fraud. The RCoin team have
+            been alerted and will reach out imminently. Your account has been
+            temporarily suspended until we can rectify the matter.
+          </Text>
+        </View>
+      );
+    } else {
+      return <></>;
     }
   } else {
     return <></>;

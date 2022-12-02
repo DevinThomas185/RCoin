@@ -43,6 +43,8 @@ class User(Base):
     sort_code = sql.Column(sql.Text, index=True)
     document_number = sql.Column(sql.Text, index=True)
     recipient_code = sql.Column(sql.Text, index=True)
+    trust_score = sql.Column(sql.Float, index=True, default=1.05)
+    suspended = sql.Column(sql.Boolean, index=True, default=False)
 
 
 class Device(Base):
@@ -368,5 +370,24 @@ async def change_name(
     db.query(User).filter(User.id == user_id).update(
         {User.first_name: new_first_name, User.last_name: new_last_name},
         synchronize_session=False,
+    )
+    db.commit()
+
+
+async def suspend_user(
+    user_id: int,
+    db: "Session",
+) -> None:
+    db.query(User).filter(User.id == user_id).update(
+        {User.suspended: True}, synchronize_session=False
+    )
+    db.commit()
+
+async def unsuspend_user(
+    user_id: int,
+    db: "Session",
+) -> None:
+    db.query(User).filter(User.id == user_id).update(
+        {User.suspended: False}, synchronize_session=False
     )
     db.commit()
