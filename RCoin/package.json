@@ -5,6 +5,7 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "postinstall": "patch-package",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
@@ -31,6 +32,7 @@
     "react": "18.1.0",
     "react-native": "0.70.5",
     "react-native-biometrics": "^3.0.1",
+    "react-native-camera": "^4.2.1",
     "react-native-config": "^1.4.11",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.8.0",
@@ -40,6 +42,7 @@
     "react-native-notifications": "^4.3.3",
     "react-native-pager-view": "^6.1.0",
     "react-native-paystack-webview": "^4.0.3",
+    "react-native-permissions": "^3.6.1",
     "react-native-qrcode-scanner": "^1.5.5",
     "react-native-qrcode-svg": "^6.1.2",
     "react-native-reanimated": "^2.12.0",

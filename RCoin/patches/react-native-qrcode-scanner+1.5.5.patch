@@ -1,0 +1,165 @@
+diff --git a/node_modules/react-native-qrcode-scanner/index.js b/node_modules/react-native-qrcode-scanner/index.js
+index b9bb661..6b04be5 100644
+--- a/node_modules/react-native-qrcode-scanner/index.js
++++ b/node_modules/react-native-qrcode-scanner/index.js
+@@ -1,6 +1,6 @@
+ 'use strict';
+ 
+-import React, { Component } from 'react';
++import React, {Component} from 'react';
+ import PropTypes from 'prop-types';
+ 
+ import {
+@@ -16,8 +16,8 @@ import {
+   PermissionsAndroid,
+ } from 'react-native';
+ 
+-import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+-import { RNCamera as Camera } from 'react-native-camera';
++import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
++import {RNCamera as Camera} from 'react-native-camera';
+ 
+ const CAMERA_FLASH_MODE = Camera.Constants.FlashMode;
+ const CAMERA_FLASH_MODES = [
+@@ -71,14 +71,12 @@ export default class QRCodeScanner extends Component {
+           flex: 1,
+           alignItems: 'center',
+           justifyContent: 'center',
+-        }}
+-      >
++        }}>
+         <Text
+           style={{
+             textAlign: 'center',
+             fontSize: 16,
+-          }}
+-        >
++          }}>
+           Camera not authorized
+         </Text>
+       </View>
+@@ -89,14 +87,12 @@ export default class QRCodeScanner extends Component {
+           flex: 1,
+           alignItems: 'center',
+           justifyContent: 'center',
+-        }}
+-      >
++        }}>
+         <Text
+           style={{
+             textAlign: 'center',
+             fontSize: 16,
+-          }}
+-        >
++          }}>
+           ...
+         </Text>
+       </View>
+@@ -116,9 +112,8 @@ export default class QRCodeScanner extends Component {
+           height: Dimensions.get('window').height,
+           width: Dimensions.get('window').width,
+           backgroundColor: 'black',
+-        }}
+-      >
+-        <Text style={{ color: 'white' }}>Tap to activate camera</Text>
++        }}>
++        <Text style={{color: 'white'}}>Tap to activate camera</Text>
+       </View>
+     ),
+   };
+@@ -157,10 +152,10 @@ export default class QRCodeScanner extends Component {
+       }).then(granted => {
+         const isAuthorized = granted === PermissionsAndroid.RESULTS.GRANTED;
+ 
+-        this.setState({ isAuthorized, isAuthorizationChecked: true });
++        this.setState({isAuthorized, isAuthorizationChecked: true});
+       });
+     } else {
+-      this.setState({ isAuthorized: true, isAuthorizationChecked: true });
++      this.setState({isAuthorized: true, isAuthorizationChecked: true});
+     }
+ 
+     if (this.props.fadeIn) {
+@@ -187,14 +182,14 @@ export default class QRCodeScanner extends Component {
+   }
+ 
+   disable() {
+-    this.setState({ disableVibrationByUser: true });
++    this.setState({disableVibrationByUser: true});
+   }
+   enable() {
+-    this.setState({ disableVibrationByUser: false });
++    this.setState({disableVibrationByUser: false});
+   }
+ 
+   _setScanning(value) {
+-    this.setState({ scanning: value });
++    this.setState({scanning: value});
+   }
+ 
+   _setCamera(value) {
+@@ -217,7 +212,7 @@ export default class QRCodeScanner extends Component {
+             ]).start();
+           }
+         }
+-      }
++      },
+     );
+   }
+ 
+@@ -231,7 +226,7 @@ export default class QRCodeScanner extends Component {
+       if (this.props.reactivate) {
+         this._scannerTimeout = setTimeout(
+           () => this._setScanning(false),
+-          this.props.reactivateTimeout
++          this.props.reactivateTimeout,
+         );
+       }
+     }
+@@ -284,8 +279,7 @@ export default class QRCodeScanner extends Component {
+         type={this.props.cameraType}
+         flashMode={this.props.flashMode}
+         captureAudio={false}
+-        {...this.props.cameraProps}
+-      >
++        >
+         {this._renderCameraMarker()}
+       </Camera>
+     );
+@@ -307,13 +301,13 @@ export default class QRCodeScanner extends Component {
+       );
+     }
+ 
+-    const { isAuthorized, isAuthorizationChecked } = this.state;
++    const {isAuthorized, isAuthorizationChecked} = this.state;
+     if (isAuthorized) {
+       if (this.props.cameraTimeout > 0) {
+         this.timer && clearTimeout(this.timer);
+         this.timer = setTimeout(
+           () => this._setCamera(false),
+-          this.props.cameraTimeout
++          this.props.cameraTimeout,
+         );
+       }
+ 
+@@ -326,8 +320,7 @@ export default class QRCodeScanner extends Component {
+               height:
+                 (this.props.cameraStyle && this.props.cameraStyle.height) ||
+                 styles.camera.height,
+-            }}
+-          >
++            }}>
+             {this._renderCameraComponent()}
+           </Animated.View>
+         );
+@@ -350,7 +343,9 @@ export default class QRCodeScanner extends Component {
+         <View style={[styles.infoView, this.props.topViewStyle]}>
+           {this._renderTopContent()}
+         </View>
+-        <View style={this.props.cameraContainerStyle}>{this._renderCamera()}</View>
++        <View style={this.props.cameraContainerStyle}>
++          {this._renderCamera()}
++        </View>
+         <View style={[styles.infoView, this.props.bottomViewStyle]}>
+           {this._renderBottomContent()}
+         </View>
