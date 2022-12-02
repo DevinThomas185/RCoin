@@ -111,7 +111,6 @@ def get_reserve_balance() -> float:
 
         r = post(solana_client, json=payload)
         j = r.json()
-        print(j)
         accounts = j["result"]["value"]
         amount = None
         for account in accounts:

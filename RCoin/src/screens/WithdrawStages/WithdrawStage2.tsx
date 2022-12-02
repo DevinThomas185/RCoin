@@ -10,6 +10,7 @@ import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
 import PendingLoader from '../../components/PendingLoader';
 import Config from 'react-native-config';
+import SuspectedFraudError from '../../errors/SuspectedFraudError';
 
 // Confirmation
 const WithdrawStage2 = ({
@@ -50,7 +51,9 @@ const WithdrawStage2 = ({
       body: JSON.stringify({amount_in_coins: coins_to_withdraw}, null, 2),
     })
       .then(res => {
-        if (!res.ok) {
+        if (res.status == 409) {
+          throw new SuspectedFraudError();
+        } else if (!res.ok) {
           throw new Error('initial redeem failed');
         }
         return res.json();
@@ -108,7 +111,11 @@ const WithdrawStage2 = ({
         }
       })
       .catch(error => {
-        setResponseState(-1);
+        if (error instanceof SuspectedFraudError) {
+          setResponseState(-2);
+        } else {
+          setResponseState(-1);
+        }
         setLoading(false);
         console.log(error);
       });

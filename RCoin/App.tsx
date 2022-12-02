@@ -11,9 +11,10 @@ import {AuthStack} from './src/routes/AuthStack';
 import {KeypairProvider} from './src/contexts/Keypair';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from './src/style/style';
-import {Image, LoaderScreen} from 'react-native-ui-lib';
+import {Image, LoaderScreen, Text, View} from 'react-native-ui-lib';
 import Home from './src/screens/Home';
 import {BalanceProvider} from './src/contexts/BalanceContext';
+import Style from './src/style/style';
 import {NotificationContainer} from './src/components/NotificationContainer';
 import {LogBox} from 'react-native';
 
@@ -23,6 +24,38 @@ LogBox.ignoreLogs(['Invalid prop textStyle of type array supplied to Cell']);
 const App = () => {
   const AuthRouter = ({children}: {children: JSX.Element}) => {
     const {authData, loading} = useAuth();
+
+    if (authData?.token_info.suspended) {
+      return (
+        <View flex center>
+          <Image
+            source={require('./src/style/Logo.png')}
+            style={{width: 100, height: 100}}
+          />
+          <Text center text10 color={Style.rcoin} margin-10>
+            Hey{' '}
+            {authData?.token_info.name.substring(
+              0,
+              authData?.token_info.name.indexOf(' '),
+            )}
+            !
+          </Text>
+          <Text center text40 color={Style.rcoin} margin-10>
+            Please do not be alarmed
+          </Text>
+          <Text center text60 color={Style.rcoin} margin-10>
+            Your account has been temporarily suspended due to a suspected
+            fraudulent transaction.
+          </Text>
+          <Text center text60 color={Style.rcoin} margin-10>
+            You will be contacted by a member of the RCoin team shortly to help
+            to resolve this and hopefully get you back online with RCoin!
+          </Text>
+          <Image href="./src/style/Logo.png" />
+        </View>
+      );
+    }
+
     if (loading) {
       return (
         <LoaderScreen

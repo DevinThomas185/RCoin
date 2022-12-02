@@ -10,6 +10,8 @@ export type TokenInfo = {
   user_id: string;
   email: string;
   name: string;
+  trust_score: string;
+  suspended: boolean;
   wallet_id: string;
 };
 
@@ -62,6 +64,8 @@ const signIn = (
                   user_id: data_['user_id'],
                   email: data_['email'],
                   name: data_['name'],
+                  trust_score: data_['trust_score'],
+                  suspended: data_['suspended'],
                   wallet_id: data_['walled_id'],
                 },
               });
