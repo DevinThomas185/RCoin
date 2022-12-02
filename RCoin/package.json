@@ -50,6 +50,7 @@
     "react-native-table-component": "^1.2.2",
     "react-native-ui-lib": "^6.23.1",
     "react-native-vector-icons": "^9.2.0",
+    "react-native-webview": "^11.23.1",
     "react-native-wizard": "^2.1.0",
     "react-navigation": "^4.4.4",
     "tweetnacl": "^1.0.3",
