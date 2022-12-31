@@ -1,10 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "./theme";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/HomePage/Home";
 import AuditPage from "./components/AuditPage/AuditPage";
 import DownloadPage from "./components/DownloadPage/DownloadPage";

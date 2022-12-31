@@ -11,4 +11,8 @@ export const rcoinBlue = defineStyle({
   700: "#2E3F6B",
   800: "#1F2A47",
   900: "#0F1524",
+  1000: "#FFFFFF", //WHITE
+  1100: "#1E1E1E", //DARK GREY
+  1200: "#11B05A", //BLOCKCHAIN GREEN
+  1300: "#b467f0", //SOLANA PURPLE
 });
