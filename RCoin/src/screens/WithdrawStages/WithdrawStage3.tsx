@@ -1,18 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View, Button, Image} from 'react-native-ui-lib';
+import {NavigationScreenProp} from 'react-navigation';
 import styles from '../../style/style';
 
 // Success
 const WithdrawStage3 = ({
+  navigation,
   nextStage,
   coins_to_withdraw,
-  rands_being_credited,
   bank_account,
   transactionId,
 }: {
+  navigation: NavigationScreenProp<any, any>;
   nextStage: React.Dispatch<void>;
   coins_to_withdraw: number;
-  rands_being_credited: number;
   bank_account: {[key: string]: string};
   transactionId: string;
 }) => {
@@ -38,7 +39,8 @@ const WithdrawStage3 = ({
           account.
         </Text>
         <Text style={styles.buttonCaption}>
-          You have received R{rands_being_credited}.
+          You will receive R{coins_to_withdraw} to the bank account{' '}
+          {bank_account.bank_account} {bank_account.sort_code}.
         </Text>
         <Text style={styles.buttonCaption}>
           Transaction ID = {transactionId}
@@ -49,7 +51,10 @@ const WithdrawStage3 = ({
           You can now see your updated balance on the dashboard
         </Text>
         <Button
-          onPress={nextStage}
+          onPress={() => {
+            navigation.navigate('Home');
+            nextStage();
+          }}
           label="RCoin Dashboard"
           backgroundColor={styles.rcoin}
         />

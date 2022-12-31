@@ -12,7 +12,7 @@ Style = {
   solana_surge_green: '#00FFA3',
   solana_ocean_blue: '#03E1FF',
   solana_purple_dino: '#DC1FFF',
-  solana_black: '#000000',
+  solana_black: '#3F3F3F',
 
   title: {
     //top right bottom left
@@ -61,9 +61,9 @@ Style = {
   },
 
   transactionIcon: {
-    width: 60,
-    height: 60,
-    marginTop: 3,
+    width: 50,
+    height: 50,
+    marginRight: 10,
   },
 
   arrow: {
@@ -73,10 +73,8 @@ Style = {
   },
 
   qrIcon: {
-    width: 60,
-    height: 60,
-    marginTop: 3,
-    marginRight: 20,
+    width: 40,
+    height: 40,
     // justifyContent: 'right',
   },
 

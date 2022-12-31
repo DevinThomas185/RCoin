@@ -83,11 +83,10 @@ def verify_account_ZA(
 
 
 def create_transfer_recipient_by_bank_account(
-    bank_type: str,
-    name: str,
+    first_name: str,
+    last_name: str,
     account_number: str,
     bank_code: str,
-    currency: str,
 ):
     response = requests.post(
         """https://api.paystack.co/transferrecipient""",
@@ -96,11 +95,11 @@ def create_transfer_recipient_by_bank_account(
             "Content-Type": "application.json",
         },
         json={
-            "type": bank_type,
-            "name": name,
+            "type": "basa",
+            "name": first_name + " " + last_name,
             "account_number": account_number,
             "bank_code": bank_code,
-            "currency": currency,
+            "currency": "ZAR",
         },
     ).json()
 

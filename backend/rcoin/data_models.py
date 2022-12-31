@@ -12,10 +12,39 @@ class UserInformation(BaseModel):
     bank_account: str
     sort_code: str
     document_number: str
-    recipient_code: str
 
     class Config:
         orm_mode = True
+
+
+class UserTableInfo(BaseModel):
+    email: str
+    password: Union[str, bytes]
+    first_name: str
+    last_name: str
+    wallet_id: Union[str, bytes]
+    document_number: str
+
+    class Config:
+        orm_mode = True
+
+
+class BankAccount(BaseModel):
+    user_id: int
+    bank_account: str
+    sort_code: str
+    recipient_code: str
+    default: bool
+
+
+class AlterBankAccount(BaseModel):
+    user_id: int
+    bank_account: str
+    sort_code: str
+
+
+class Friend(BaseModel):
+    email: str
 
 
 class LoginInformation(BaseModel):
@@ -30,6 +59,7 @@ class IssueTransaction(BaseModel):
     # email: str
     # wallet: str
     amount_in_rands: float
+
 
 class AuditTransactionsRequest(BaseModel):
     offset: int

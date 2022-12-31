@@ -5,8 +5,13 @@ import IssueAmount from './IssueStages/Issue0Amount';
 import IssueSummary from './IssueStages/Issue1Summary';
 import IssueSuccess from './IssueStages/Issue2Success';
 import styles from '../style/style';
+import {NavigationScreenProp} from 'react-navigation';
 
-const TransferScreen = () => {
+const IssueScreen = ({
+  navigation,
+}: {
+  navigation: NavigationScreenProp<any, any>;
+}) => {
   const [stage, setStage] = useState(0);
   const [coins_to_issue, setCoinsToIssue] = useState(0.0);
   const [rand_to_pay, setRandToPay] = useState(0.0);
@@ -49,10 +54,12 @@ const TransferScreen = () => {
     } else {
       return (
         <IssueSuccess
+          navigation={navigation}
           nextStage={() => {
             setStage(0);
           }}
           rand_to_pay={rand_to_pay}
+          coins_to_issue={coins_to_issue}
         />
       );
     }
@@ -96,4 +103,4 @@ const TransferScreen = () => {
   );
 };
 
-export default TransferScreen;
+export default IssueScreen;

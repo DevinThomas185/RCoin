@@ -1,40 +1,88 @@
 {
-    "transaction_history": [
-        {
-            "sender": "adam@gmail.com",
-            "recipient": "quadam@gmail.com",
-            "amount": 120,
-            "signature": "ak93jkasdf392klasdfk2393lkasjfo23i2932jerw"
-        },
-        {
-            "sender": "adam@gmail.com",
-            "recipient": "reserve",
-            "amount": 321,
-            "signature": "ak93jkasdf392klasdfasdifj93k2393lkasjfoi2932jerw"
-        },
-        {
-            "sender": "quadam@gmail.com",
-            "recipient": "adam@gmail.com",
-            "amount": 45,
-            "signature": "ak93jkasdf392kdlaasdfj2sdfk2393lkasjfoi2932jerw"
-        },
-        {
-            "sender": "reserve",
-            "recipient": "adam@gmail.com",
-            "amount": 54,
-            "signature": "ak93jkasdf392klasdfwfoask2393lkasjfosdfi2932jerw"
-        },
-        {
-            "sender": "adam@gmail.com",
-            "recipient": "quadam@gmail.com",
-            "amount": 42,
-            "signature": "ak93jkasdf392klaasldfj3sdfk2393lkasjfoi223932jerw"
-        },
-        {
-            "sender": "quadam@gmail.com",
-            "recipient": "adam@gmail.com",
-            "amount": 90,
-            "signature": "ak93jkasdf392klaasldfj3sdfk2393lkasjfoiasf2932jerw"
-        }
-    ]
+  "transaction_history": [
+    {
+      "sender": "adam@gmail.com",
+      "recipient": "quadam@gmail.com",
+      "amount": 120,
+      "transaction_type": "send",
+      "signature": "ak93jkasdf392klasdfk2393lkasjfo23i2932jerw"
+    },
+    {
+      "sender": "adam@gmail.com",
+      "recipient": "reserve",
+      "amount": 321,
+      "transaction_type": "deposit",
+      "signature": "ak93jkasdf392klasdfasdifj93k2393lkasjfoi2932jerw"
+    },
+    {
+      "sender": "quadam@gmail.com",
+      "recipient": "adam@gmail.com",
+      "amount": 45,
+      "transaction_type": "send",
+      "signature": "ak93jkasdf392kdlaasdfj2sdfk2393lkasjfoi2932jerw"
+    },
+    {
+      "sender": "reserve",
+      "recipient": "adam@gmail.com",
+      "amount": 54,
+      "transaction_type": "recieve",
+      "signature": "ak93jkasdf392klasdfwfoask2393lkasjfosdfi2932jerw"
+    },
+    {
+      "sender": "adam@gmail.com",
+      "recipient": "quadam@gmail.com",
+      "amount": 42,
+      "transaction_type": "deposit",
+      "signature": "ak93jkasdf392klaasldfj3sdfk2393lkasjfoi223932jerw"
+    },
+    {
+      "sender": "quadam@gmail.com",
+      "recipient": "adam@gmail.com",
+      "amount": 90,
+      "transaction_type": "withdraw",
+      "signature": "ak93jkasdf392klaasldfj3sdfk2393lkasjfoiasf2932jerw"
+    },
+    {
+      "sender": "adam@gmail.com",
+      "recipient": "quadam@gmail.com",
+      "amount": 120,
+      "transaction_type": "send",
+      "signature": "2ak93jkasdf392klasdfk2393lkasjfo23i2932jerw"
+    },
+    {
+      "sender": "adam@gmail.com",
+      "recipient": "reserve",
+      "amount": 321,
+      "transaction_type": "deposit",
+      "signature": "2ak93jkasdf392klasdfasdifj93k2393lkasjfoi2932jerw"
+    },
+    {
+      "sender": "quadam@gmail.com",
+      "recipient": "adam@gmail.com",
+      "amount": 45,
+      "transaction_type": "send",
+      "signature": "2ak93jkasdf392kdlaasdfj2sdfk2393lkasjfoi2932jerw"
+    },
+    {
+      "sender": "reserve",
+      "recipient": "adam@gmail.com",
+      "amount": 54,
+      "transaction_type": "recieve",
+      "signature": "2ak93jkasdf392klasdfwfoask2393lkasjfosdfi2932jerw"
+    },
+    {
+      "sender": "adam@gmail.com",
+      "recipient": "quadam@gmail.com",
+      "amount": 42,
+      "transaction_type": "deposit",
+      "signature": "2ak93jkasdf392klaasldfj3sdfk2393lkasjfoi223932jerw"
+    },
+    {
+      "sender": "quadam@gmail.com",
+      "recipient": "adam@gmail.com",
+      "amount": 90,
+      "transaction_type": "withdraw",
+      "signature": "2ak93jkasdf392klaasldfj3sdfk2393lkasjfoiasf2932jerw"
+    }
+  ]
 }

@@ -35,11 +35,14 @@ const NameDetail = () => {
         setResponded(true);
         if (res.status == 200) {
           setSuccess(true);
+          setNewFirstName('');
+          setNewLastName('');
         }
       })
       .catch(error => {
         console.log(error);
       });
+    auth.refresh();
   };
 
   return (
@@ -63,6 +66,7 @@ const NameDetail = () => {
           <TextField
             placeholder="New First Name"
             style={styles.input}
+            value={new_first_name}
             onChangeText={(value: string) => {
               setNewFirstName(value);
             }}
@@ -71,6 +75,7 @@ const NameDetail = () => {
           <TextField
             placeholder="New Last Name"
             style={styles.input}
+            value={new_last_name}
             onChangeText={(value: string) => {
               setNewLastName(value);
             }}

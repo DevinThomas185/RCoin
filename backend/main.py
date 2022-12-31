@@ -31,6 +31,7 @@ from rcoin.solana_backend.api import (
     get_recipient_for_trade_transaction,
     get_total_tokens_issued,
     get_transfer_amount_for_transaction,
+    get_user_token_balance,
 )
 
 from rcoin.solana_backend.response import Success, Failure
@@ -52,6 +53,10 @@ from rcoin.data_models import (
     TokenResponse,
     TradeEmailValid,
     UserInformation,
+    UserTableInfo,
+    BankAccount,
+    AlterBankAccount,
+    Friend,
     IssueTransaction,
     TradeTransaction,
     AuditTransactionsRequest,
@@ -103,26 +108,11 @@ def update_reserve_ratio():
 
 
 def send_ratio_email():
-    print("should have emailed, implement properly")
-    # ctx = ssl.create_default_context()
-    # password = os.getenv("GMAIL_PASSWORD")
-    # sender = "africanmicronation@gmail.com"
-    # recipient = "africanmicronation@proton.me"
-
-    # edited_message = """
-    # RATIO DROPPED!
-    # CHECK IMMEDIATELY!
-    # """
-
-    # msg = EmailMessage()
-    # msg.set_content(edited_message)
-    # msg["Subject"] = "!!! RATIO DROPPED !!!"
-    # msg["From"] = sender
-    # msg["To"] = recipient
-
-    # with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
-    #     server.login(sender, password)
-    #     server.send_message(msg)
+    message = """
+RATIO DROPPED!
+CHECK IMMEDIATELY!
+    """
+    send_email("!!! RATIO DROPPED !!!", message)
 
 
 @app.on_event("startup")
@@ -198,58 +188,67 @@ def from_paystack(func):
 
 def not_fraudulent(func):
     """Decorator for ensuring transactions are not fraudulent"""
-    
+
     @functools.wraps(func)
     async def check_function(*args, **kwargs):
 
-        user = kwargs["sender"]
         db = kwargs["db"]
         response = kwargs["response"]
-        assert(isinstance(user, User))
+        user = kwargs["user"] if "user" in kwargs else kwargs["sender"]
+        assert isinstance(user, User)
         balance = get_user_token_balance(user.wallet_id).contents
 
         if "issue_transaction" in kwargs:
-            data = kwargs["redeem_transaction"]
-            assert(isinstance(data, IssueTransaction))
+            data = kwargs["issue_transaction"]
+            assert isinstance(data, IssueTransaction)
+            assert isinstance(user, User)
 
-            transaction = pd.DataFrame(data={
-                "time": [time.time()],
-                "type": ["ISSUE"],
-                "amount": [data.amount_in_rands],
-                "sender": [0],  # ID for us
-                "balance_before": [balance],
-                "balance_after": [balance + data.amount_in_rands],
-                "receiver": [user.id],
-            })
+            transaction = pd.DataFrame(
+                data={
+                    "time": [time.time()],
+                    "type": ["ISSUE"],
+                    "amount": [data.amount_in_rands],
+                    "sender": [0],  # ID for us
+                    "balance_before": [balance],
+                    "balance_after": [balance + data.amount_in_rands],
+                    "receiver": [user.id],
+                }
+            )
 
         elif "trade_transaction" in kwargs:
             data = kwargs["trade_transaction"]
-            assert(isinstance(data, TradeTransaction))
+            assert isinstance(data, TradeTransaction)
+            assert isinstance(user, User)
             receiver = await database_api.get_user(data.recipient_email, db=db)
 
-            transaction = pd.DataFrame(data={
-                "time": [time.time()],
-                "type": ["TRADE"],
-                "amount": [data.coins_to_transfer],
-                "sender": [user.id],
-                "balance_before": [balance],
-                "balance_after": [balance - data.coins_to_transfer],
-                "receiver": [receiver.id],
-            })
+            transaction = pd.DataFrame(
+                data={
+                    "time": [time.time()],
+                    "type": ["TRADE"],
+                    "amount": [data.coins_to_transfer],
+                    "sender": [user.id],
+                    "balance_before": [balance],
+                    "balance_after": [balance - data.coins_to_transfer],
+                    "receiver": [receiver.id],
+                }
+            )
 
         elif "redeem_transaction" in kwargs:
-            data = kwargs["issue_transaction"]
-            assert(isinstance(data, RedeemTransaction))
+            data = kwargs["redeem_transaction"]
+            assert isinstance(data, RedeemTransaction)
+            assert isinstance(user, User)
 
-            transaction = pd.DataFrame(data={
-                "time": [time.time()],
-                "type": ["REDEEM"],
-                "amount": [data.amount_in_coins],
-                "sender": [user.id],
-                "balance_before": [balance],
-                "balance_after": [balance - data.amount_in_coins],
-                "receiver": [0],  # ID for us
-            })
+            transaction = pd.DataFrame(
+                data={
+                    "time": [time.time()],
+                    "type": ["REDEEM"],
+                    "amount": [data.amount_in_coins],
+                    "sender": [user.id],
+                    "balance_before": [balance],
+                    "balance_after": [balance - data.amount_in_coins],
+                    "receiver": [0],  # ID for us
+                }
+            )
         else:
             raise Exception("How did we get here?")
 
@@ -259,9 +258,11 @@ def not_fraudulent(func):
         else:
             print("FRAUDULENT - Sending Email")
             now = datetime.now()
-            t = now.strftime('%X')
+            t = now.strftime("%X")
             date = now.strftime("%A, %x")
-            subject = f"POSSIBLE FRAUD: {user.first_name} {user.last_name} at {t} on {date}"
+            subject = (
+                f"POSSIBLE FRAUD: {user.first_name} {user.last_name} at {t} on {date}"
+            )
             message = f"""
 Details of transaction:
 
@@ -289,16 +290,20 @@ Date: {date}
 
 def not_suspended(func):
     """Decorator for ensuring that a user is not currently suspended"""
+
     @functools.wraps(func)
     async def check_function(*args, **kwargs):
-        user = kwargs["sender"]
-        assert(isinstance(user, User))
+        user = kwargs["user"] if "user" in kwargs else kwargs["sender"]
+        assert isinstance(user, User)
 
         if user.suspended:
             return  # Do not continue if suspended
-        
+
         return await func(*args, **kwargs)
+
     return check_function
+
+
 def checkReserveRatio(func):
     """Decorator to check reserve ratio ever 10 api calls"""
 
@@ -345,7 +350,6 @@ async def signup(
     user: UserInformation,
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    user.password = hash_password(user.password)
     # verify = paystack_api.verify_account_ZA(
     #     bank_code=user.sort_code,
     #     account_number=user.bank_account,
@@ -353,14 +357,38 @@ async def signup(
     #     document_number=user.document_number
     # )
     recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
-        bank_type="basa",
-        name=user.first_name + " " + user.last_name,
+        first_name=user.first_name,
+        last_name=user.last_name,
         account_number=user.bank_account,
         bank_code=user.sort_code,
-        currency="ZAR",
     )
-    user.recipient_code = recipient_code
-    await database_api.create_user(user=user, db=db)
+
+    temp = UserTableInfo.parse_obj(
+        {
+            "email": user.email,
+            "password": user.password,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "wallet_id": user.wallet_id,
+            "document_number": user.document_number,
+        }
+    )
+    temp.password = hash_password(user.password)
+
+    db_user_id = await database_api.create_user(user=temp, db=db)
+
+    bank_account = BankAccount.parse_obj(
+        {
+            "user_id": db_user_id,
+            "bank_account": user.bank_account,
+            "sort_code": user.sort_code,
+            "recipient_code": recipient_code,
+            "default": True,
+        }
+    )
+
+    await database_api.add_bank_account(bank_account=bank_account, db=db)
+
     response: CustomResponse = solana_api.construct_create_account_transaction(
         user.wallet_id
     )
@@ -381,12 +409,20 @@ async def signup(
 class JwtToken:
     iss = "imperial-server"
 
-    def __init__(self, user_id: str, email: str, name: str, trust_score: str, suspended: bool):
+    def __init__(
+        self, user_id: str, email: str, name: str, trust_score: float, suspended: bool
+    ):
         current_time = datetime.now(tz=timezone.utc)
         self.iat = current_time
         self.exp = current_time + timedelta(days=31)
         self.jti = ""  # to uniquely identify, empty for now
-        self.context = {"user_id": user_id, "email": email, "name": name, "trust_score": trust_score, "suspended": suspended}
+        self.context = {
+            "user_id": user_id,
+            "email": email,
+            "name": name,
+            "trust_score": trust_score,
+            "suspended": suspended,
+        }
 
     def get_jwt(self):
         return jwt.encode(self.__dict__, JWT_SECRET, algorithm="HS256")
@@ -407,7 +443,9 @@ async def login(
         )
 
     # Build the jwt
-    token = JwtToken(match.id, match.email, match.first_name, str(match.trust_score), match.suspended)
+    token = JwtToken(
+        match.id, match.email, match.first_name, match.trust_score, match.suspended
+    )
     jwt_token = token.get_jwt()
     return {
         "access_token": jwt_token,
@@ -561,6 +599,7 @@ async def trade(
 @checkReserveRatio
 async def redeem(
     redeem_transaction: RedeemTransaction,
+    response: Response,
     user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
@@ -693,12 +732,23 @@ async def complete_redeem(
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()
 
-    reference = paystack_api.initiate_transfer(
-        amount_resp.contents, user.recipient_code, user.wallet_id
+    default_bank_account = await database_api.get_default_bank_account_for_id(
+        user.id, db=db
     )
+
+    reference = paystack_api.initiate_transfer(
+        abs(float(amount_resp.contents)),
+        default_bank_account.recipient_code,
+        user.wallet_id,
+    )
+
     if reference == -1:
         # TODO[devin]: WHAT TO DO WHEN PAYSTACK FAILS - SEND TO FRONTEND
-        return {"success": False}
+        return {
+            "success": False,
+            "default_bank_account": default_bank_account,
+            "amount": amount_resp.contents,
+        }
 
     await database_api.create_redeem_transaction(
         redeem=transaction,
@@ -723,28 +773,120 @@ async def complete_redeem(
 @app.get("/api/get_bank_accounts")
 async def get_bank_accounts(
     user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
 
     return {
-        "bank_accounts": [
-            {
-                "bank_account": user.bank_account,
-                "sort_code": user.sort_code,
-            },
-        ]
+        "bank_accounts": await database_api.get_bank_accounts_for_id(id=user.id, db=db)
     }
+
+
+@app.post("/api/add_bank_account")
+async def add_bank_account(
+    bank_account: BankAccount,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+
+    recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        account_number=bank_account.bank_account,
+        bank_code=bank_account.sort_code,
+    )
+
+    bank_account.recipient_code = recipient_code
+
+    await database_api.add_bank_account(bank_account=bank_account, db=db)
+
+
+@app.post("/api/delete_bank_account")
+async def delete_bank_accounts(
+    bank_account: AlterBankAccount,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+    await database_api.delete_bank_account(
+        user_id=bank_account.user_id,
+        bank_account=bank_account.bank_account,
+        sort_code=bank_account.sort_code,
+        db=db,
+    )
 
 
 # GET DEFAULT BANK ACCOUNTS FOR USER
 @app.get("/api/get_default_bank_account")
-async def get_default_bank_accounts(
+async def get_default_bank_account(
     user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
 
+    bank_account = await database_api.get_default_bank_account_for_id(id=user.id, db=db)
+
     return {
-        "bank_account": user.bank_account,
-        "sort_code": user.sort_code,
+        "bank_account": bank_account.bank_account,
+        "sort_code": bank_account.sort_code,
     }
+
+
+@app.post("/api/set_default_bank_account")
+async def set_default_bank_account(
+    bank_account: AlterBankAccount,
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> None:
+    await database_api.set_default_bank_account_for_id(
+        id=bank_account.user_id,
+        bank_account=bank_account.bank_account,
+        sort_code=bank_account.sort_code,
+        db=db,
+    )
+
+
+#### FRIENDS
+@app.get("/api/get_friends")
+async def get_friends(
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> list[dict[str, Any]]:
+    return {"friends": await database_api.get_friends_of_id(id=user.id, db=db)}
+
+
+@app.get("/api/get_n_friends")
+async def get_friends(
+    n: int,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> list[dict[str, Any]]:
+    return {"friends": await database_api.get_n_friends_of_id(id=user.id, n=n, db=db)}
+
+
+@app.post("/api/add_friend")
+async def add_friend(
+    friend: Friend,
+    response: Response,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> list[dict[str, Any]]:
+    friend = await database_api.get_user(friend.email, db=db)
+    if not friend:
+        response.status_code = 500
+    else:
+        await database_api.add_friend(person_id=user.id, friend_id=friend.id, db=db)
+        response.status_code = 200
+
+
+@app.post("/api/delete_friend")
+async def delete_friend(
+    friend: Friend,
+    response: Response,
+    user: User = Depends(get_current_user),
+    db: orm.Session = Depends(database_api.connect_to_DB),
+) -> list[dict[str, Any]]:
+    friend = await database_api.get_user(friend.email, db=db)
+    if not friend:
+        response.status_code = 500
+    else:
+        await database_api.delete_friend(person_id=user.id, friend_id=friend.id, db=db)
+        response.status_code = 200
 
 
 #### TRUST CALCULATIONS ON ISSUE AND WITHDRAW
@@ -755,6 +897,7 @@ async def get_trust_score(
     # TODO[devin]: DO NOT REVEAL TO THE USER THEIR TRUST SCORES
     return user.trust_score
 
+
 # GET AMOUNT OF RAND TO PAY - ISSUE
 @app.get("/api/get_rand_to_pay")
 async def get_coins_to_issue_api(
@@ -763,6 +906,7 @@ async def get_coins_to_issue_api(
 ) -> dict[str, float]:
     return {"rand_to_pay": get_rand_to_pay(amount, user)}
 
+
 def get_rand_to_pay(
     amount_in_coins: float,
     user: User,
@@ -770,7 +914,7 @@ def get_rand_to_pay(
     def receive_after_fee(a):
         a *= 100
         c = 0 if a < 1000 else 100
-        return round((a - (1.15 * (math.ceil(0.029 * a) + c)) ) / 100, 2)
+        return math.ceil((a - (1.15 * (math.ceil(0.029 * a) + c))) / 100)
 
     res = amount_in_coins
     after_fee = receive_after_fee(res)
@@ -791,11 +935,11 @@ async def get_rand_to_return_api(
 ) -> dict[str, float]:
     return {"rand_to_return": get_rand_to_return(amount)}
 
+
 def get_rand_to_return(
     amount_in_coins: float,
 ) -> float:
     return amount_in_coins
-
 
 
 # GET A NEW TRANSACTION ID FOR A MERCHANT TRANSACTION
@@ -935,10 +1079,23 @@ async def recieve_issue_webhook(
     # Issued coins payment
     if data["event"] == "charge.success":
         transaction_id = data["data"]["reference"]
-        amount = data["data"]["amount"] / 100
+        # amount = data["data"]["amount"] / 100
+        # amount = amount / 1.05
 
         # Coz of stupid component, doesn't allow us to pass in generic props :(
-        user_id = data["data"]["metadata"]["custom_fields"][0]["variable_name"]
+        metadata = str(data["data"]["metadata"]["custom_fields"][0]["variable_name"])
+        metadata = metadata.split("X")
+
+        # Expected metadata length
+        if len(metadata) != 2:
+            response.status_code = 200
+            raise ValueError(
+                f"Old webhook - respond and ignore. Metadata was {metadata}"
+            )
+
+        user_id = metadata[0]
+        amount = float(metadata[1])
+
         user: User = await database_api.get_user_by_id(user_id, db=db)
 
         if not user:
@@ -1070,11 +1227,7 @@ async def send_support_message(
     send_email(subject, edited_message, user.email)
 
 
-def send_email(
-    subject: str, 
-    message: str,
-    reply_to=None
-) -> None:
+def send_email(subject: str, message: str, reply_to=None) -> None:
     ctx = ssl.create_default_context()
     password = os.getenv("GMAIL_PASSWORD")
     sender = "africanmicronation@gmail.com"
@@ -1083,14 +1236,16 @@ def send_email(
     msg = EmailMessage()
     msg.set_content(message)
     if reply_to is not None:
-        msg.add_header('reply-to', reply_to)
+        msg.add_header("reply-to", reply_to)
     msg["Subject"] = subject
     msg["From"] = sender
     msg["to"] = recipient
 
-    with smtplib.SMTP_SSL('smtp.gmail.com', port=465, context=ctx) as server:
-        server.login(sender, password)
-        server.send_message(msg)
+    # Actual Emailing disabled for now
+
+    # with smtplib.SMTP_SSL("smtp.gmail.com", port=465, context=ctx) as server:
+    #     server.login(sender, password)
+    #     server.send_message(msg)
 
 
 # remove this when going to prod

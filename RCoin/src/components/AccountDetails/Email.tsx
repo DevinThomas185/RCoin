@@ -27,11 +27,13 @@ const EmailDetail = () => {
         setResponded(true);
         if (res.status == 200) {
           setSuccess(true);
+          setNewEmail('');
         }
       })
       .catch(error => {
         console.log(error);
       });
+    auth.refresh();
   };
 
   return (
@@ -55,6 +57,7 @@ const EmailDetail = () => {
           <TextField
             placeholder="New Email"
             style={styles.input}
+            value={new_email}
             onChangeText={(value: string) => {
               setNewEmail(value);
             }}

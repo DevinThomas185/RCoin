@@ -8,6 +8,8 @@ import AccountSelect from './AccountScreens/AccountSelectScreen';
 import SupportScreen from './AccountScreens/SupportScreen';
 import FAQScreen from './AccountScreens/FAQScreen';
 import AccountDetails from './AccountScreens/AccountDetails';
+import FriendsScreen from './AccountScreens/FriendsScreen';
+
 const Stack = createNativeStackNavigator();
 
 const AccountScreen = () => {
@@ -19,6 +21,7 @@ const AccountScreen = () => {
           component={AccountSelect}
           options={{headerShown: false}}
         />
+        <Stack.Screen name="Common Payees" component={FriendsScreen} />
         <Stack.Screen name="FAQ" component={FAQScreen} />
         <Stack.Screen name="Support" component={SupportScreen} />
         <Stack.Screen name="Account Details" component={AccountDetails} />

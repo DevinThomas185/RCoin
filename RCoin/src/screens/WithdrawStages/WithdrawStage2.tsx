@@ -15,21 +15,16 @@ import SuspectedFraudError from '../../errors/SuspectedFraudError';
 // Confirmation
 const WithdrawStage2 = ({
   nextStage,
-  token_balance,
   coins_to_withdraw,
-  rands_being_credited,
   current_bank_account,
   setTransactionId,
 }: {
   nextStage: React.Dispatch<void>;
-  token_balance: number;
   coins_to_withdraw: number;
-  rands_being_credited: number;
   current_bank_account: {[key: string]: string};
   setTransactionId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const auth = useAuth();
-  const new_balance = token_balance - coins_to_withdraw;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [confirm_clicked, setConfirmClicked] = useState(false);
@@ -88,7 +83,7 @@ const WithdrawStage2 = ({
             })
               .then(res => {
                 if (!res.ok) {
-                  throw new Error('Complete redem failed');
+                  throw new Error('Complete redeem failed');
                 }
                 return res.json();
               })
@@ -130,7 +125,6 @@ const WithdrawStage2 = ({
         <ChangingBalance deduction={coins_to_withdraw} />
         <WithdrawReciept
           coins={coins_to_withdraw}
-          rands={rands_being_credited}
           bank_account={current_bank_account}
         />
       </View>

@@ -109,6 +109,7 @@ const TransferScreen = ({
     } else {
       return (
         <TransferSuccess
+          navigation={navigation}
           nextStage={() => {
             setStage(0);
           }}

@@ -20,6 +20,8 @@ const IssueSummary = ({
   const auth = useAuth();
   const paystackWebViewRef = useRef<paystackProps.PayStackRef>();
 
+  const metadata = `${auth.authData?.token_info.user_id}X${coins_to_issue}`;
+
   return (
     <View flex>
       <Text text40 margin-30 color={styles.rcoin}>
@@ -40,7 +42,7 @@ const IssueSummary = ({
         currency="ZAR"
         activityIndicatorColor={styles.rcoin}
         // This is used to hold user id because we can't pass in custom props
-        billingName={auth.authData?.token_info.user_id}
+        billingName={metadata}
         onCancel={() => {
           // handle response here
           setStage(1);

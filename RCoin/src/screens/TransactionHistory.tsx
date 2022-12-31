@@ -1,11 +1,10 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Text, View} from 'react-native-ui-lib';
+import {Card, Text, View} from 'react-native-ui-lib';
 import {RefreshControl, ScrollView} from 'react-native';
 import {useAuth} from '../contexts/Auth';
 import style from '../style/style';
 import History from './history.json';
 import Transaction from '../components/Transaction';
-import Balance from '../components/Balances/Balance';
 import PendingLoader from '../components/PendingLoader';
 import Config from 'react-native-config';
 
@@ -50,41 +49,37 @@ const TransactionHistory = () => {
     setRefreshing(false);
   }, []);
 
-  return (
-    <View flex>
-      <Balance />
-      <Text text50 marginT-20 marginH-30>
-        Transaction History
-      </Text>
-      {loading ? (
-        <PendingLoader
-          loading={loading}
-          show={loading}
-          response_state={0}
-          loading_page_message="Fetching your Transaction History"
-          custom_fail_message="Failed to fetch your Transaction History"
-        />
-      ) : (
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }>
-          {transaction_history.map(transaction => (
-            <View key={transaction.signature}>
-              <Transaction
-                type={transaction.transaction_type}
-                rcoin={transaction.amount}
-                recipient={transaction.recipient}
-                sender={transaction.sender}
-                user_email={auth.authData?.token_info.email}
-              />
-              <View style={style.thinDivider} />
-            </View>
-          ))}
-        </ScrollView>
-      )}
-    </View>
-  );
+  if (loading) {
+    return (
+      <PendingLoader
+        loading={loading}
+        show={loading}
+        response_state={0}
+        loading_page_message="Fetching your Transaction History"
+        custom_fail_message="Failed to fetch your Transaction History"
+      />
+    );
+  } else {
+    return (
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+        {transaction_history.map(transaction => (
+          <View key={transaction.signature}>
+            <Transaction
+              type={transaction.transaction_type}
+              rcoin={transaction.amount}
+              recipient={transaction.recipient}
+              sender={transaction.sender}
+              user_email={auth.authData?.token_info.email}
+            />
+            <View style={style.thinDivider} />
+          </View>
+        ))}
+      </ScrollView>
+    );
+  }
 };
 
 export default TransactionHistory;
