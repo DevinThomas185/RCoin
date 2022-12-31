@@ -10,12 +10,10 @@ import Config from 'react-native-config';
 const WithdrawStage1 = ({
   nextStage,
   setCoinsToWithdraw,
-  setRandsBeingCredited,
   setBankAccount,
 }: {
   nextStage: React.Dispatch<void>;
   setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
-  setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
   setBankAccount: React.Dispatch<React.SetStateAction<{[key: string]: string}>>;
 }) => {
   const auth = useAuth();
@@ -24,7 +22,7 @@ const WithdrawStage1 = ({
   const [valid, setValid] = useState(false);
 
   useEffect(() => {
-    fetch(`${Config.API_URL}:8000/api/get_bank_accounts`, {
+    fetch(`${Config.API_URL}:8000/api/get_default_bank_account`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
@@ -33,23 +31,8 @@ const WithdrawStage1 = ({
     })
       .then(res => res.json())
       .then(data => {
-        console.log(data.bank_accounts[0]);
-        setBankAccount(data.bank_accounts[0]);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-
-    fetch(`${Config.API_URL}:8000/api/get_token_balance`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${auth.authData?.token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        setTokenBalance(data['token_balance']);
+        console.log(data);
+        setBankAccount(data);
       })
       .catch(error => {
         console.log(error);
@@ -81,7 +64,7 @@ const WithdrawStage1 = ({
       </View>
 
       <View marginH-30>
-        <Text>How much would you like to send?</Text>
+        <Text>How much would you like to withdraw?</Text>
         <AmountEntry
           setAmount={setCoinsToWithdraw}
           least_limit={0}

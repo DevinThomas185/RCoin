@@ -10,7 +10,7 @@ export type TokenInfo = {
   user_id: string;
   email: string;
   name: string;
-  trust_score: string;
+  trust_score: number;
   suspended: boolean;
   wallet_id: string;
 };

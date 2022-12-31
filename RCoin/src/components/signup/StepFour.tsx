@@ -70,7 +70,6 @@ export const StepFour = ({
             bank_account: signUpDetails.bankAccountNumber,
             sort_code: signUpDetails.bankCode,
             document_number: signUpDetails.IDNumber,
-            recipient_code: '',
           },
           null,
           2,

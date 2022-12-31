@@ -33,18 +33,45 @@ class User(Base):
         index=True,
         unique=True,
     )
-    email = sql.Column(sql.Text, index=True, unique=True)
+    email = sql.Column(sql.Text, unique=True)
     # user_name = sql.Column(sql.Text, index=True, unique=True)
-    password = sql.Column(sql.LargeBinary, index=True)
-    first_name = sql.Column(sql.Text, index=True)
-    last_name = sql.Column(sql.Text, index=True)
-    wallet_id = sql.Column(sql.Text, index=True)  # , unique=True)
-    bank_account = sql.Column(sql.Text, index=True)
-    sort_code = sql.Column(sql.Text, index=True)
-    document_number = sql.Column(sql.Text, index=True)
-    recipient_code = sql.Column(sql.Text, index=True)
-    trust_score = sql.Column(sql.Float, index=True, default=1.05)
-    suspended = sql.Column(sql.Boolean, index=True, default=False)
+    password = sql.Column(sql.LargeBinary)
+    first_name = sql.Column(sql.Text)
+    last_name = sql.Column(sql.Text)
+    wallet_id = sql.Column(sql.Text)  # , unique=True)
+    document_number = sql.Column(sql.Text)
+    recipient_code = sql.Column(sql.Text)
+    trust_score = sql.Column(sql.Float, default=1.05)
+    suspended = sql.Column(sql.Boolean, default=False)
+
+
+class BankAccount(Base):
+    __tablename__ = "bankaccounts"
+    id = sql.Column(
+        sql.Integer,
+        Sequence("bank_account_id_seq", start=1001, increment=1),
+        primary_key=True,
+        index=True,
+        unique=True,
+    )
+    user_id = sql.Column(sql.Integer, sql.ForeignKey("users.id"))
+    bank_account = sql.Column(sql.Text)
+    sort_code = sql.Column(sql.Text)
+    recipient_code = sql.Column(sql.Text)
+    default = sql.Column(sql.Boolean)
+
+
+class Friend(Base):
+    __tablename__ = "friends"
+    id = sql.Column(
+        sql.Integer,
+        Sequence("friends_id_seq", start=1001, increment=1),
+        primary_key=True,
+        index=True,
+        unique=True,
+    )
+    person_id = sql.Column(sql.Integer, sql.ForeignKey("users.id"))
+    friend_id = sql.Column(sql.Integer, sql.ForeignKey("users.id"))
 
 
 class Device(Base):
@@ -135,9 +162,9 @@ def connect_to_DB():
 
 
 async def create_user(
-    user: data_models.UserInformation,
+    user: data_models.UserTableInfo,
     db: "Session",
-) -> data_models.UserInformation:
+):
     """
     Create a user for the stablecoin
 
@@ -145,21 +172,130 @@ async def create_user(
     :param db: The database session to utilise
     :return: The user information
     """
+    wid = user.wallet_id
     user = User(**user.dict())
     db.add(user)
     db.commit()
     db.refresh(user)
-    return data_models.UserInformation.from_orm(user)
+    db_user = await get_user_by_wallet_id(wallet_id=wid, db=db)
+    return db_user.id
+
+
+async def add_bank_account(
+    bank_account: data_models.BankAccount,
+    db: "Session",
+) -> data_models.BankAccount:
+    """
+    Add a bank account for a user
+    """
+    account = BankAccount(**bank_account.dict())
+    db.add(account)
+    db.commit()
+    db.refresh(account)
+
+
+async def delete_bank_account(
+    user_id: str,
+    bank_account: str,
+    sort_code: str,
+    db: "Session",
+) -> None:
+    db.query(BankAccount).filter(BankAccount.user_id == user_id).filter(
+        BankAccount.bank_account == bank_account
+    ).filter(BankAccount.sort_code == sort_code).delete()
+    db.commit()
+
+
+async def get_bank_accounts_for_id(
+    id: str,
+    db: "Session",
+) -> List[BankAccount]:
+    return (
+        db.query(BankAccount)
+        .filter(BankAccount.user_id == id)
+        .order_by(BankAccount.id)
+        .all()
+    )
+
+
+async def get_default_bank_account_for_id(
+    id: str,
+    db: "Session",
+) -> BankAccount:
+    return (
+        db.query(BankAccount)
+        .filter(BankAccount.user_id == id)
+        .filter(BankAccount.default == True)
+        .first()
+    )
+
+
+async def set_default_bank_account_for_id(
+    id: str,
+    bank_account: str,
+    sort_code: str,
+    db: "Session",
+) -> None:
+
+    db.query(BankAccount).filter(BankAccount.user_id == id).filter(
+        BankAccount.default == True
+    ).update({BankAccount.default: False}, synchronize_session=False)
+
+    db.query(BankAccount).filter(BankAccount.user_id == id).filter(
+        BankAccount.bank_account == bank_account
+    ).filter(BankAccount.sort_code == sort_code).update(
+        {BankAccount.default: True}, synchronize_session=False
+    )
+    db.commit()
+
+
+async def get_friends_of_id(id: str, db: "Session") -> List[Friend]:
+    return (
+        db.query(User.id, User.first_name, User.last_name, User.email)
+        .join(Friend, Friend.friend_id == User.id)
+        .filter(Friend.person_id == id)
+        .all()
+    )
+
+
+async def get_n_friends_of_id(id: str, n: int, db: "Session") -> List[Friend]:
+    return (
+        db.query(User.id, User.first_name, User.last_name, User.email)
+        .join(Friend, Friend.friend_id == User.id)
+        .filter(Friend.person_id == id)
+        .limit(n)
+        .all()
+    )
+
+
+async def add_friend(person_id: str, friend_id: str, db: "Session") -> None:
+    friend_entry = Friend(person_id=person_id, friend_id=friend_id)
+
+    # If not already friends, add friend
+    if (
+        not db.query(Friend)
+        .filter(Friend.person_id == person_id)
+        .filter(Friend.friend_id == friend_id)
+        .first()
+    ):
+        db.add(friend_entry)
+        db.commit()
+        db.refresh(friend_entry)
+
+
+async def delete_friend(person_id: str, friend_id: str, db: "Session") -> None:
+    db.query(Friend).filter(Friend.person_id == person_id).filter(
+        Friend.friend_id == friend_id
+    ).delete()
+    db.commit()
 
 
 async def get_user_by_id(id: str, db: "Session") -> User:
-    user = db.query(User).filter(User.id == id).first()
-    return user
+    return db.query(User).filter(User.id == id).first()
 
 
 async def get_user_by_wallet_id(wallet_id: str, db: "Session") -> User:
-    user = db.query(User).filter(User.wallet_id == wallet_id).first()
-    return user
+    return db.query(User).filter(User.wallet_id == wallet_id).first()
 
 
 async def get_user(
@@ -173,8 +309,7 @@ async def get_user(
     :param db: The database session to utilise
     :return: The user information found
     """
-    user = db.query(User).filter(User.email == email).first()
-    return user
+    return db.query(User).filter(User.email == email).first()
 
 
 # Device
@@ -382,6 +517,7 @@ async def suspend_user(
         {User.suspended: True}, synchronize_session=False
     )
     db.commit()
+
 
 async def unsuspend_user(
     user_id: int,

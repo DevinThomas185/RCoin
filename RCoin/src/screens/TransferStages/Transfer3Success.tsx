@@ -1,14 +1,17 @@
 import React from 'react';
 import {Text, View, Button, Image} from 'react-native-ui-lib';
+import {NavigationScreenProp} from 'react-navigation';
 import styles from '../../style/style';
 
 // Select the amount
 const Transfer2Confirm = ({
+  navigation,
   nextStage,
   amount,
   recipient,
   transactionId,
 }: {
+  navigation: NavigationScreenProp<any, any>;
   nextStage: React.Dispatch<void>;
   amount: number;
   recipient: string;
@@ -41,7 +44,14 @@ const Transfer2Confirm = ({
           You can now see your updated balance on the dashboard
         </Text>
         <Button
-          onPress={nextStage}
+          onPress={() => {
+            navigation.navigate('Transfer', {
+              qr_amount: 0,
+              qr_recipient: '',
+            });
+            navigation.navigate('Home');
+            nextStage();
+          }}
           label="RCoin Dashboard"
           backgroundColor={styles.rcoin}
         />

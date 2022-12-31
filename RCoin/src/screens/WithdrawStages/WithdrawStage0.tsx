@@ -8,38 +8,7 @@ import Config from 'react-native-config';
 const LEAST_LIMIT = 0;
 
 // Select the amount
-const WithdrawStage0 = ({
-  nextStage,
-  setRandsBeingCredited,
-  coins_to_withdraw,
-}: {
-  nextStage: React.Dispatch<void>;
-  setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
-  coins_to_withdraw: number;
-}) => {
-  const auth = useAuth();
-
-  useEffect(() => {
-    fetch(
-      `${Config.API_URL}:8000/api/get_rand_to_return?amount=` +
-        coins_to_withdraw.toString(),
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.authData?.token}`,
-        },
-      },
-    )
-      .then(res => res.json())
-      .then(data => {
-        setRandsBeingCredited(data['rand_to_return']);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }, [coins_to_withdraw]);
-
+const WithdrawStage0 = ({nextStage}: {nextStage: React.Dispatch<void>}) => {
   return (
     <View flex>
       <Text text40 style={styles.title}>

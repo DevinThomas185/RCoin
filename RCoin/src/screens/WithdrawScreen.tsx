@@ -19,12 +19,10 @@ const WithdrawScreen = ({
 }) => {
   const [stage, setStage] = useState(0);
   const [coins_to_withdraw, setCoinstoWithdraw] = useState(0.0);
-  const [rands_being_credited, setRandsBeingCredited] = useState(0.0);
   const [bank_account, setBankAccount] = useState<{[key: string]: string}>({
     bank_account: '',
     sort_code: '',
   });
-  const [token_balance, setTokenBalance] = useState(0.0);
   const [transactionId, setTransactionId] = useState('');
   const [keyExists, setKeyExsts] = useState(true);
   const auth = useAuth();
@@ -77,8 +75,6 @@ const WithdrawScreen = ({
             nextStage={() => {
               setStage(1);
             }}
-            setRandsBeingCredited={setRandsBeingCredited}
-            coins_to_withdraw={coins_to_withdraw}
           />
         );
       case 1:
@@ -88,7 +84,6 @@ const WithdrawScreen = ({
               setStage(2);
             }}
             setCoinsToWithdraw={setCoinstoWithdraw}
-            setRandsBeingCredited={setRandsBeingCredited}
             setBankAccount={setBankAccount}
           />
         );
@@ -99,20 +94,18 @@ const WithdrawScreen = ({
               setStage(3);
             }}
             coins_to_withdraw={coins_to_withdraw}
-            rands_being_credited={rands_being_credited}
             current_bank_account={bank_account}
-            token_balance={token_balance}
             setTransactionId={setTransactionId}
           />
         );
       case 3:
         return (
           <WithdrawStage3
+            navigation={navigation}
             nextStage={() => {
               setStage(0);
             }}
             coins_to_withdraw={coins_to_withdraw}
-            rands_being_credited={rands_being_credited}
             bank_account={bank_account}
             transactionId={transactionId}
           />

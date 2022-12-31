@@ -15,11 +15,9 @@ const {TextField} = Incubator;
 // Select the amount
 const Reciept = ({
   coins,
-  rands,
   bank_account,
 }: {
   coins: number;
-  rands: number;
   bank_account: {[key: string]: string};
 }) => {
   const numberWithCommas = (x: number) => {
@@ -33,7 +31,7 @@ const Reciept = ({
   return (
     <View>
       <Text style={styles.buttonCaption}>
-        You are withdrawing{'\n'}
+        You will receive{'\n'}
         <Text text40 color={styles.rcoin}>
           {numberWithCommas(coins)} Rand
         </Text>

@@ -17,11 +17,29 @@ const AccountSelect = ({
   return (
     <View flex>
       <View marginV-50 center>
+        <Image
+          source={require('../../style/deposit.png')}
+          style={{width: 100, height: 100, borderRadius: 50}}
+        />
         <Text marginV-10 text40>
           {auth.authData?.token_info.name}
         </Text>
         <Text text70>{auth.authData?.token_info.email}</Text>
-        <Text>{auth.authData?.token_info.trust_score}</Text>
+        {auth.authData?.token_info.trust_score == undefined ? (
+          <Text>Undefined</Text>
+        ) : auth.authData.token_info.trust_score > 1.04 ? (
+          <Text>Min</Text>
+        ) : auth.authData.token_info.trust_score > 1.03 ? (
+          <Text>Low</Text>
+        ) : auth.authData.token_info.trust_score > 1.02 ? (
+          <Text>Mid</Text>
+        ) : auth.authData.token_info.trust_score > 1.01 ? (
+          <Text>High</Text>
+        ) : auth.authData.token_info.trust_score > 1 ? (
+          <Text>Max</Text>
+        ) : (
+          <></>
+        )}
       </View>
 
       <View flex>
@@ -31,6 +49,13 @@ const AccountSelect = ({
           <ServiceLink
             title="Account Details"
             message={'View and change your account details'}
+          />
+        </TouchableOpacity>
+        {divider}
+        <TouchableOpacity onPress={() => navigation.navigate('Common Payees')}>
+          <ServiceLink
+            title="Edit Common Payees"
+            message={'View and edit your common payees'}
           />
         </TouchableOpacity>
         {divider}

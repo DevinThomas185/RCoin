@@ -32,14 +32,14 @@ const Transaction = ({
     <View style={{flexDirection: 'row'}}>
       <Image
         source={require('../style/deposit.png')}
-        style={style.balanceLogo}
+        style={style.transactionIcon}
       />
       <View style={{}}>
         <Text text70 grey10 left>
           {numberWithCommas(amount)} RCoin
         </Text>
-        <Text text80 grey10 left style={{fontWeight: 'bold'}}>
-          Deposited
+        <Text text80 grey10 left>
+          <Text style={{fontWeight: 'bold'}}>Deposited</Text>
         </Text>
       </View>
     </View>
@@ -49,7 +49,7 @@ const Transaction = ({
     <View style={{flexDirection: 'row'}}>
       <Image
         source={require('../style/transferTo.png')}
-        style={style.balanceLogo}
+        style={style.transactionIcon}
       />
       <View>
         <Text text70 grey10 left>
@@ -66,7 +66,7 @@ const Transaction = ({
     <View style={{flexDirection: 'row'}}>
       <Image
         source={require('../style/transferFrom.png')}
-        style={style.balanceLogo}
+        style={style.transactionIcon}
       />
       <View>
         <Text text70 grey10 left>
@@ -84,21 +84,21 @@ const Transaction = ({
     <View style={{flexDirection: 'row'}}>
       <Image
         source={require('../style/withdraw.png')}
-        style={style.balanceLogo}
+        style={style.transactionIcon}
       />
       <View>
         <Text text70 grey10 left>
           {numberWithCommas(-amount)} RCoin
         </Text>
-        <Text text80 grey10 left style={{fontWeight: 'bold'}}>
-          Withdrawn
+        <Text text80 grey10 left>
+          <Text style={{fontWeight: 'bold'}}>Withdrawn</Text>
         </Text>
       </View>
     </View>
   );
 
   return (
-    <View marginH-30 marginV-20 style={{flexDirection: 'row'}}>
+    <View marginH-30 marginV-10 style={{flexDirection: 'row'}}>
       {/* <View> */}
       <>
         {type == 'deposit' ? deposit(amount, sender, recipient) : null}

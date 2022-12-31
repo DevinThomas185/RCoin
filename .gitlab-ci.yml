@@ -64,8 +64,8 @@ deploy-dev:
     - INFO=$(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_SIGNER_DEV" docker ps)
     - if [[ $(echo $INFO | grep stablecoin_signer-proxy_1 | wc -l) -ne 1 ]]; then echo "signer nginx container not running" && exit 1; else echo "signer nginx container check successful"; fi
     - if [[ $(echo $INFO | grep stablecoin_signer-backend_1 | wc -l) -ne 1 ]]; then echo "signer backend container not running" && exit 1; else echo "signer backend container check successful"; fi
-  only:
-    - master
+  # only:
+  #   - master
 
 deploy-prod:
   image: docker/compose:debian-1.29.2
