@@ -37,12 +37,13 @@ const LeftPane = ({ onGetStarted }: { onGetStarted: () => void }) => {
 };
 
 const AuditDescription = () => {
+  const fontSize = "46px";
   return (
     <Box
       bg="white"
-      justifySelf="right"
-      alignItems="center"
-      width="56%"
+      // justifySelf="right"
+      // alignItems="center"
+      maxWidth="50%"
       height="fit-content"
       padding="3"
       borderRadius="25"

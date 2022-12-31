@@ -172,7 +172,7 @@ const GetStartedPage = () => {
   }
   return (
     <Box textAlign="center" fontSize="xl">
-      <InformationPane gradientDirection="to-tl" gradientStrength={400}>
+      <InformationPane colour={"rcoinBlue.1100"}>
         <Grid
           minH="100vh"
           maxW="1080px"

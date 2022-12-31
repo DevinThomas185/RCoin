@@ -4,7 +4,7 @@ import MockupPhone from "../HomePage/LandingPage/MockupPhone";
 
 const DownloadPage = () => {
   return (
-    <InformationPane gradientDirection="to-br" gradientStrength={500}>
+    <InformationPane colour={"rcoinBlue.1000"}>
       <Grid
         bg="rcoinBlue.50"
         alignItems="center"
