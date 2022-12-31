@@ -1,5 +1,6 @@
 import { HStack, Text, Image, Box, Grid, Button } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import "../../../main.css";
 
 const LeftPane = ({ onGetStarted }: { onGetStarted: () => void }) => {
   return (
@@ -46,7 +47,16 @@ const AuditDescription = () => {
       padding="3"
       borderRadius="25"
     >
-      <Image src="transparency.png" maxWidth="350px" fit="contain" />
+      {/* <Image src="transparency.png" maxWidth="350px" fit="contain" /> */}
+      {/* <div className="glass" style={{ justifyContent: "center" }}>
+        {" "}
+        Transparency in everything we do
+      </div> */}
+      <div className="title">
+        <h1>Transparency in everything we do</h1>
+
+        <div className="glass-child glass"></div>
+      </div>
       <Text alignSelf="center">
         Every transaction we make is visible on the blockchain ensuring fair
         play. Our real-time auditing system shows every ZAR transfer flowing

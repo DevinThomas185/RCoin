@@ -127,6 +127,20 @@ Style = {
     // justifyContent: "center",
     alignItems: 'center',
   },
+
+  image: {
+    height: 300,
+    width: 300,
+    justifyContent: 'center',
+    alignItems: 'baseline',
+  },
+
+  containerCoin: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#435C9C',
+  },
 };
 
 export default Style;

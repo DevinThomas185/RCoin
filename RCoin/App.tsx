@@ -22,6 +22,7 @@ import {
 import Home from './src/screens/Home';
 import {BalanceProvider} from './src/contexts/BalanceContext';
 import Style from './src/style/style';
+import SpinningRCoin from './src/style/SpinningRCoin';
 import {NotificationContainer} from './src/components/NotificationContainer';
 import {LogBox} from 'react-native';
 import {AuditProvider} from './src/contexts/AuditContext';
@@ -68,15 +69,7 @@ const App = () => {
     }
 
     if (loading) {
-      return (
-        <LoaderScreen
-          overlay
-          backgroundColor={styles.rcoin}
-          loaderColor="white"
-          message="Loading Dashboard"
-          messageStyle={{color: 'white'}}
-        />
-      );
+      return <SpinningRCoin />;
     }
 
     return (
