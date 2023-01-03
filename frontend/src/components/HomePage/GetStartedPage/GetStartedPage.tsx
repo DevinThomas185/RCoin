@@ -17,56 +17,59 @@ const WorkflowStageCard = ({
 }) => {
   return (
     <Grid
-      bg="rcoinBlue.50"
-      borderRadius="25px"
+      // bg="rcoinBlue.50"
+      // borderRadius="25px"
       minWidth="1080px"
       maxWidth="1080px"
       alignContent="stretch"
       gap={0}
     >
       <Flex>
-        <Button
+        <Text
           marginTop="10px"
-          marginLeft="10px"
-          borderRadius="3xl"
-          fontSize="md"
+          marginRight="10px"
+          // borderRadius="3xl"
+          fontSize="110px"
           fontWeight="bold"
-          color="rcoinBlue.50"
-          bg="rcoinBlue.600"
-          boxShadow="lg"
+          color="rcoinBlue.1000"
+          // bg="rcoinBlue.600"
+          // boxShadow="lg"
         >
           {" "}
           {index}{" "}
-        </Button>
-        <Box
-          textAlign="left"
-          fontSize="4xl"
-          fontWeight="bold"
-          color="rcoinBlue.600"
-          marginLeft="10px"
-        >
-          {" "}
-          {text}{" "}
-        </Box>
-      </Flex>
-      <Flex>
-        <Box
-          maxWidth="200px"
-          justifySelf="left"
-          marginLeft="60px"
-          marginTop="10px"
-        >
-          <Image src={image} maxWidth="150px" />
-        </Box>
-        <Text
-          textAlign="left"
-          color="black"
-          marginLeft="10px"
-          marginRight="10px"
-        >
-          {description}
         </Text>
-        <Spacer />
+        <Box>
+          <Box
+            textAlign="left"
+            fontSize="4xl"
+            fontWeight="bold"
+            color="rcoinBlue.1000"
+            marginLeft="10px"
+          >
+            {" "}
+            {text}{" "}
+          </Box>
+
+          <Flex>
+            <Text
+              textAlign="left"
+              color="rcoinBlue.1000"
+              marginLeft="10px"
+              marginRight="10px"
+            >
+              {description}
+            </Text>
+            <Box
+              maxWidth="200px"
+              justifySelf="left"
+              marginLeft="60px"
+              marginTop="10px"
+            >
+              <Image src={image} maxWidth="250px" />
+            </Box>
+            <Spacer />
+          </Flex>
+        </Box>
       </Flex>
       <Box
         marginBottom="10px"
@@ -85,11 +88,7 @@ const workflowHeadings = [
   "Transfer Rcoins",
   "Withdraw your funds",
 ];
-const workflowImages = [
-  "rand_to_rcoin.png",
-  "rcoin_to_rcoin.png",
-  "rcoin_to_rand.png",
-];
+const workflowImages = ["ZtoR.png", "RtoR.png", "RtoZ.png"];
 
 const depositDescription = (
   <Text>
@@ -173,6 +172,18 @@ const GetStartedPage = () => {
   return (
     <Box textAlign="center" fontSize="xl">
       <InformationPane colour={"rcoinBlue.1100"}>
+        <Text
+          marginTop="30px"
+          marginBottom="25px"
+          // borderRadius="3xl"
+          fontSize="50px"
+          fontWeight="bold"
+          color="rcoinBlue.1000"
+          // bg="rcoinBlue.600"
+          // boxShadow="lg"
+        >
+          How you can use RCoin
+        </Text>
         <Grid
           minH="100vh"
           maxW="1080px"
@@ -188,7 +199,7 @@ const GetStartedPage = () => {
               Download The App
             </Button>
           </Link>
-          <Box fontSize="xs" textAlign="right">
+          <Box fontSize="xs" textAlign="right" color={"rcoinBlue.1000"}>
             *Fees apply.
           </Box>
         </Grid>
