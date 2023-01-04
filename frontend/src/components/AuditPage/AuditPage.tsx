@@ -48,7 +48,7 @@ const AuditPage = () => {
     }
   };
 
-  const gradientSetting = `linear(to-br, white, rcoinBlue.500)`;
+  const gradientSetting = `linear(to-br, white, rcoinBlue.400)`;
 
   return (
     <Grid gap={1} bgGradient={gradientSetting}>
