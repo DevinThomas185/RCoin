@@ -1,4 +1,12 @@
-import { Image, Box, Grid, HStack, Text, Button } from "@chakra-ui/react";
+import {
+  Image,
+  Box,
+  Grid,
+  HStack,
+  Text,
+  Button,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 
 const paystackButton = (
   <Button
@@ -18,31 +26,42 @@ const paystackButton = (
 );
 
 const AuditExplanationPopup = () => {
+  const useMobileView = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+
+  const width = useMobileView ? "90%" : "1080px";
+
   return (
     <Grid
       bg="rcoinBlue.100"
       borderRadius="25px"
-      minWidth="1080px"
-      maxWidth="1080px"
+      marginLeft="auto"
+      marginRight="auto"
+      minWidth={width}
+      maxWidth={width}
       alignContent="stretch"
       gap={0}
     >
       <Box
         textAlign="left"
         fontSize="4xl"
-        marginLeft="10px"
+        marginLeft="20px"
         fontWeight="bold"
         color="rcoinBlue.700"
       >
         Why do we need the Audit?
       </Box>
       <HStack>
-        <Image
-          src="parity.png"
-          maxWidth="20%"
-          justifySelf="center"
-          fit="contain"
-        />
+        {useMobileView ? null : (
+          <Image
+            src="parity.png"
+            maxWidth="20%"
+            justifySelf="center"
+            fit="contain"
+          />
+        )}
         <Text
           marginLeft="30px"
           marginRight="30px"
