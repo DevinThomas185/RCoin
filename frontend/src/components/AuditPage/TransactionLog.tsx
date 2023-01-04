@@ -10,10 +10,17 @@ import {
   Flex,
   Spacer,
   useOutsideClick,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 
-const TransactionLog = ({ transaction }: { transaction: any }) => {
+const TransactionLog = ({
+  transaction,
+  isMobileView,
+}: {
+  transaction: any;
+  isMobileView: boolean | undefined;
+}) => {
   const { isOpen, onToggle } = useDisclosure();
   const ref = useRef<any>();
   useOutsideClick({
@@ -25,25 +32,34 @@ const TransactionLog = ({ transaction }: { transaction: any }) => {
     },
   });
 
+  const width = isMobileView ? "fit-content" : "1080px";
+  const [description, bankID, blockchainID] = isMobileView
+    ? [null, null, null]
+    : [
+        <TransactionDescription transaction_type={transaction.type} />,
+        <TransactionId transaction_id={transaction.bank_transaction_id} />,
+        <TransactionId
+          transaction_id={transaction.blockchain_transaction_id}
+        />,
+      ];
+
   return (
     <Grid ref={ref} onClick={onToggle} gap={1}>
       <Box
         borderRadius="25"
         bg="rcoinBlue.50"
-        width="1080px"
+        width={width}
         transition="transform 0.15s ease-out, background 0.15s ease-out"
         _hover={{
           transform: "scale(1.02, 1.01)",
         }}
       >
-        <HStack spacing={3}>
+        <HStack spacing={3} marginRight="10px">
           <TransactionIcon transaction_type={transaction.type} />
           <TransactionAmount amount={transaction.amount} />
-          <TransactionDescription transaction_type={transaction.type} />
-          <TransactionId transaction_id={transaction.bank_transaction_id} />
-          <TransactionId
-            transaction_id={transaction.blockchain_transaction_id}
-          />
+          {description}
+          {bankID}
+          {blockchainID}
           <TransactionDate date={transaction.date} />
         </HStack>
       </Box>
@@ -62,7 +78,7 @@ const TransactionIcon = ({
   const image =
     transaction_type == "issue" ? "increase_block.png" : "decrease_block.png";
 
-  return <Image src={image} boxSize="40px" />;
+  return <Image src={image} boxSize="40px" borderRadius="25px" />;
 };
 
 const TransactionAmount = ({ amount }: { amount: number }) => {
@@ -70,7 +86,7 @@ const TransactionAmount = ({ amount }: { amount: number }) => {
     <HStack maxWidth="110px" minWidth="110px">
       <Image src="small_logo.png" boxSize="25px" />
       <Text fontWeight="bold" color="rcoinBlue.500">
-        {amount}
+        {amount.toLocaleString(undefined, { maximumFractionDigits: 2 })}
       </Text>
     </HStack>
   );
@@ -108,7 +124,12 @@ const TransactionId = ({ transaction_id }: { transaction_id: string }) => {
 };
 
 const TransactionDate = ({ date }: { date: string }) => {
-  return <Text> {parseDate(date)} </Text>;
+  return (
+    <Text fontWeight="bold" fontSize="md">
+      {" "}
+      {parseDate(date)}{" "}
+    </Text>
+  );
 };
 
 const parseDate = (date: string) => {
@@ -121,7 +142,7 @@ const parseDate = (date: string) => {
   const [hour, minutes, secondsMiliseconds] = timeComponents.split(":");
   const [seconds, _] = secondsMiliseconds.split(".");
 
-  return `${hour}:${minutes}:${seconds} ${day}.${month}.${year}`;
+  return `${day}/${month}/${year} ${hour}:${minutes}:${seconds}`;
 };
 
 const TransactionDetailsPopup = ({ transaction }: { transaction: any }) => {
@@ -179,36 +200,55 @@ const TransactionFlow = ({ transaction }: { transaction: any }) => {
 };
 
 const TransactionDetailsList = ({ transaction }: { transaction: any }) => {
+  const isMobileView = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+
+  const direction = isMobileView ? "column" : "row";
+  const width = isMobileView ? "150px" : "fit-content";
+
   const IDEntry = ({ title, id }: { title: string; id: string }) => {
+    const text = isMobileView ? `${id.slice(0, 20)}...` : id;
     return (
-      <HStack>
-        <Text fontWeight="bold" fontSize="md" color="rcoinBlue.700">
+      <Flex direction={direction} width={width}>
+        <Text
+          fontWeight="bold"
+          marginRight="10px"
+          fontSize="md"
+          color="rcoinBlue.700"
+        >
           {title}
         </Text>
         <Text fontSize="sm" fontFamily="monospace">
-          {id}
+          {text}
         </Text>
-      </HStack>
+      </Flex>
     );
   };
 
   return (
-    <Grid marginLeft="15px">
+    <Flex marginLeft="15px" maxWidth={width} direction="column">
       <WordDescription transaction={transaction} />
       <IDEntry
-        title="Bank Transaction ID:"
+        title="Bank Transaction ID: "
         id={transaction.bank_transaction_id}
       />
       <IDEntry
-        title="Solana Transaction ID:"
+        title="Solana Transaction ID: "
         id={transaction.blockchain_transaction_id}
       />
-    </Grid>
+    </Flex>
   );
 };
 
 const WordDescription = ({ transaction }: { transaction: any }) => {
-  const beginning = `At ${parseHour(transaction.date)} ${transaction.amount}`;
+  const isMobileView = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+
+  const beginning = `On ${parseHour(transaction.date)} ${transaction.amount}`;
 
   const tail =
     transaction.type === "issue"
@@ -217,9 +257,16 @@ const WordDescription = ({ transaction }: { transaction: any }) => {
       : `ZAR was withdrawn
         from the reserve account and ${transaction.amount} Rcoins were burned.`;
 
-  return (
+  return isMobileView ? (
+    <Text width="fit-content"></Text>
+  ) : (
     <HStack>
-      <Text fontWeight="bold" fontSize="md" color="rcoinBlue.700">
+      <Text
+        fontWeight="bold"
+        fontSize="md"
+        marginRight="10px"
+        color="rcoinBlue.700"
+      >
         {" "}
         Transaction Details:{" "}
       </Text>
