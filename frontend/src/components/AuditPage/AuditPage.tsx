@@ -1,4 +1,4 @@
-import { Grid } from "@chakra-ui/react";
+import { Box, Grid } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import React from "react";
 import AuditHeader from "./AuditHeader";
@@ -51,14 +51,16 @@ const AuditPage = () => {
   const gradientSetting = `linear(to-br, white, rcoinBlue.400)`;
 
   return (
-    <Grid gap={1} bgGradient={gradientSetting}>
-      <AuditHeader />
-      <TransactionTable
-        transactions={transactions}
-        isLoaded={isLoaded}
-        onScroll={handleTransactionTableScroll}
-      />
-    </Grid>
+    <Box bgGradient={gradientSetting} minHeight="100vh">
+      <Grid gap={1}>
+        <AuditHeader />
+        <TransactionTable
+          transactions={transactions}
+          isLoaded={isLoaded}
+          onScroll={handleTransactionTableScroll}
+        />
+      </Grid>
+    </Box>
   );
 };
 

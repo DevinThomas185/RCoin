@@ -1,4 +1,13 @@
-import { Box, Text, Button, Flex, Grid, Image, Spacer } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Button,
+  Flex,
+  Grid,
+  Image,
+  Spacer,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import InformationPane from "../../Common/InformationPane";
 
@@ -15,12 +24,21 @@ const WorkflowStageCard = ({
   image: string;
   footerButton: any;
 }) => {
+  const useMobileView = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+
+  const cardDirection = useMobileView ? "column" : "row";
+  const width = useMobileView ? "100%" : "1080px";
+  const imageLeftOffset = useMobileView ? "auto" : "60px";
+
   return (
     <Grid
       bg="rcoinBlue.50"
       borderRadius="25px"
-      minWidth="1080px"
-      maxWidth="1080px"
+      minWidth={width}
+      maxWidth={width}
       alignContent="stretch"
       gap={0}
     >
@@ -49,11 +67,12 @@ const WorkflowStageCard = ({
           {text}{" "}
         </Box>
       </Flex>
-      <Flex>
+      <Flex direction={cardDirection}>
         <Box
           maxWidth="200px"
           justifySelf="left"
-          marginLeft="60px"
+          marginLeft={imageLeftOffset}
+          marginRight="auto"
           marginTop="10px"
         >
           <Image src={image} maxWidth="150px" />

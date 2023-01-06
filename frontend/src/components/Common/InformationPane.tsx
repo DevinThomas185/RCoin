@@ -4,15 +4,17 @@ const InformationPane = ({
   gradientDirection,
   gradientStrength,
   children,
+  overrideMaxHeight,
 }: {
   gradientDirection: string;
   gradientStrength: number;
   children: JSX.Element | JSX.Element[];
-  overrideMaxWidth?: string;
+  overrideMaxHeight?: string;
 }) => {
   const gradientSetting = `linear(${gradientDirection}, white, rcoinBlue.${gradientStrength})`;
+  const maxHeight = overrideMaxHeight ? overrideMaxHeight : "90%";
   return (
-    <Box maxHeight="90%" bgGradient={gradientSetting}>
+    <Box maxHeight={maxHeight} bgGradient={gradientSetting}>
       <Grid
         minH="100vh"
         maxW="1080px"
