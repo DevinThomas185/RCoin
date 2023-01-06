@@ -1,13 +1,29 @@
-import { HStack, Text, Image, Box, Grid, Button } from "@chakra-ui/react";
+import {
+  HStack,
+  Text,
+  Image,
+  Box,
+  Grid,
+  Button,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import "../../../main.css";
 
-const LeftPane = ({ onGetStarted }: { onGetStarted: () => void }) => {
+const AuditPointer = ({
+  imageHeight,
+  maxWidth,
+}: {
+  imageHeight?: string;
+  maxWidth?: string;
+}) => {
+  const width = maxWidth ? maxWidth : "35%";
   return (
-    <Grid gap={6}>
+    <Grid>
       <Image
         src="blockchain_loop.png"
-        maxWidth="35%"
+        maxWidth={width}
+        height={imageHeight}
         justifySelf="center"
         fit="contain"
       />
@@ -18,9 +34,26 @@ const LeftPane = ({ onGetStarted }: { onGetStarted: () => void }) => {
           </Button>
         </Link>
       </Box>
+    </Grid>
+  );
+};
+
+const GetStartedPointer = ({
+  imageHeight,
+  onGetStarted,
+  maxWidth,
+}: {
+  imageHeight?: string;
+  onGetStarted: () => void;
+  maxWidth?: string;
+}) => {
+  const width = maxWidth ? maxWidth : "35%";
+  return (
+    <Grid>
       <Image
         src="parity.png"
-        maxWidth="35%"
+        maxWidth={width}
+        height={imageHeight}
         justifySelf="center"
         fit="contain"
       />
@@ -35,23 +68,40 @@ const LeftPane = ({ onGetStarted }: { onGetStarted: () => void }) => {
     </Grid>
   );
 };
+const MobileButtonGroup = ({ onGetStarted }: { onGetStarted: () => void }) => {
+  return (
+    <HStack>
+      <AuditPointer imageHeight="100px" maxWidth="200px" />
+      <GetStartedPointer
+        imageHeight="100px"
+        onGetStarted={onGetStarted}
+        maxWidth="100%"
+      />
+    </HStack>
+  );
+};
 
-const AuditDescription = () => {
+const ButtonGroup = ({ onGetStarted }: { onGetStarted: () => void }) => {
+  return (
+    <Grid gap={6}>
+      <AuditPointer />
+      <GetStartedPointer onGetStarted={onGetStarted} />
+    </Grid>
+  );
+};
+
+const AuditDescription = ({ overrideWidth }: { overrideWidth?: string }) => {
+  const width = overrideWidth ? overrideWidth : "fit-content";
   return (
     <Box
       bg="white"
       justifySelf="right"
       alignItems="center"
-      width="56%"
+      width={width}
       height="fit-content"
       padding="3"
       borderRadius="25"
     >
-      {/* <Image src="transparency.png" maxWidth="350px" fit="contain" /> */}
-      {/* <div className="glass" style={{ justifyContent: "center" }}>
-        {" "}
-        Transparency in everything we do
-      </div> */}
       <div className="title">
         <h1>Transparency in everything we do</h1>
 
@@ -69,12 +119,42 @@ const AuditDescription = () => {
   );
 };
 
-const AuditExplanation = ({ onGetStarted }: { onGetStarted: () => void }) => {
+const MobileAuditExplanation = ({
+  onGetStarted,
+}: {
+  onGetStarted: () => void;
+}) => {
+  return (
+    <Grid>
+      <AuditDescription />
+      <MobileButtonGroup onGetStarted={onGetStarted} />
+    </Grid>
+  );
+};
+
+const DesktopAuditExplanation = ({
+  onGetStarted,
+}: {
+  onGetStarted: () => void;
+}) => {
   return (
     <HStack>
-      <LeftPane onGetStarted={onGetStarted} />
-      <AuditDescription />
+      <ButtonGroup onGetStarted={onGetStarted} />
+      <AuditDescription overrideWidth="56%" />
     </HStack>
+  );
+};
+
+const AuditExplanation = ({ onGetStarted }: { onGetStarted: () => void }) => {
+  const useMobileView = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+
+  return useMobileView ? (
+    <MobileAuditExplanation onGetStarted={onGetStarted} />
+  ) : (
+    <DesktopAuditExplanation onGetStarted={onGetStarted} />
   );
 };
 
