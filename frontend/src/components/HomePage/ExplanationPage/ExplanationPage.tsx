@@ -1,4 +1,4 @@
-import { Grid, Spacer, useBreakpointValue } from "@chakra-ui/react";
+import { Grid, useBreakpointValue, VStack } from "@chakra-ui/react";
 import InformationPane from "../../Common/InformationPane";
 import AuditExplanation from "./AuditExplanation";
 import ExplanationHeader from "./ExplanationHeader";
@@ -13,12 +13,12 @@ const ExplanationPage = ({ onGetStarted }: { onGetStarted: () => void }) => {
   const gap = useMobileView ? 6 : 0;
 
   return (
-    <InformationPane gradientDirection="to-bl" gradientStrength={400}>
-      <ExplanationHeader />
-      <Grid alignSelf="center" gap={gap}>
+    <InformationPane colour={"rcoinBlue.1000"}>
+      {/* <ExplanationHeader /> */}
+      <VStack alignSelf="center" gap={gap}>
         <SolanaExplanation />
         <AuditExplanation onGetStarted={onGetStarted} />
-      </Grid>
+      </VStack>
     </InformationPane>
   );
 };

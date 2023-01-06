@@ -92,12 +92,14 @@ const ButtonGroup = ({ onGetStarted }: { onGetStarted: () => void }) => {
 
 const AuditDescription = ({ overrideWidth }: { overrideWidth?: string }) => {
   const width = overrideWidth ? overrideWidth : "fit-content";
+
+  const fontSize = "46px";
   return (
     <Box
       bg="white"
-      justifySelf="right"
-      alignItems="center"
-      width={width}
+      // justifySelf="right"
+      // alignItems="center"
+      maxWidth="50%"
       height="fit-content"
       padding="3"
       borderRadius="25"

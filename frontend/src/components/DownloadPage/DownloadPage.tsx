@@ -52,7 +52,7 @@ const StoreButton = ({
 
 const MobileDownloadPage = () => {
   return (
-    <InformationPane gradientDirection="to-br" gradientStrength={500}>
+    <InformationPane colour={"rcoinBlue.1000"}>
       <Flex
         bg="rcoinBlue.50"
         gap={0}
@@ -107,7 +107,7 @@ const MobileDownloadPage = () => {
 
 const DesktopDownloadPage = () => {
   return (
-    <InformationPane gradientDirection="to-br" gradientStrength={500}>
+    <InformationPane colour={"rcoinBlue.1000"}>
       <Grid
         bg="rcoinBlue.50"
         alignItems="center"

@@ -9,7 +9,7 @@ export default function NavBar() {
 
   return (
     <>
-      <Box bg="rcoinBlue.500" px={4}>
+      <Box bg="rcoinBlue.1400" px={4}>
         <DrawerComponent isOpen={isDrawerOpen} setIsOpen={setIsDrawerOpen} />
         <NavBarButtons setIsDrawerOpen={setIsDrawerOpen} />
       </Box>

@@ -6,6 +6,7 @@ import {
   Grid,
   Button,
   Link,
+  chakra,
   useBreakpointValue,
 } from "@chakra-ui/react";
 
@@ -53,18 +54,31 @@ const MobileSolanaExplanation = () => {
 };
 
 const DesktopSolanaExplanation = () => {
+  const fontSize = "46px";
   return (
     <HStack>
       <Box
         bg="white"
         alignItems="center"
         height="fit-content"
-        width="55%"
+        maxWidth="45%"
         padding="2"
         borderRadius="25"
       >
-        <Text alignSelf="center" fontSize="4xl" color="black" fontWeight="bold">
-          Rand on a Blockchain
+        <Text
+          alignSelf="center"
+          fontSize={fontSize}
+          color="black"
+          fontWeight="bold"
+        >
+          Rand on a{" "}
+          <chakra.span
+            fontSize={fontSize}
+            color="rcoinBlue.1200"
+            fontWeight="bold"
+          >
+            Blockchain
+          </chakra.span>
         </Text>
         <Text alignSelf="center">
           RCoin is a digital representation of Rand, in the form of a blockchain
@@ -73,7 +87,18 @@ const DesktopSolanaExplanation = () => {
           this, our fees are significantly lower than traditional services.
         </Text>
       </Box>
-      <SolanaButton maxWidth="500px" />
+      {/* <<<<<<< HEAD */}
+      {/* <SolanaButton maxWidth="500px" /> */}
+      {/* ======= */}
+      <Grid paddingLeft={"10%"}>
+        <Image src="big_solana.png" fit="contain" />
+        <Link justifySelf="center" href="https://solana.com" isExternal>
+          <Button variant="reactive" size="lg">
+            Learn more about Solana
+          </Button>
+        </Link>
+      </Grid>
+      {/* >>>>>>> WebAppRedesign */}
     </HStack>
   );
 };
