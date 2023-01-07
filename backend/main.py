@@ -46,6 +46,7 @@ from fastapi import Depends, FastAPI, Response, Request, HTTPException, status
 from fastapi_utils.tasks import repeat_every
 from fastapi.security import OAuth2PasswordBearer
 from rcoin.data_models import (
+    AddAuditorRequest,
     CompleteRedeemTransaction,
     CompleteTradeTransaction,
     LoginInformation,
@@ -1305,6 +1306,14 @@ async def get_logs():
         output = file.read()
 
     return output
+
+
+@app.post("/api/add-auditor")
+async def add_auditor(req: AddAuditorRequest, response: Response):
+    success = paystack_api.invite_user_to_audit(req.email, r)
+
+    if not success:
+        response.status_code = 500
 
 
 app.add_middleware(SessionMiddleware, secret_key="random-string")

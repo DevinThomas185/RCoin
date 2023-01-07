@@ -116,3 +116,7 @@ class TokenResponse(BaseModel):
 
 class RegisterDeviceToken(BaseModel):
     device_token: str
+
+
+class AddAuditorRequest(BaseModel):
+    email: str

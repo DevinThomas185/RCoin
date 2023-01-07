@@ -1600,9 +1600,8 @@
     "read-package-json-fast" "^3.0.0"
     "which" "^3.0.0"
 
-"@react-native-async-storage/async-storage@^1.13.4", "@react-native-async-storage/async-storage@^1.17.11":
-  "integrity" "sha512-bzs45n5HNcDq6mxXnSsOHysZWn1SbbebNxldBXCQs8dSvF8Aor9KCdpm+TpnnGweK3R6diqsT8lFhX77VX0NFw=="
-  "resolved" "https://registry.npmjs.org/@react-native-async-storage/async-storage/-/async-storage-1.17.11.tgz"
+"@react-native-async-storage/async-storage@^1.13.4", "@react-native-async-storage/async-storage@github:react-native-community/async-storage":
+  "resolved" "git+ssh://git@github.com/react-native-community/async-storage.git#c1469cbac8d02aac56a52fe02866f3f198cf5c4a"
   "version" "1.17.11"
   dependencies:
     "merge-options" "^3.0.4"

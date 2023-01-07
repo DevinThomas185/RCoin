@@ -1,7 +1,8 @@
-import React, {createContext, useState, useContext} from 'react';
+import React, {createContext, useState, useContext, useEffect} from 'react';
 import {AuthData, authService} from '../services/authService';
 import {useKeypair} from './Keypair';
 import Config from 'react-native-config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type AuthContextData = {
   authData?: AuthData;
@@ -16,22 +17,41 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [authData, setAuthData] = useState<AuthData>();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const keypair = useKeypair();
 
+  useEffect(() => {
+    loadLoginSaved();
+  }, []);
+
+  async function loadLoginSaved(): Promise<void> {
+    try {
+      //Try get the data from Async Storage
+      const authDataSerialized = await AsyncStorage.getItem('@AuthData');
+      if (authDataSerialized) {
+        const _authData: AuthData = JSON.parse(authDataSerialized);
+        setAuthData(_authData);
+      }
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
     const _authData = await authService.signIn(email, password);
+
+    AsyncStorage.setItem('@AuthData', JSON.stringify(_authData));
 
     if (_authData) {
       keypair.deleteBio();
     }
     setAuthData(_authData);
-    setLoading(false);
   };
 
   const signOut = async () => {
     setAuthData(undefined);
+    await AsyncStorage.removeItem('@AuthData');
   };
 
   const refresh = () => {
