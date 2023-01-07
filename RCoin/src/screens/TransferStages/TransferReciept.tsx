@@ -4,6 +4,7 @@ import {useFriends} from '../../contexts/FriendContext';
 import styles from '../../style/style';
 
 const TransferReciept = ({email, amount}: {email: string; amount: number}) => {
+  const ON_CHAIN_FEE = 0.0043;
   const numberWithCommas = (x: number) => {
     const options = {
       minimumFractionDigits: 2,
@@ -30,6 +31,10 @@ const TransferReciept = ({email, amount}: {email: string; amount: number}) => {
               {numberWithCommas(amount)}
             </Text>
           </View>
+          <Text>for a fee</Text>
+          <Text text40 color={styles.rcoin}>
+            {numberWithCommas(ON_CHAIN_FEE)} Rand
+          </Text>
         </View>
         <Image
           source={require('../../style/RCoin-RCoin.png')}

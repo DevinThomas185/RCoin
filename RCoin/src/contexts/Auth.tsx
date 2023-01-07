@@ -30,7 +30,17 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
       const authDataSerialized = await AsyncStorage.getItem('@AuthData');
       if (authDataSerialized) {
         const _authData: AuthData = JSON.parse(authDataSerialized);
-        setAuthData(_authData);
+        fetch(`${Config.API_URL}:8000/api/user`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${_authData.token}`,
+          },
+        }).then(res => {
+          if (res.ok) {
+            setAuthData(_authData);
+          }
+        });
       }
     } catch (error) {
     } finally {

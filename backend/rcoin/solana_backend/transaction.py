@@ -30,6 +30,7 @@ from rcoin.solana_backend.common import (
     TOKEN_DECIMALS,
     RESERVE_ACCOUNT,
     SOLANA_CLIENT,
+    FEE_ACCOUNT,
 )
 
 from rcoin.solana_backend.exceptions import (
@@ -92,6 +93,22 @@ def construct_token_transfer(
     assert dest_account is not None
 
     try:
+        # If sending tokens between users apply the fee.
+        # Solana fees are $0.00025 which equates to less than 0.1 ZAR.
+        SOLANA_FEE = 0.0043
+        if is_trade_transfer(source_account, dest_account):
+            transaction.add(
+                transfer(
+                    TransferParams(
+                        program_id=TOKEN_PROGRAM_ID,
+                        source=source_account,
+                        dest=FEE_ACCOUNT,
+                        owner=sender,
+                        amount=int(SOLANA_FEE * (10**TOKEN_DECIMALS)),
+                        signers=get_transfer_signers(sender),
+                    )
+                )
+            )
         transaction.add(
             transfer(
                 TransferParams(
@@ -112,6 +129,8 @@ def construct_token_transfer(
 
     return transaction
 
+def is_trade_transfer(source: PublicKey, destination: PublicKey) -> bool:
+    return source is not RESERVE_ACCOUNT and destination is not RESERVE_ACCOUNT
 
 def stamp_blockhash(transaction: Transaction):
     blockhash_resp = SOLANA_CLIENT.get_latest_blockhash()
