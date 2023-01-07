@@ -1,9 +1,13 @@
-import React from 'react';
-import {Image, Text, TouchableOpacity, View} from 'react-native-ui-lib';
+import React, {useState} from 'react';
+import {Text, TouchableOpacity, View} from 'react-native-ui-lib';
 import ServiceLink from '../../components/ServiceLink';
 import style from '../../style/style';
 import {NavigationScreenProp} from 'react-navigation';
 import {useAuth} from '../../contexts/Auth';
+import {launchImageLibrary} from 'react-native-image-picker';
+import Config from 'react-native-config';
+import FriendAvatar from '../../components/FriendAvatar';
+import {ScrollView} from 'react-native';
 
 const AccountSelect = ({
   navigation,
@@ -14,66 +18,66 @@ const AccountSelect = ({
 
   const divider = <View style={style.thinDivider} />;
 
+  let names = ['A', 'Z'];
+  let initials = 'AZ';
+  if (auth.authData) {
+    names = auth.authData?.token_info.name.split(' ');
+    initials = names[0].charAt(0) + names[1].charAt(0);
+  }
+
   return (
     <View flex>
       <View marginV-50 center>
-        <Image
-          source={require('../../style/deposit.png')}
-          style={{width: 100, height: 100, borderRadius: 50}}
-        />
+        {auth.authData ? (
+          <FriendAvatar
+            size={100}
+            first_name={names[0]}
+            last_name={names[1]}
+            wallet_id={auth.authData.token_info.wallet_id}
+          />
+        ) : (
+          <></>
+        )}
         <Text marginV-10 text40>
           {auth.authData?.token_info.name}
         </Text>
         <Text text70>{auth.authData?.token_info.email}</Text>
-        {auth.authData?.token_info.trust_score == undefined ? (
-          <Text>Undefined</Text>
-        ) : auth.authData.token_info.trust_score > 1.04 ? (
-          <Text>Min</Text>
-        ) : auth.authData.token_info.trust_score > 1.03 ? (
-          <Text>Low</Text>
-        ) : auth.authData.token_info.trust_score > 1.02 ? (
-          <Text>Mid</Text>
-        ) : auth.authData.token_info.trust_score > 1.01 ? (
-          <Text>High</Text>
-        ) : auth.authData.token_info.trust_score > 1 ? (
-          <Text>Max</Text>
-        ) : (
-          <></>
-        )}
       </View>
-
-      <View flex>
-        {divider}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Account Details')}>
-          <ServiceLink
-            title="Account Details"
-            message={'View and change your account details'}
-          />
-        </TouchableOpacity>
-        {divider}
-        <TouchableOpacity onPress={() => navigation.navigate('Common Payees')}>
-          <ServiceLink
-            title="Edit Common Payees"
-            message={'View and edit your common payees'}
-          />
-        </TouchableOpacity>
-        {divider}
-        <TouchableOpacity onPress={() => navigation.navigate('FAQ')}>
-          <ServiceLink
-            title="Frequently Asked Questions"
-            message={'Find FAQs here'}
-          />
-        </TouchableOpacity>
-        {divider}
-        <TouchableOpacity onPress={() => navigation.navigate('Support')}>
-          <ServiceLink
-            title="Support"
-            message={'Is RCoin causing an issue? Contact us here!'}
-          />
-        </TouchableOpacity>
-        {divider}
-      </View>
+      <ScrollView>
+        <View flex>
+          {divider}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Account Details')}>
+            <ServiceLink
+              title="Account Details"
+              message={'View and change your account details'}
+            />
+          </TouchableOpacity>
+          {divider}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Quick Contacts')}>
+            <ServiceLink
+              title="Edit Quick Contacts"
+              message={'View and edit your quick contacts'}
+            />
+          </TouchableOpacity>
+          {divider}
+          <TouchableOpacity onPress={() => navigation.navigate('FAQ')}>
+            <ServiceLink
+              title="Frequently Asked Questions"
+              message={'Find FAQs here'}
+            />
+          </TouchableOpacity>
+          {divider}
+          {/* <TouchableOpacity onPress={() => navigation.navigate('Support')}>
+            <ServiceLink
+              title="Support"
+              message={'Is RCoin causing an issue? Contact us here!'}
+            />
+          </TouchableOpacity>
+          {divider} */}
+        </View>
+      </ScrollView>
     </View>
   );
 };

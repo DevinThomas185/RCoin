@@ -11,6 +11,7 @@ import PasswordPopup from '../../components/PasswordPopup';
 import PendingLoader from '../../components/PendingLoader';
 import Config from 'react-native-config';
 import SuspectedFraudError from '../../errors/SuspectedFraudError';
+import ChangingBalanceCard from '../../components/Balances/ChangingBalanceCard';
 
 // Confirmation
 const WithdrawStage2 = ({
@@ -117,35 +118,33 @@ const WithdrawStage2 = ({
   };
 
   return (
-    <View flex>
+    <View flex marginH-10>
       <Text text40 style={styles.title}>
-        Confirm your transaction
+        Confirm Withdraw
       </Text>
-      <View>
-        <ChangingBalance deduction={coins_to_withdraw} />
+
+      <View marginV-10>
         <WithdrawReciept
           coins={coins_to_withdraw}
           bank_account={current_bank_account}
         />
       </View>
-      {/* <View flex bottom marginH-30 marginB-5>
-        <Button
-          onPress={nextStage}
-          label="Account Settings"
-          backgroundColor={styles.rcoin}
-        />
+
+      <View flex>
+        {loading ? (
+          <PendingLoader
+            loading={loading}
+            show={confirm_clicked}
+            response_state={response_state}
+            loading_page_message={loading_page_message}
+            custom_fail_message="Withdraw failed, please confirm again"
+          />
+        ) : (
+          <ChangingBalanceCard increment={-coins_to_withdraw} />
+        )}
       </View>
-      <Text style={styles.buttonCaption}>
-        Wrong bank info? Change in your account settings
-      </Text> */}
-      <PendingLoader
-        loading={loading}
-        show={confirm_clicked}
-        response_state={response_state}
-        loading_page_message={loading_page_message}
-        custom_fail_message="Withdraw failed, please confirm again"
-      />
-      <View flex bottom marginH-30 marginB-50>
+
+      <View flex bottom marginV-10>
         <Button
           onPress={() => {
             setIsModalVisible(true);

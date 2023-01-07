@@ -1,6 +1,5 @@
 import {ScrollView} from 'react-native';
-import {Text, View} from 'react-native-ui-lib';
-import Style from '../../style/style';
+import {View} from 'react-native-ui-lib';
 import FAQs from './faqs.json';
 import {useState} from 'react';
 import FAQElement from '../../components/FAQElement';

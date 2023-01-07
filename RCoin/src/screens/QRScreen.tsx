@@ -77,6 +77,11 @@ const AccountScreen = ({
 
   return (
     <View flex>
+      <View center marginV-10 height={50}>
+        <Text text60 color={style.rcoin}>
+          {TopMessage()}
+        </Text>
+      </View>
       <QRCodeScanner
         customMarker={
           <View
@@ -121,27 +126,34 @@ const AccountScreen = ({
             }
           }
         }}
-        topContent={
-          <View marginB-80>
-            <Text style={style.centerText}>{TopMessage()}</Text>
-            <Text>
-              {amount} to {merchant}
-            </Text>
-          </View>
-        }
-        bottomContent={
-          <View>
-            <Button
-              marginT-70
-              onPress={() => {
-                setShowCode(!showCode);
-              }}
-              label={BottomMessage()}
-              backgroundColor={style.rcoin}
-            />
-          </View>
-        }
+        // topContent={
+        //   <View>
+        //     <Text text50 color={style.rcoin}>
+        //       {TopMessage()}
+        //     </Text>
+        //   </View>
+        // }
+        // bottomContent={
+        //   <View>
+        //     <Button
+        //       onPress={() => {
+        //         setShowCode(!showCode);
+        //       }}
+        //       label={BottomMessage()}
+        //       backgroundColor={style.rcoin}
+        //     />
+        //   </View>
+        // }
       />
+      <View margin-10>
+        <Button
+          onPress={() => {
+            setShowCode(!showCode);
+          }}
+          label={BottomMessage()}
+          backgroundColor={style.rcoin}
+        />
+      </View>
     </View>
   );
 };

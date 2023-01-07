@@ -1,6 +1,15 @@
 import {useState} from 'react';
 import {StyleSheet} from 'react-native';
-import {View, Button, Incubator, Text, Icon, Image} from 'react-native-ui-lib'; //eslint-disable-line
+import {
+  View,
+  Button,
+  Incubator,
+  Text,
+  Icon,
+  Image,
+  Checkbox,
+} from 'react-native-ui-lib'; //eslint-disable-line
+import Style from '../../style/style';
 import {UserSignUp} from '../../types/SignUp';
 const {TextField} = Incubator;
 
@@ -22,8 +31,11 @@ export const StepOne = ({
   return (
     <View>
       <Text style={styles.title}>Your Details</Text>
-      <Text style={styles.subtext}>Your email will be used to sign in.</Text>
+      <Text style={styles.subtext}>
+        Your email will be used to sign into your account.
+      </Text>
       <TextField
+        marginV-10
         style={styles.inputField}
         placeholder={'Email'}
         placeholderTextColor={'gray'}
@@ -39,6 +51,7 @@ export const StepOne = ({
       />
 
       <TextField
+        marginV-10
         style={styles.inputField}
         placeholderTextColor={'gray'}
         placeholder={'First Name'}
@@ -52,6 +65,7 @@ export const StepOne = ({
       />
 
       <TextField
+        marginV-10
         style={styles.inputField}
         placeholder={'Last Name'}
         placeholderTextColor={'gray'}
@@ -66,7 +80,7 @@ export const StepOne = ({
       <View>
         <TextField
           style={styles.inputField}
-          dasdad
+          marginV-10
           placeholder={'Password'}
           placeholderTextColor={'gray'}
           onChangeText={(password: string) =>
@@ -82,6 +96,19 @@ export const StepOne = ({
           {passwordText}
         </Text>
       </View>
+      <View row margin-10>
+        <Checkbox
+          label="Is this account for a merchant?"
+          color={Style.rcoin}
+          value={signUpDetails.is_merchant}
+          onValueChange={(is_merchant: boolean) =>
+            setSignUpDetails(prev => ({
+              ...prev,
+              is_merchant: is_merchant,
+            }))
+          }
+        />
+      </View>
     </View>
   );
 };
@@ -91,17 +118,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 30,
     textAlign: 'left',
-    marginLeft: 20,
+    color: Style.rcoin,
   },
 
   subtext: {
-    padding: 20,
     color: 'grey',
   },
 
   floatingPlaceholder: {
     zIndex: 0,
-    margin: 20,
     fontSize: 20,
   },
 
@@ -114,7 +139,6 @@ const styles = StyleSheet.create({
     borderColor: '#d1d1d1',
     borderWidth: 1,
     borderRadius: 5,
-    margin: 10,
   },
 
   passwordToggleButton: {
@@ -126,8 +150,6 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    padding: 14,
-    margin: 20,
     width: '80%',
     justifyContent: 'center',
     alignSelf: 'center',

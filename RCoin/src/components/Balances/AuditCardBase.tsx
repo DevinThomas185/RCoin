@@ -7,9 +7,9 @@ import style from '../../style/style';
 
 const AuditCardBase = ({colour, ratio}: {colour: string; ratio: number}) => {
   return (
-    <View row paddingH-30 paddingV-20>
+    <View row>
       <Button
-        marginH-10
+        marginR-5
         label="View the Audit"
         backgroundColor={style.solana_black}
         borderRadius={10}
@@ -17,9 +17,9 @@ const AuditCardBase = ({colour, ratio}: {colour: string; ratio: number}) => {
         onPress={() => Linking.openURL(Config.AUDIT_URL!)}
       />
       <Card
+        marginL-5
         flex
         enableShadow
-        paddingH-10
         center
         style={{
           flexDirection: 'row',
@@ -40,7 +40,7 @@ const AuditCardBase = ({colour, ratio}: {colour: string; ratio: number}) => {
               $textDefault: true,
             },
             {
-              text: 'Audit Ratio',
+              text: ' Audit Ratio ',
               text90: true,
               $textDisabled: true,
             },

@@ -12,7 +12,7 @@ const ChangingBalance = ({deduction}: {deduction: number}) => {
 
   if (balance_context.loading) {
     return (
-      <View center marginV-20 height={200}>
+      <View center height={200}>
         <LoaderScreen
           margin-30
           message={'Loading Balance'}
@@ -23,7 +23,7 @@ const ChangingBalance = ({deduction}: {deduction: number}) => {
   } else {
     return (
       <View centerV center row>
-        <View center marginV-20 height={200}>
+        <View center height={200}>
           <BalanceFormat token_balance={balance_context.balance} />
           <View center>
             {deduction > 0 ? (
@@ -33,7 +33,7 @@ const ChangingBalance = ({deduction}: {deduction: number}) => {
               />
             ) : (
               <Image
-                source={require('../../style/green-arrow-down.png')}
+                source={require('../../style/green-arrow-up.png')}
                 style={{width: 40, height: 40}}
               />
             )}

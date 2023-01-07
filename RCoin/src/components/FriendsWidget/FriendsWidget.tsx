@@ -1,66 +1,52 @@
-import {useEffect, useState} from 'react';
-import Config from 'react-native-config';
-import {Card} from 'react-native-ui-lib';
-import {ScrollView} from 'react-native';
+import {Card, View} from 'react-native-ui-lib';
+import {ScrollView, useWindowDimensions} from 'react-native';
 import {NavigationScreenProp} from 'react-navigation';
-import {useAuth} from '../../contexts/Auth';
 import FriendCircle from './FriendCircle';
+import {useFriends} from '../../contexts/FriendContext';
+import {useEffect} from 'react';
 
 const FriendsWidget = ({
   navigation,
 }: {
   navigation: NavigationScreenProp<any, any>;
 }) => {
-  const auth = useAuth();
-
-  const initArr: any[] = [];
-  const [friends, setFriends] = useState<any[]>(initArr);
-
-  const updateFriends = () => {
-    fetch(`${Config.API_URL}:8000/api/get_friends`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${auth.authData?.token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        setFriends(data['friends']);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
+  const friend_context = useFriends();
 
   useEffect(() => {
-    updateFriends();
+    friend_context.refresh();
   }, []);
 
-  if (friends.length == 0) {
+  const circle_width = 80;
+
+  const {width} = useWindowDimensions();
+
+  const component_width = width - 20; // Dashboard says marginH-10 for this component
+
+  const full_circles = Math.floor(component_width / circle_width);
+
+  const final_width = component_width / full_circles;
+
+  if (friend_context.friends.length == 0) {
     return <></>;
   } else {
     return (
-      <Card
-        center
-        row
-        marginH-30
-        paddingV-10
-        style={{justifyContent: 'space-between'}}>
-        <ScrollView horizontal>
-          {friends.map(friend => (
-            <FriendCircle
-              key={friend.id}
-              image={require('../../style/deposit.png')}
-              first_name={friend.first_name}
-              last_name={friend.last_name}
-              onPress={() => {
-                navigation.navigate('Transfer', {
-                  qr_amount: 0,
-                  qr_recipient: friend.email,
-                });
-              }}
-            />
+      <Card center row paddingV-5 style={{justifyContent: 'space-between'}}>
+        <ScrollView horizontal centerContent>
+          {friend_context.friends.map(friend => (
+            <View key={friend.id} style={{width: final_width}}>
+              <FriendCircle
+                image="" // Unused right now
+                first_name={friend.first_name}
+                last_name={friend.last_name}
+                wallet_id={friend.wallet_id}
+                onPress={() => {
+                  navigation.navigate('Transfer', {
+                    qr_amount: 0,
+                    qr_recipient: friend.email,
+                  });
+                }}
+              />
+            </View>
           ))}
         </ScrollView>
       </Card>

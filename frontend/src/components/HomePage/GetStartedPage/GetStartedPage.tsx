@@ -135,7 +135,7 @@ const WorkflowStageCard = ({
 
 const workflowHeadings = [
   "Make a Deposit",
-  "Transfer Rcoins",
+  "Transfer RCoins",
   "Withdraw your funds",
 ];
 const workflowImages = ["ZtoR.png", "RtoR.png", "RtoZ.png"];

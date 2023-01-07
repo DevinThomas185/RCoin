@@ -18,13 +18,13 @@ def sendPushNotification(tokens: List[str], title: str, body: str):
 
 def notify_issued(tokens: List[str], amount: float):
     sendPushNotification(
-        tokens, title="Deposit Successful", body=f"You deposited {amount} rand."
+        tokens, title="Deposit Successful", body=f"You deposited {amount} RCoin."
     )
 
 
 def notify_withdrawn(tokens: List[str], amount: float):
     sendPushNotification(
-        tokens, title="Withdrawal Successful", body=f"You withdrew {amount} rand."
+        tokens, title="Withdrawal Successful", body=f"You withdrew {-amount} RCoin."
     )
 
 
@@ -37,11 +37,11 @@ def notify_transacted(
 ):
     sendPushNotification(
         senderTokens,
-        title="Transaction Sent",
+        title="RCoin Sent",
         body=f"You sent {amount} RCoin to {receiverEmail}.",
     )
     sendPushNotification(
         recieverTokens,
-        title="Transaction Received",
+        title="RCoin Received",
         body=f"You received {amount} RCoin from {senderEmail}.",
     )

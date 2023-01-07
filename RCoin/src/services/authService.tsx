@@ -13,6 +13,7 @@ export type TokenInfo = {
   trust_score: number;
   suspended: boolean;
   wallet_id: string;
+  is_merchant: boolean;
 };
 
 // Returns undefined promise if login is unsuccessful
@@ -67,6 +68,7 @@ const signIn = (
                   trust_score: data_['trust_score'],
                   suspended: data_['suspended'],
                   wallet_id: data_['walled_id'],
+                  is_merchant: data_['is_merchant'],
                 },
               });
             })

@@ -3,52 +3,65 @@ import {Text, View, Button, Incubator, Image} from 'react-native-ui-lib';
 const {TextField} = Incubator;
 import styles from '../../style/style';
 import AmountEntry from '../../components/AmountEntry';
+import ChangingBalanceCard from '../../components/Balances/ChangingBalanceCard';
+import NumberKeyboard from '../../components/NumberKeyboard/NumberKeyboard';
 
 // Select the recipient
 const Merchant0Amount = ({
   nextStage,
   setAmount,
+  amount,
 }: {
   nextStage: React.Dispatch<void>;
   setAmount: React.Dispatch<React.SetStateAction<number>>;
+  amount: number;
 }) => {
   const [valid, setValid] = useState(false);
 
   return (
-    <View flex>
-      <Text text40 style={styles.title}>
-        Requesting a Transfer
-      </Text>
-      <View marginH-30 marginV-20>
-        <Text>
-          While in merchant mode easily request a transfer by entering the
-          amount and generate a code for your customer to scan.
+    <View flex marginH-10>
+      <View marginV-10>
+        <Text text40 style={styles.title}>
+          Choose the Amount
         </Text>
+        <Text text70>How many RCoin is the transaction worth?</Text>
       </View>
 
-      <View marginH-30>
-        <View>
-          <Text>How much would you like to recieve?</Text>
-        </View>
-        <View>
-          <AmountEntry
-            setAmount={setAmount}
-            least_limit={5}
-            max_limit={1000000}
-            tellButton={setValid}
-          />
-        </View>
+      <View flex center>
+        <Image
+          source={require('../../style/RCoin-RCoin.png')}
+          style={{width: '100%', height: 130}}
+        />
       </View>
-      <Image
-        source={require('../../style/RCoin-RCoin.png')}
-        style={{width: '100%', height: 130}}
-      />
-      <View flex bottom marginH-30 marginB-50>
+
+      <View flex bottom marginV-10>
+        <NumberKeyboard
+          style={{
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+          }}
+          number={amount}
+          setNumber={x => {
+            setAmount(x);
+          }}
+          setValid={setValid}
+          limit_to_balance={false}
+        />
         <Button
-          onPress={nextStage}
+          style={{
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            borderBottomLeftRadius: 10,
+            borderBottomRightRadius: 10,
+          }}
+          onPress={() => {
+            nextStage();
+          }}
+          label="Generate QR Code"
           disabled={!valid}
-          label="Continue to Choose Amount"
-          backgroundColor={styles.rcoin}
+          backgroundColor={styles.paystack}
         />
       </View>
     </View>

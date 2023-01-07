@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View, Button, LoaderScreen} from 'react-native-ui-lib';
-import ChangingBalance from '../../components/Balances/ChangingBalance';
+import {Text, View, Button} from 'react-native-ui-lib';
 import TransferReceipt from '../TransferStages/TransferReciept';
 import styles from '../../style/style';
 import {useAuth} from '../../contexts/Auth';
@@ -10,6 +9,7 @@ import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
 import PendingLoader from '../../components/PendingLoader';
 import Config from 'react-native-config';
+import BalanceCard from '../../components/Balances/BalanceCard';
 
 const QR0Confirm = ({
   nextStage,
@@ -71,6 +71,7 @@ const QR0Confirm = ({
         }
       })
       .catch(error => {
+        console.log('HEH');
         console.log(error);
       });
   }
@@ -160,22 +161,27 @@ const QR0Confirm = ({
   };
 
   return (
-    <View flex>
-      <Text text40 style={styles.title} margin-30>
-        Confirm your transaction
+    <View flex marginH-10>
+      <Text text40 style={styles.title}>
+        Confirm Payment
       </Text>
-      <View margin-30>
-        <ChangingBalance deduction={amount} />
+      <View marginV-10>
         <TransferReceipt email={recipient} amount={amount} />
       </View>
-      <PendingLoader
-        loading={loading}
-        show={confirm_clicked}
-        response_state={response_state}
-        loading_page_message={loading_page_message}
-        custom_fail_message="Transfer failed, please confirm again"
-      />
-      <View flex bottom marginH-30 marginB-50>
+      <View>
+        {loading ? (
+          <PendingLoader
+            loading={loading}
+            show={confirm_clicked}
+            response_state={response_state}
+            loading_page_message={loading_page_message}
+            custom_fail_message="Transfer failed, please confirm again"
+          />
+        ) : (
+          <BalanceCard />
+        )}
+      </View>
+      <View flex bottom marginV-10>
         <Button
           onPress={() => setIsModalVisible(true)}
           label="Confirm Transfer"
