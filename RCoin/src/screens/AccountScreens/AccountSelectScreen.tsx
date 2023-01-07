@@ -1,11 +1,9 @@
-import React, {useState} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native-ui-lib';
+import React from 'react';
+import {Button, Text, TouchableOpacity, View} from 'react-native-ui-lib';
 import ServiceLink from '../../components/ServiceLink';
 import style from '../../style/style';
 import {NavigationScreenProp} from 'react-navigation';
 import {useAuth} from '../../contexts/Auth';
-import {launchImageLibrary} from 'react-native-image-picker';
-import Config from 'react-native-config';
 import FriendAvatar from '../../components/FriendAvatar';
 import {ScrollView} from 'react-native';
 
@@ -26,7 +24,7 @@ const AccountSelect = ({
   }
 
   return (
-    <View flex>
+    <View flex marginH-10>
       <View marginV-50 center>
         {auth.authData ? (
           <FriendAvatar
@@ -42,6 +40,15 @@ const AccountSelect = ({
           {auth.authData?.token_info.name}
         </Text>
         <Text text70>{auth.authData?.token_info.email}</Text>
+      </View>
+      <View marginV-10>
+        <Button
+          backgroundColor={style.rcoin}
+          label="Sign Out"
+          onPress={() => {
+            auth.signOut();
+          }}
+        />
       </View>
       <ScrollView>
         <View flex>

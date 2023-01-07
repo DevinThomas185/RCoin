@@ -346,7 +346,7 @@ def _fix_transaction_format(transaction, public_key: str) -> TransactionLogItem:
             transaction_type,
             sender=transaction["sender"],
             recipient=transaction["recipient"],
-            amount=(transaction["amount"]),
+            amount=amount,
             signature=transaction["signature"],
             block_time=transaction["block_time"],
         )
