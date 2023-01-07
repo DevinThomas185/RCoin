@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text, View, Wizard} from 'react-native-ui-lib';
 import TransferEmail from './TransferStages/Transfer0Email';
 import TransferAmount from './TransferStages/Transfer1Amount';
@@ -32,13 +32,15 @@ const TransferScreen = ({
 
   const [transactionId, setTransactionId] = useState('');
 
-  console.log('stage was: ' + stage);
-  console.log('PARAMS: ' + route.params.qr_amount + route.params.qr_recipient);
-  console.log('PARAMS2: ' + amount2 + recipient2);
-  console.log('vvvvvvvvvvvvvv');
-  // When someone just scans an email to send to
+  useEffect(() => {
+    // Mount
+    return () => {
+      // Unmount
+      navigation.setParams({qr_recipient: '', qr_amount: 0.0});
+    };
+  }, []);
+
   if (route.params.qr_recipient != recipient2) {
-    // console.log(route.params.qr_recipient);
     setStage(1);
     setAmount2(route.params.qr_amount);
     setAmount(route.params.qr_amount);
@@ -84,15 +86,18 @@ const TransferScreen = ({
             setStage(1);
           }}
           setRecipient={setRecipient}
+          navigation={navigation}
         />
       );
     } else if (stage == 1) {
       return (
         <TransferAmount
+          amount={amount}
           nextStage={() => {
             setStage(2);
           }}
           setAmount={setAmount}
+          recipient={recipient}
         />
       );
     } else if (stage == 2) {

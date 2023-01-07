@@ -50,23 +50,6 @@ const WithdrawScreen = ({
 
   useBackHandler(backHandlerAction);
 
-  useEffect(() => {
-    fetch(`${Config.API_URL}:8000/api/get_token_balance`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${auth.authData?.token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        setTokenBalance(data['token_balance']);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }, []);
-
   const renderCurrentStage = () => {
     switch (stage) {
       case 0:
@@ -75,6 +58,8 @@ const WithdrawScreen = ({
             nextStage={() => {
               setStage(1);
             }}
+            coins_to_withdraw={coins_to_withdraw}
+            setCoinsToWithdraw={setCoinstoWithdraw}
           />
         );
       case 1:
@@ -83,8 +68,8 @@ const WithdrawScreen = ({
             nextStage={() => {
               setStage(2);
             }}
-            setCoinsToWithdraw={setCoinstoWithdraw}
             setBankAccount={setBankAccount}
+            current_bank_account={bank_account}
           />
         );
       case 2:
@@ -137,7 +122,7 @@ const WithdrawScreen = ({
             />
             <Wizard.Step
               state={getStageState(1)}
-              label={'Select Amount'}
+              label={'Select Bank Account'}
               circleColor={styles.rcoin}
               color={styles.rcoin}
             />

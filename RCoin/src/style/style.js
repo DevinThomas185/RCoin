@@ -5,9 +5,11 @@ Style = {
   success: '#5DB075',
   paystack: '#41AA5E',
   grey: '#757575',
+  light_grey: '#DDDDDD',
   yellow: '#FFD23F',
   failed: '#B31515',
   tiffany_blue: '#3CBBB1',
+  white: '#FFFFFF',
 
   solana_surge_green: '#00FFA3',
   solana_ocean_blue: '#03E1FF',
@@ -16,8 +18,6 @@ Style = {
 
   title: {
     //top right bottom left
-    marginHorizontal: 30,
-    marginVertical: 20,
     color: '#435C9C',
   },
 
@@ -41,10 +41,12 @@ Style = {
   },
 
   thinDivider: {
-    borderWidth: 0.75,
+    height: 1,
+    backgroundColor: '#435C9C',
+    // borderWidth: 0.75,
     borderColor: '#435C9C',
-    width: '90%',
-    alignSelf: 'center',
+    // width: '90%',
+    // alignSelf: 'center',
   },
 
   bankDetailsLabel: {
@@ -104,7 +106,6 @@ Style = {
 
   input: {
     height: 40,
-    margin: 12,
     borderWidth: 1,
     padding: 10,
     borderRadius: 7.5,
@@ -112,7 +113,6 @@ Style = {
 
   large_input: {
     height: 100,
-    margin: 12,
     borderWidth: 1,
     padding: 10,
     borderRadius: 7.5,

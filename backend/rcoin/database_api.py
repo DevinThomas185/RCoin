@@ -40,9 +40,9 @@ class User(Base):
     last_name = sql.Column(sql.Text)
     wallet_id = sql.Column(sql.Text)  # , unique=True)
     document_number = sql.Column(sql.Text)
-    recipient_code = sql.Column(sql.Text)
     trust_score = sql.Column(sql.Float, default=1.05)
     suspended = sql.Column(sql.Boolean, default=False)
+    is_merchant = sql.Column(sql.Boolean)
 
 
 class BankAccount(Base):
@@ -251,7 +251,7 @@ async def set_default_bank_account_for_id(
 
 async def get_friends_of_id(id: str, db: "Session") -> List[Friend]:
     return (
-        db.query(User.id, User.first_name, User.last_name, User.email)
+        db.query(User.id, User.first_name, User.last_name, User.email, User.wallet_id)
         .join(Friend, Friend.friend_id == User.id)
         .filter(Friend.person_id == id)
         .all()
@@ -399,7 +399,9 @@ async def complete_issue_transaction(
 
 
 async def get_user_issue_for_bank_transaction(
-    user_id: str, bank_transaction_id: str, db: "Session"
+    user_id: str,
+    bank_transaction_id: str,
+    db: "Session",
 ) -> Optional[Issue]:
     issue = (
         db.query(Issue)
@@ -411,7 +413,8 @@ async def get_user_issue_for_bank_transaction(
 
 
 async def get_issue_transactions_for_user(
-    user_id: str, db: "Session"
+    user_id: str,
+    db: "Session",
 ) -> Optional[List[Issue]]:
 
     issues = db.query(Issue).filter(Issue.id == user_id)
@@ -443,6 +446,30 @@ async def create_redeem_transaction(
     db.commit()
 
     return redeem_transaction
+
+
+async def get_pending_transactions(
+    user_id: int,
+    db: "Session",
+) -> List[Tuple]:
+    """Gets pending transactions for a user"""
+
+    QUERY = """
+    SELECT 'redeem' AS type, amount, date
+    FROM redeem
+    WHERE user_id = :user_id
+    AND bank_transaction_id IS NULL
+    UNION
+    SELECT 'issue' AS type, amount, date 
+    FROM issue
+    WHERE user_id = :user_id
+    AND blockchain_transaction_id IS NULL
+    ORDER BY date DESC
+    """
+
+    res = db.execute(QUERY, {"user_id": user_id})
+    db.commit()
+    return list(res)
 
 
 async def get_audit_transactions(

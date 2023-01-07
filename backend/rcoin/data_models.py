@@ -12,6 +12,7 @@ class UserInformation(BaseModel):
     bank_account: str
     sort_code: str
     document_number: str
+    is_merchant: bool
 
     class Config:
         orm_mode = True
@@ -24,6 +25,7 @@ class UserTableInfo(BaseModel):
     last_name: str
     wallet_id: Union[str, bytes]
     document_number: str
+    is_merchant: bool
 
     class Config:
         orm_mode = True
@@ -45,6 +47,11 @@ class AlterBankAccount(BaseModel):
 
 class Friend(BaseModel):
     email: str
+
+
+class MerchantTransaction(BaseModel):
+    transaction_id: str
+    signature: str
 
 
 class LoginInformation(BaseModel):

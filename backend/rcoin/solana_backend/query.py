@@ -13,6 +13,7 @@ from solders.rpc.responses import (
 )
 from solders.transaction_status import (
     EncodedTransactionWithStatusMeta,
+    EncodedConfirmedTransactionWithStatusMeta,
 )
 
 from spl.token.constants import TOKEN_PROGRAM_ID
@@ -140,14 +141,14 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
         for status in resp.value
     ]
 
-    confirmed_transactions: list[EncodedTransactionWithStatusMeta] = [
-        (signature, transaction.value.transaction)
+    confirmed_transactions: list[EncodedConfirmedTransactionWithStatusMeta] = [
+        (signature, transaction.value.transaction, transaction.value.block_time)
         for signature, transaction in transactions
         if transaction.value
     ]
 
     processed_transactions = []
-    for signature, confirmed_transaction in confirmed_transactions:
+    for signature, confirmed_transaction, block_time in confirmed_transactions:
         # Skip the transaction if it doesn't have the metadata for some reason.
         if confirmed_transaction.meta is None:
             continue
@@ -216,6 +217,7 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
                 "sender": sender,
                 "recipient": recipient,
                 "amount": amount,
+                "block_time": block_time,
             }
         )
 

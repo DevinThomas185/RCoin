@@ -151,7 +151,7 @@ const BankAccounts = () => {
         </View>
       </Card>
       {open ? (
-        <Card spread centerV onPress>
+        <Card spread centerV onPress enableShadow>
           {bank_accounts.map((acc, i) => (
             <View row spread marginH-20 marginV-5 centerV key={i}>
               <Ionicons
@@ -189,6 +189,7 @@ const BankAccounts = () => {
           ))}
           <View spread centerV>
             <TextField
+              marginV-5
               placeholder="Account Number"
               style={styles.input}
               onChangeText={(value: string) => {

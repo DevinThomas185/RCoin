@@ -293,12 +293,14 @@ class TransactionLogItem:
         recipient: str,
         amount: float,
         signature: str,
+        block_time: int,
     ):
         self.transaction_type = transaction_type
         self.sender = sender
         self.recipient = recipient
         self.amount = amount
         self.signature = signature
+        self.block_time = block_time
 
 
 def _fix_transaction_format(transaction, public_key: str) -> TransactionLogItem:
@@ -323,6 +325,7 @@ def _fix_transaction_format(transaction, public_key: str) -> TransactionLogItem:
             recipient=transaction["sender"],
             amount=(-amount),
             signature=transaction["signature"],
+            block_time=transaction["block_time"],
         )
 
     else:
@@ -345,6 +348,7 @@ def _fix_transaction_format(transaction, public_key: str) -> TransactionLogItem:
             recipient=transaction["recipient"],
             amount=(transaction["amount"]),
             signature=transaction["signature"],
+            block_time=transaction["block_time"],
         )
 
     return fixed_transaction.__dict__

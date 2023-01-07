@@ -1,24 +1,28 @@
 import React from 'react';
-import {ScrollView} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {Card, Image, Text, View} from 'react-native-ui-lib';
+import {Card, Text, View} from 'react-native-ui-lib';
 import styles from '../style/style';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Config from 'react-native-config';
 import {useAuth} from '../contexts/Auth';
+import FriendAvatar from './FriendAvatar';
+import {useFriends} from '../contexts/FriendContext';
 
 const small_size = 50;
 
 const FriendElement = ({
-  name,
+  first_name,
+  last_name,
   email,
-  update,
+  wallet_id,
 }: {
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  update: () => void;
+  wallet_id: string;
 }) => {
   const auth = useAuth();
+  const friends_context = useFriends();
+
   const deleteFriend = () => {
     fetch(`${Config.API_URL}:8000/api/delete_friend`, {
       method: 'POST',
@@ -30,24 +34,24 @@ const FriendElement = ({
     }).catch(error => {
       console.log(error);
     });
-    update();
+    friends_context.refresh();
   };
 
   return (
     <Card style={{borderRadius: small_size / 2}}>
       <View row>
         <View flexS>
-          <Image
-            source={require('../style/deposit.png')}
-            style={{
-              height: small_size,
-              width: small_size,
-              borderRadius: small_size / 2,
-            }}
+          <FriendAvatar
+            size={small_size}
+            first_name={first_name}
+            last_name={last_name}
+            wallet_id={wallet_id}
           />
         </View>
         <View flexG center>
-          <Text text60>{name}</Text>
+          <Text text60>
+            {first_name} {last_name}
+          </Text>
           <Text text70>{email}</Text>
         </View>
         <View flexS centerV>

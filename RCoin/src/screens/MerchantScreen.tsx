@@ -9,8 +9,14 @@ import Config from 'react-native-config';
 import MerchantAmount from './MerchantStages/Merchant0Amount';
 import MerchantCode from './MerchantStages/Merchant1Code';
 import {useAuth} from '../contexts/Auth';
+import {NavigationScreenProp} from 'react-navigation';
+import Merchant2Success from './MerchantStages/Merchant2Success';
 
-const MerchantScreen = () => {
+const MerchantScreen = ({
+  navigation,
+}: {
+  navigation: NavigationScreenProp<any, any>;
+}) => {
   const [stage, setStage] = useState(0);
   const [amount, setAmount] = useState(0.0);
   const [transactionId, setTransactionId] = useState('');
@@ -63,11 +69,15 @@ const MerchantScreen = () => {
             setStage(1);
           }}
           setAmount={setAmount}
+          amount={amount}
         />
       );
     } else if (stage == 1) {
       return (
         <MerchantCode
+          returnToTerminal={() => {
+            setStage(0);
+          }}
           nextStage={() => {
             setStage(2);
           }}
@@ -78,12 +88,21 @@ const MerchantScreen = () => {
     } else {
       return (
         //success
-        <TransferSuccess
+        // <TransferSuccess
+        //   navigation={navigation}
+        //   nextStage={() => {
+        //     setStage(0);
+        //   }}
+        //   amount={amount}
+        //   recipient={'you'}
+        //   transactionId={transactionId}
+        // />
+        <Merchant2Success
+          navigation={navigation}
           nextStage={() => {
             setStage(0);
           }}
           amount={amount}
-          recipient={'you'}
           transactionId={transactionId}
         />
       );

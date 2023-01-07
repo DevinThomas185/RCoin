@@ -11,6 +11,7 @@ import PasswordPopup from '../../components/PasswordPopup';
 import PendingLoader from '../../components/PendingLoader';
 import Config from 'react-native-config';
 import SuspectedFraudError from '../../errors/SuspectedFraudError';
+import ChangingBalanceCard from '../../components/Balances/ChangingBalanceCard';
 
 const Transfer2Confirm = ({
   nextStage,
@@ -122,22 +123,31 @@ const Transfer2Confirm = ({
   };
 
   return (
-    <View flex>
-      <Text text40 style={styles.title} margin-30>
-        Confirm your transaction
-      </Text>
-      <View margin-30>
-        <ChangingBalance deduction={amount} />
+    <View flex marginH-10>
+      <View marginV-10>
+        <Text text40 style={styles.title}>
+          Confirm Transfer
+        </Text>
+      </View>
+
+      <View marginV-10>
         <TransferReceipt email={recipient} amount={amount} />
       </View>
-      <PendingLoader
-        loading={loading}
-        show={confirm_clicked}
-        response_state={response_state}
-        loading_page_message={loading_page_message}
-        custom_fail_message="Transfer failed, please confirm again"
-      />
-      <View flex bottom marginH-30 marginB-50>
+
+      <View flex>
+        {loading ? (
+          <PendingLoader
+            loading={loading}
+            show={confirm_clicked}
+            response_state={response_state}
+            loading_page_message={loading_page_message}
+            custom_fail_message="Transfer failed, please confirm again"
+          />
+        ) : (
+          <ChangingBalanceCard increment={-amount} />
+        )}
+      </View>
+      <View flex bottom marginV-10>
         <Button
           onPress={() => setIsModalVisible(true)}
           label={
@@ -148,7 +158,7 @@ const Transfer2Confirm = ({
               : 'Confirm Transfer'
           }
           disabled={loading || response_state == -2}
-          backgroundColor={styles.rcoin}
+          backgroundColor={styles.paystack}
         />
       </View>
       <PasswordPopup

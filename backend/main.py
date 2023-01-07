@@ -57,6 +57,7 @@ from rcoin.data_models import (
     BankAccount,
     AlterBankAccount,
     Friend,
+    MerchantTransaction,
     IssueTransaction,
     TradeTransaction,
     AuditTransactionsRequest,
@@ -371,6 +372,7 @@ async def signup(
             "last_name": user.last_name,
             "wallet_id": user.wallet_id,
             "document_number": user.document_number,
+            "is_merchant": user.is_merchant,
         }
     )
     temp.password = hash_password(user.password)
@@ -410,7 +412,13 @@ class JwtToken:
     iss = "imperial-server"
 
     def __init__(
-        self, user_id: str, email: str, name: str, trust_score: float, suspended: bool
+        self,
+        user_id: str,
+        email: str,
+        name: str,
+        trust_score: float,
+        suspended: bool,
+        is_merchant: bool,
     ):
         current_time = datetime.now(tz=timezone.utc)
         self.iat = current_time
@@ -422,6 +430,7 @@ class JwtToken:
             "name": name,
             "trust_score": trust_score,
             "suspended": suspended,
+            "is_merchant": is_merchant,
         }
 
     def get_jwt(self):
@@ -444,7 +453,12 @@ async def login(
 
     # Build the jwt
     token = JwtToken(
-        match.id, match.email, match.first_name, match.trust_score, match.suspended
+        user_id=match.id,
+        email=match.email,
+        name=match.first_name,
+        trust_score=match.trust_score,
+        suspended=match.suspended,
+        is_merchant=match.is_merchant,
     )
     jwt_token = token.get_jwt()
     return {
@@ -463,6 +477,7 @@ async def get_user(user: User = Depends(get_current_user)):
         "trust_score": user.trust_score,
         "suspended": user.suspended,
         "walled_id": user.wallet_id,
+        "is_merchant": user.is_merchant,
     }
 
 
@@ -549,10 +564,10 @@ async def transactionHistory(
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     wallet_id = user.wallet_id
-    transactions = solana_api.get_stablecoin_transactions(wallet_id).to_json()[
+    transaction_history = solana_api.get_stablecoin_transactions(wallet_id).to_json()[
         "transaction_history"
     ]
-    for transaction in transactions:
+    for transaction in transaction_history:
         sender = await database_api.get_user_by_wallet_id(transaction["sender"], db=db)
         recipient = await database_api.get_user_by_wallet_id(
             transaction["recipient"], db=db
@@ -562,7 +577,14 @@ async def transactionHistory(
         if recipient is not None:
             transaction["recipient"] = recipient.email
 
-    return {"transaction_history": transactions}
+    pending_transactions = await database_api.get_pending_transactions(
+        user_id=user.id, db=db
+    )
+
+    return {
+        "transaction_history": transaction_history,
+        "pending_transactions": pending_transactions,
+    }
 
 
 @app.post("/api/trade")
@@ -911,18 +933,16 @@ def get_rand_to_pay(
     amount_in_coins: float,
     user: User,
 ) -> float:
-    def receive_after_fee(a):
-        a *= 100
-        c = 0 if a < 1000 else 100
-        return math.ceil((a - (1.15 * (math.ceil(0.029 * a) + c))) / 100)
+    # def receive_after_fee(a):
+    #     a *= 100
+    #     c = 0 if a < 1000 else 100
+    #     return math.ceil((a - (1.15 * (math.ceil(0.029 * a) + c))) / 100)
 
     res = amount_in_coins
-    after_fee = receive_after_fee(res)
-    print(after_fee)
-    while after_fee < amount_in_coins:
-        res += 1
-        after_fee = receive_after_fee(res)
-        print(after_fee, amount_in_coins - after_fee)
+    # after_fee = receive_after_fee(res)
+    # while after_fee < amount_in_coins:
+    #     res += 1
+    #     after_fee = receive_after_fee(res)
 
     return res * user.trust_score
 
@@ -968,18 +988,30 @@ async def get_merchant_transaction_api(
     return {"transaction_id": transaction_id}
 
 
+def wait_for_transaction_in_redis(id):
+    max_wait = 10
+
+    count = 0
+    while not r.exists(id) and count < max_wait:
+        time.sleep(1)
+
+    return r.exists(id)
+
+
 @app.get("/api/merchant_transaction_status")
 async def merchant_transaction_status_api(
     transaction_id: str,
     user: User = Depends(get_current_user),
 ) -> dict[str, str]:
-    id = transaction_id
-    print("<<<<<<<" + transaction_id)
-    print("<<<<<<<" + id)
-    # if r.exists(id):
-    data = r.get(id)
+
+    exists = wait_for_transaction_in_redis(transaction_id)
+    if not exists:
+        return {"complete": "false, transaction cannot be found in time"}
+
+    data = r.get(transaction_id)
     print("data from get end: " + str(data))
-    result = json.loads(str(data))
+    # result = json.loads(str(data))
+    result = json.loads(data)
     print("data from get end: " + str(result))
 
     return {"complete": result["complete"]}
@@ -996,6 +1028,11 @@ async def complete_merchant_transaction_api(
 ) -> dict[str, str]:
     print("trans_id from get end: " + transaction_id)
     id = transaction_id[2:]
+
+    exists = wait_for_transaction_in_redis(id)
+    if not exists:
+        return {"complete": "false, transaction cannot be found in time"}
+
     if r.exists(id):
         data = r.get(id)
         print("data from get end: " + str(data))
@@ -1011,17 +1048,21 @@ async def complete_merchant_transaction_api(
 
 # AFTER SENDER SIGNS THE TRANSACTION, SENDER UPDATAES THE REDIS
 @app.post("/api/sign_merchant_transaction")
-async def sign_merchant_transaction(request: Request) -> dict[str, Any]:
-    input = await request.json()
+async def sign_merchant_transaction(mt: MerchantTransaction) -> dict[str, Any]:
 
-    transaction_id = input["transaction_id"]
-    signature = input["signature"]
+    transaction_id = mt.transaction_id
+    signature = mt.signature
+
+    exists = wait_for_transaction_in_redis(transaction_id)
+    if not exists:
+        return {"complete": "false, transaction cannot be found in time"}
 
     print("tid: ", transaction_id)
 
     data = r.get(transaction_id)
     print("data from get end: " + str(data))
-    result = json.loads(str(data))
+    # result = json.loads(str(data))
+    result = json.loads(data)
 
     print("before" + str(data))
 
@@ -1037,7 +1078,8 @@ async def sign_merchant_transaction(request: Request) -> dict[str, Any]:
 
     data = r.get(transaction_id)
     print("data from get end: " + str(data))
-    result = json.loads(str(data))
+    # result = json.loads(str(data))
+    result = json.loads(data)
 
     print("after" + str(data))
 
@@ -1106,7 +1148,7 @@ async def recieve_issue_webhook(
 
         THIRTY_MINUTES = 60 * 30
         # Need to add timeout to other functions like waiting for blockchain
-        lock_name = f"{user_id}"  # can we lock on amount too, less coarse?
+        lock_name = f"{user_id} {amount}"
         async with redis_lock(lock_name, timeout=THIRTY_MINUTES) as lock:
 
             issue_check = await get_should_issue_stage(transaction_id, user, amount, db)
@@ -1249,9 +1291,17 @@ def send_email(subject: str, message: str, reply_to=None) -> None:
 
 
 # remove this when going to prod
-@app.get("/api/logs")
+@app.get("/api/error-log")
 async def get_logs():
-    with open("logs/logfile.log", "r") as file:
+    with open("logs/error.log", "r") as file:
+        output = file.read()
+
+    return output
+
+
+@app.get("/api/access-log")
+async def get_logs():
+    with open("logs/access.log", "r") as file:
         output = file.read()
 
     return output

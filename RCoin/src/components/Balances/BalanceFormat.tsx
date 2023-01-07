@@ -20,7 +20,7 @@ const BalanceFormat = ({token_balance}: {token_balance: number}) => {
         source={require('../../style/Logo.png')}
         style={styles.balanceLogo}
       />
-      <Text text20 grey10 left>
+      <Text text30 grey10 left>
         {numberWithCommas(token_balance)}
       </Text>
     </View>

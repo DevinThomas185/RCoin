@@ -1,20 +1,21 @@
 import {ScrollView} from 'react-native';
-import {Button, Text, View, Incubator} from 'react-native-ui-lib';
+import {Button, View, Incubator} from 'react-native-ui-lib';
 import styles from '../../style/style';
 import React, {useEffect, useState} from 'react';
 import FriendElement from '../../components/FriendElement';
 import Config from 'react-native-config';
 import {useAuth} from '../../contexts/Auth';
+import {useFriends} from '../../contexts/FriendContext';
 const {TextField} = Incubator;
 
 const FriendsScreen = () => {
   const [loading, setLoading] = useState(false);
   const initArr: any[] = [];
-  const [friends, setFriends] = useState<any[]>(initArr);
   const [newFriendEmail, setNewFriendEmail] = useState('');
   const [valid, setValid] = useState(false);
 
   const auth = useAuth();
+  const friends_context = useFriends();
 
   function isEmailValid(email: string): Promise<boolean> {
     return fetch(`${Config.API_URL}:8000/api/trade-email-valid`, {
@@ -53,32 +54,8 @@ const FriendsScreen = () => {
       setLoading(false);
       console.log(error);
     });
-    updateFriends();
+    friends_context.refresh();
   };
-
-  const updateFriends = () => {
-    setLoading(true);
-    fetch(`${Config.API_URL}:8000/api/get_friends`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${auth.authData?.token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        setFriends(data['friends']);
-        setLoading(false);
-      })
-      .catch(error => {
-        setLoading(false);
-        console.log(error);
-      });
-  };
-
-  useEffect(() => {
-    updateFriends();
-  }, []);
 
   if (loading) {
     return <></>;
@@ -86,12 +63,13 @@ const FriendsScreen = () => {
     return (
       <View flex margin-10>
         <ScrollView>
-          {friends.map(friend => (
+          {friends_context.friends.map(friend => (
             <View paddingV-5 key={friend.id}>
               <FriendElement
-                name={friend.first_name + ' ' + friend.last_name}
+                first_name={friend.first_name}
+                last_name={friend.last_name}
+                wallet_id={friend.wallet_id}
                 email={friend.email}
-                update={updateFriends}
               />
             </View>
           ))}

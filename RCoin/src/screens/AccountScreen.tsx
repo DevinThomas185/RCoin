@@ -21,7 +21,7 @@ const AccountScreen = () => {
           component={AccountSelect}
           options={{headerShown: false}}
         />
-        <Stack.Screen name="Common Payees" component={FriendsScreen} />
+        <Stack.Screen name="Quick Contacts" component={FriendsScreen} />
         <Stack.Screen name="FAQ" component={FAQScreen} />
         <Stack.Screen name="Support" component={SupportScreen} />
         <Stack.Screen name="Account Details" component={AccountDetails} />

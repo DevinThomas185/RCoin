@@ -1,25 +1,33 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, Button, Picker} from 'react-native-ui-lib';
+import {Text, View, Button, Incubator, Card} from 'react-native-ui-lib';
+
 import {useAuth} from '../../contexts/Auth';
 import styles from '../../style/style';
-import Balance from '../../components/Balances/Balance';
-import AmountEntry from '../../components/AmountEntry';
 import Config from 'react-native-config';
+import {Picker} from 'react-native-wheel-pick';
 
 // Select Account
 const WithdrawStage1 = ({
   nextStage,
-  setCoinsToWithdraw,
   setBankAccount,
+  current_bank_account,
 }: {
   nextStage: React.Dispatch<void>;
-  setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
   setBankAccount: React.Dispatch<React.SetStateAction<{[key: string]: string}>>;
+  current_bank_account: {[key: string]: string};
 }) => {
   const auth = useAuth();
 
-  const [token_balance, setTokenBalance] = useState(0.0);
-  const [valid, setValid] = useState(false);
+  const [bank_accounts, setBankAccounts] = useState<any[]>([]);
+
+  let bank_account_items = bank_accounts.map(
+    (item: {[key: string]: string}, i: number) => ({
+      label:
+        'Account ' + (i + 1) + ': ' + item.bank_account + ' ' + item.sort_code,
+      value: item.bank_account + '|' + item.sort_code,
+      align: Incubator.WheelPickerAlign.RIGHT,
+    }),
+  );
 
   useEffect(() => {
     fetch(`${Config.API_URL}:8000/api/get_default_bank_account`, {
@@ -38,16 +46,17 @@ const WithdrawStage1 = ({
         console.log(error);
       });
 
-    fetch(`${Config.API_URL}:8000/api/get_token_balance`, {
+    fetch(`${Config.API_URL}:8000/api/get_bank_accounts`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-type': 'application/json',
         Authorization: `Bearer ${auth.authData?.token}`,
       },
     })
       .then(res => res.json())
       .then(data => {
-        setTokenBalance(data['token_balance']);
+        console.log(data);
+        setBankAccounts(data['bank_accounts']);
       })
       .catch(error => {
         console.log(error);
@@ -55,54 +64,90 @@ const WithdrawStage1 = ({
   }, []);
 
   return (
-    <View flex>
-      <Text text40 style={styles.title}>
-        Choose an Amount
-      </Text>
-      <View marginH-20>
-        <Balance />
+    <View flex marginH-10>
+      <View marginV-10>
+        <Text text40 style={styles.title}>
+          Choose Bank Account
+        </Text>
+        <Text text70>Choose the bank account to deposit the Rand into.</Text>
       </View>
 
-      <View marginH-30>
-        <Text>How much would you like to withdraw?</Text>
-        <AmountEntry
-          setAmount={setCoinsToWithdraw}
-          least_limit={0}
-          max_limit={token_balance}
-          tellButton={setValid}
-        />
+      <View flex centerV>
+        <View center>
+          <Text text50>Selected Bank Account</Text>
+        </View>
+        <View
+          marginV-10
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={styles.bankDetails}>
+            {current_bank_account['bank_account']}
+            {'\n'}
+            {current_bank_account['sort_code']}
+          </Text>
+          <Text style={styles.bankDetailsLabel}>
+            Account Number
+            {'\n'}
+            Bank Code
+          </Text>
+        </View>
+        <Card
+          enableShadow
+          center
+          style={{flexDirection: 'row'}}
+          activeOpacity={1}
+          selectionOptions={{
+            color: styles.rcoin,
+            indicatorSize: 25,
+            borderWidth: 3,
+          }}>
+          {/* <Incubator.WheelPicker
+            initialValue={
+              current_bank_account['bank_account'] +
+              ' ' +
+              current_bank_account['sort_code']
+            }
+            activeTextColor={styles.success}
+            inactiveTextColor={styles.grey}
+            items={bank_account_items}
+            onChange={(new_bank_account: string) => {
+              let split = new_bank_account.split('|');
+              setBankAccount({
+                bank_account: split[0],
+                sort_code: split[1],
+              });
+            }}
+          /> */}
+          {current_bank_account.bank_account != '' && (
+            <Picker
+              style={{backgroundColor: 'white', width: 300, height: 215}}
+              selectedValue={
+                current_bank_account.bank_account +
+                ' ' +
+                current_bank_account.sort_code
+              }
+              pickerData={bank_accounts.map(
+                bank_account =>
+                  bank_account.bank_account + ' ' + bank_account.sort_code,
+              )}
+              onValueChange={(new_bank_account: string) => {
+                let split = new_bank_account.split(' ');
+                setBankAccount({
+                  bank_account: split[0],
+                  sort_code: split[1],
+                });
+              }}
+            />
+          )}
+        </Card>
       </View>
 
-      {/* <View margin-30>
-        <Text text60 grey10>
-          Select which account you'd like to be paid into
-        </Text>
-        <Text text70 marginT-20>
-          Bank Account: {current_bank_account['bank_account']}
-        </Text>
-        <Text text70 marginT-20>
-          Sort Code: {current_bank_account['sort_code']}
-        </Text>
-        {/* <Picker
-          migrateTextField
-          useWheelPicker
-          value={current_bank_account["bank_account"]}
-          onChange={(account: string) => {setBankAccount(account)}}  
-        >
-          {bank_accounts.map((account) => {
-            return <Picker.Item 
-                      key={account["bank_account"]}
-                      value={account["bank_account"]}
-                      label={"Account: " + account["bank_account"]}
-                    />
-          })}
-        </Picker>
-      </View> */}
-
-      <View flex bottom marginH-30 marginB-10>
+      <View bottom marginV-10>
         <Button
           onPress={nextStage}
-          disabled={!valid}
           label="Continue"
           backgroundColor={styles.rcoin}
         />

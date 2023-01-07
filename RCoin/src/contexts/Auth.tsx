@@ -60,6 +60,7 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
               trust_score: data_['trust_score'],
               suspended: data_['suspended'],
               wallet_id: data_['walled_id'],
+              is_merchant: data_['is_merchant'],
             },
           });
         }

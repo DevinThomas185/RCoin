@@ -5,6 +5,7 @@ import styles from '../style/style';
 import {RouteProp} from '@react-navigation/native';
 import QR0Confirm from './QRStages/QR0Confirm';
 import QR1Success from './QRStages/QR1Success';
+import {NavigationScreenProp} from 'react-navigation';
 
 type RootStackParamList = {
   MerchantTransaction: {
@@ -16,8 +17,10 @@ type RootStackParamList = {
 
 const MerchantTransferScreen = ({
   route,
+  navigation,
 }: {
   route: RouteProp<RootStackParamList, 'MerchantTransaction'>;
+  navigation: NavigationScreenProp<any, any>;
 }) => {
   const recipient = route.params.qr_recipient;
   const amount = route.params.qr_amount;
@@ -70,6 +73,7 @@ const MerchantTransferScreen = ({
           amount={amount}
           recipient={recipient}
           transactionId={transactionId}
+          navigation={navigation}
         />
       );
     }

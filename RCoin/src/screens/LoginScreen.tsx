@@ -27,7 +27,7 @@ export const LoginScreen = ({
           style={{height: 100, width: 100}}
         />
         <Text text30 color="white">
-          Log In
+          Welcome to RCoin
         </Text>
       </View>
 

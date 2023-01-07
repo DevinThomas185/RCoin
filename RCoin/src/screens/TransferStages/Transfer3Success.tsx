@@ -1,6 +1,7 @@
 import React from 'react';
 import {Text, View, Button, Image} from 'react-native-ui-lib';
 import {NavigationScreenProp} from 'react-navigation';
+import {useFriends} from '../../contexts/FriendContext';
 import styles from '../../style/style';
 
 // Select the amount
@@ -17,9 +18,19 @@ const Transfer2Confirm = ({
   recipient: string;
   transactionId: string;
 }) => {
+  const friends_context = useFriends();
+
+  const numberWithCommas = (x: number) => {
+    const options = {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    };
+    return Number(x).toLocaleString('en', options);
+  };
+
   return (
-    <View flex>
-      <View marginT-30 style={{alignSelf: 'center'}}>
+    <View flex marginH-10>
+      <View style={{alignSelf: 'center'}} marginV-10>
         <Image source={require('../../style/Success.png')} />
       </View>
       <Text
@@ -30,36 +41,35 @@ const Transfer2Confirm = ({
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        Successful
+        Success!
       </Text>
 
-      <View margin-30>
-        <Text style={styles.buttonCaption}>
-          {amount} RCoin has successfully been sent to {recipient}
+      <View marginV-10>
+        <Text text50 center>
+          {numberWithCommas(amount)} RCoin has been sent to{' '}
+          {friends_context.match_email(recipient)}
         </Text>
-        <Text>Transaction ID = {transactionId}</Text>
       </View>
-      <View flex bottom marginH-30 marginB-20>
-        <Text style={styles.buttonCaption}>
-          You can now see your updated balance on the dashboard
+
+      <View marginV-20>
+        <Text text60 center>
+          It may take a few minutes for your balance to update.
         </Text>
+      </View>
+      <View flex bottom>
         <Button
-          onPress={() => {
-            navigation.navigate('Transfer', {
-              qr_amount: 0,
-              qr_recipient: '',
-            });
-            navigation.navigate('Home');
-            nextStage();
-          }}
-          label="RCoin Dashboard"
+          marginV-10
+          onPress={nextStage} //navigate to transfer page
+          label="Make another transfer"
           backgroundColor={styles.rcoin}
         />
-      </View>
-      <View flex bottom marginH-30 marginB-50>
         <Button
-          onPress={nextStage}
-          label="Make another Transfer"
+          marginV-10
+          onPress={() => {
+            navigation.navigate('Home');
+            nextStage();
+          }} //navigate to dashboard page
+          label="Back to Dashboard"
           backgroundColor={styles.rcoin}
         />
       </View>

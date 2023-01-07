@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {StyleSheet} from 'react-native';
+import {Alert, StyleSheet} from 'react-native';
 import {View, Button, Incubator, Text, LoaderScreen} from 'react-native-ui-lib'; //eslint-disable-line
 import {Table, Row, Rows} from 'react-native-table-component';
 import {UserSignUp} from '../../types/SignUp';
@@ -7,6 +7,7 @@ const {TextField} = Incubator;
 import {NavigationScreenProp} from 'react-navigation';
 import Config from 'react-native-config';
 import * as bip39 from '../../best_practice_here/bip39';
+import Style from '../../style/style';
 
 // https://github.com/uuidjs/uuid/issues/416
 import {v4 as uuidv4} from 'uuid'; // Very important, do not remove plz!!!!!
@@ -33,6 +34,13 @@ export const StepFour = ({
   const [loading, setLoading] = useState(true);
   const keyPair = useKeypair();
   const [tableData, setTableData] = useState<string[][]>([]);
+
+  const createSignupFailedAlert = () =>
+    Alert.alert(
+      'There was a problem while signing up.',
+      'Please go back and try again',
+      [{text: 'Ok', onPress: () => console.log('OK Pressed')}],
+    );
 
   useEffect(() => {
     const mnemonic = bip39.generateMnemonic();
@@ -70,6 +78,7 @@ export const StepFour = ({
             bank_account: signUpDetails.bankAccountNumber,
             sort_code: signUpDetails.bankCode,
             document_number: signUpDetails.IDNumber,
+            is_merchant: signUpDetails.is_merchant,
           },
           null,
           2,
@@ -77,7 +86,7 @@ export const StepFour = ({
       })
         .then(res => {
           if (!res.ok) {
-            throw new Error('signup failed');
+            throw new Error('signup failed' + res.json());
           }
           return res.json();
         })
@@ -87,24 +96,42 @@ export const StepFour = ({
             setLoading(false);
           }
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          createSignupFailedAlert();
+          console.log(error);
+        });
     });
   }, []);
 
   return (
     <>
       {loading ? (
-        <LoaderScreen message={'Signing Up'} />
+        <LoaderScreen message={'Signing Up'} loaderColor={Style.rcoin} />
       ) : (
         <View>
-          <Text>
-            Please write down your recovery phrase. It can be used to recover
-            your account in case you lose your phone.
-          </Text>
-          <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
-            <Rows data={tableData} textStyle={styles.text} />
-          </Table>
-          <Button label={'Done'} onPress={() => navigation.navigate('Login')} />
+          <View>
+            <Text text40 style={Style.title}>
+              Recovery Phrase
+            </Text>
+          </View>
+          <View marginV-10>
+            <Text>
+              Please write down your recovery phrase. It can be used to recover
+              your wallet in case you lose your phone.
+            </Text>
+          </View>
+          <View marginV-10>
+            <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
+              <Rows data={tableData} textStyle={styles.text} />
+            </Table>
+          </View>
+          <View marginV-10>
+            <Button
+              backgroundColor={Style.rcoin}
+              label={'Done'}
+              onPress={() => navigation.navigate('Login')}
+            />
+          </View>
         </View>
       )}
     </>
@@ -121,8 +148,6 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    padding: 14,
-    margin: 20,
     width: '80%',
     justifyContent: 'center',
     alignSelf: 'center',
