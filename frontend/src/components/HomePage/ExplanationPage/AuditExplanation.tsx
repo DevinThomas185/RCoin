@@ -70,12 +70,15 @@ const GetStartedPointer = ({
 };
 const MobileButtonGroup = ({ onGetStarted }: { onGetStarted: () => void }) => {
   return (
-    <HStack>
-      <AuditPointer imageHeight="100px" maxWidth="200px" />
+    <HStack marginTop="25px" marginBottom="25px">
+      <AuditPointer
+        // imageHeight="100px"
+        maxWidth="80%"
+      />
       <GetStartedPointer
-        imageHeight="100px"
+        // imageHeight="100px"
         onGetStarted={onGetStarted}
-        maxWidth="100%"
+        maxWidth="80%"
       />
     </HStack>
   );
@@ -87,6 +90,39 @@ const ButtonGroup = ({ onGetStarted }: { onGetStarted: () => void }) => {
       <AuditPointer />
       <GetStartedPointer onGetStarted={onGetStarted} />
     </Grid>
+  );
+};
+const MobileAuditDescription = ({
+  overrideWidth,
+}: {
+  overrideWidth?: string;
+}) => {
+  const width = overrideWidth ? overrideWidth : "fit-content";
+
+  const fontSize = "42px";
+  return (
+    <Box
+      bg="white"
+      // justifySelf="right"
+      // alignItems="center"
+      maxWidth={width}
+      height="fit-content"
+      padding="2"
+    >
+      <div className="mobileTitle" style={{ fontSize: fontSize }}>
+        <h1>Transparency in everything we do</h1>
+
+        <div className="glass-child glass"></div>
+      </div>
+      <Text>
+        Every transaction we make is visible on the blockchain ensuring fair
+        play. Our real-time auditing system shows every ZAR transfer flowing
+        into and out of our reserve account and the corresponding on-chain
+        transaction. This ensures that every RCoin we issue is backed by exactly
+        1 Rand. That way all of our users can withdraw their Rand anytime,
+        anywhere.
+      </Text>
+    </Box>
   );
 };
 
@@ -128,7 +164,7 @@ const MobileAuditExplanation = ({
 }) => {
   return (
     <Grid>
-      <AuditDescription />
+      <MobileAuditDescription />
       <MobileButtonGroup onGetStarted={onGetStarted} />
     </Grid>
   );

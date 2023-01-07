@@ -3,6 +3,7 @@ import {
   Box,
   Grid,
   HStack,
+  Flex,
   Text,
   Button,
   useBreakpointValue,
@@ -35,8 +36,10 @@ const AuditExplanationPopup = () => {
 
   return (
     <Grid
-      bg="rcoinBlue.100"
-      borderRadius="25px"
+      bg="rcoinBlue.1000"
+      borderRadius="5px"
+      borderColor="rcoinBlue.1100"
+      borderWidth="5px"
       marginLeft="auto"
       marginRight="auto"
       minWidth={width}
@@ -49,22 +52,39 @@ const AuditExplanationPopup = () => {
         fontSize="4xl"
         marginLeft="20px"
         fontWeight="bold"
-        color="rcoinBlue.700"
+        color="rcoinBlue.1100"
       >
         Why do we need the Audit?
       </Box>
       <HStack>
         {useMobileView ? null : (
-          <Image
-            src="parity.png"
-            maxWidth="20%"
-            justifySelf="center"
-            fit="contain"
-          />
+          <Flex maxWidth="20%" flexDirection="row" marginLeft="10px">
+            <Image
+              src="cashIcon.png"
+              maxWidth="45%"
+              // justifySelf="center"
+              fit="contain"
+            />
+            <Text
+              fontSize="30px"
+              marginLeft="7px"
+              marginRight="7px"
+              color="black"
+            >
+              {" "}
+              ={" "}
+            </Text>
+            <Image
+              src="coinIcon.png"
+              maxWidth="30%"
+              // justifySelf="center"
+              fit="contain"
+            />
+          </Flex>
         )}
         <Text
-          marginLeft="30px"
-          marginRight="30px"
+          marginLeft="20px"
+          paddingRight="30px"
           textAlign="left"
           color="black"
         >

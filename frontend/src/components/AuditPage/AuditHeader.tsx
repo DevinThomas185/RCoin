@@ -74,25 +74,25 @@ const AuditHeader = () => {
         direction={headerDirection}
         marginLeft="auto"
         marginRight="auto"
-        bg="rcoinBlue.100"
-        borderRadius="35px"
+        bg="rcoinBlue.1000"
+        borderRadius="5px"
         padding="10px"
       >
         <Box
           textAlign="center"
           fontSize="4xl"
           fontWeight="bold"
-          color="rcoinBlue.700"
+          color="rcoinBlue.1100"
         >
           <Grid>
-            <Box>Real-Time Audit</Box>
+            <Box marginBottom="5px">Real-Time Audit</Box>
             <HStack
               marginLeft="auto"
               marginTop="-5px"
               paddingLeft="10px"
               color="black"
-              bg="rcoinBlue.50"
-              borderRadius="25px"
+              bg="rcoinBlue.1000"
+              borderRadius="5px"
               width="fit-content"
             >
               <Text fontSize="sm"> Last Update:</Text>
@@ -100,7 +100,12 @@ const AuditHeader = () => {
                 {" "}
                 {date}{" "}
               </Box>
-              <Box fontWeight="bold" fontSize="md">
+              <Box
+                fontWeight="bold"
+                fontSize="md"
+                width={"100px"}
+                marginRight="auto"
+              >
                 {" "}
                 {time}{" "}
               </Box>
