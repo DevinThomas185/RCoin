@@ -46,7 +46,7 @@ const TransactionLog = ({
   return (
     <Grid ref={ref} onClick={onToggle} gap={1}>
       <Box
-        borderRadius="25"
+        borderRadius="5"
         bg="rcoinBlue.50"
         width={width}
         transition="transform 0.15s ease-out, background 0.15s ease-out"
@@ -78,7 +78,7 @@ const TransactionIcon = ({
   const image =
     transaction_type == "issue" ? "increase_block.png" : "decrease_block.png";
 
-  return <Image src={image} boxSize="40px" borderRadius="25px" />;
+  return <Image src={image} boxSize="40px" borderRadius="5px" />;
 };
 
 const TransactionAmount = ({ amount }: { amount: number }) => {
@@ -151,7 +151,7 @@ const TransactionDetailsPopup = ({ transaction }: { transaction: any }) => {
       boxShadow="inner"
       p="6"
       rounded="md"
-      borderRadius="25"
+      borderRadius="5"
       padding="3px"
       bg="rcoinBlue.100"
     >

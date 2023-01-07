@@ -40,6 +40,12 @@ span {
   font-weight: bold;
 }
 
+.mobileTitle {
+  position: relative;
+  font-size: 42px;
+  font-weight: bold;
+}
+
 .glass-child {
   position: absolute;
   top: 0;

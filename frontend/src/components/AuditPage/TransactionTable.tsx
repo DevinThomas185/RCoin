@@ -35,7 +35,7 @@ const TransactionTable = ({
         maxWidth={maxWidth}
         minWidth={minWidth}
         minHeight="600px"
-        borderRadius="25px"
+        borderRadius="5px"
         isLoaded={isLoaded}
       >
         <TableContainer
@@ -77,7 +77,7 @@ const TransactionTableHeader = ({
 
   return (
     <Box
-      borderRadius="25"
+      borderRadius="5"
       bg="rcoinBlue.50"
       width={width}
       marginLeft="auto"

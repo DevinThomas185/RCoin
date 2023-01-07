@@ -31,14 +31,8 @@ const SolanaButton = ({ maxWidth }: { maxWidth: string }) => {
 const MobileSolanaExplanation = () => {
   return (
     <Grid gap={6}>
-      <Box
-        bg="white"
-        alignItems="center"
-        height="fit-content"
-        padding="2"
-        borderRadius="25"
-      >
-        <Text alignSelf="center" fontSize="4xl" color="black" fontWeight="bold">
+      <Box alignItems="center" height="fit-content" padding="2">
+        <Text alignSelf="center" fontSize="5xl" color="black" fontWeight="bold">
           Rand on a Blockchain
         </Text>
         <Text alignSelf="center">
@@ -48,7 +42,7 @@ const MobileSolanaExplanation = () => {
           this, our fees are significantly lower than traditional services.
         </Text>
       </Box>
-      <SolanaButton maxWidth="300px" />
+      <SolanaButton maxWidth="75%" />
     </Grid>
   );
 };

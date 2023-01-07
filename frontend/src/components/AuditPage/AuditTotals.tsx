@@ -25,8 +25,8 @@ const DataCard = ({
   const color = valueColor ? valueColor : "black";
   return (
     <Grid
-      borderRadius="25px"
-      bg="rcoinBlue.200"
+      borderRadius="2px"
+      bg="rcoinBlue.1100"
       boxShadow="md"
       marginLeft="10px"
       marginTop={topMargin}
@@ -36,12 +36,12 @@ const DataCard = ({
         fontSize="2xl"
         marginLeft="15px"
         fontWeight="bold"
-        color="rcoinBlue.800"
+        color="rcoinBlue.1000"
       >
         {title}
       </Box>
       <HStack
-        borderRadius="25px"
+        borderRadius="2px"
         bg="rcoinBlue.50"
         paddingLeft="10px"
         paddingRight="10px"
@@ -78,7 +78,7 @@ const AuditTotals = ({
   const direction = useMobileView ? "column" : "row";
   const itemTopMargin = useMobileView ? "10px" : "0px";
   return (
-    <Skeleton borderRadius="25px" isLoaded={isLoaded}>
+    <Skeleton borderRadius="5px" isLoaded={isLoaded}>
       <Flex direction={direction} justifyContent="center">
         <DataCard
           title="In Reserve"

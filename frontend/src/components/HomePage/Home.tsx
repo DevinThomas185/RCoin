@@ -22,7 +22,7 @@ const Home = () => {
       <div id="LearnMore"></div>
       <ExplanationPage onGetStarted={onGetStarted} />
       <div id="GetStarted"></div>
-      <GetStartedPage />
+      <GetStartedPage onLearnMore={onGetStarted} />
     </ChakraProvider>
   );
 };

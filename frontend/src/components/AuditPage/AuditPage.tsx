@@ -48,10 +48,8 @@ const AuditPage = () => {
     }
   };
 
-  const gradientSetting = `linear(to-br, white, rcoinBlue.400)`;
-
   return (
-    <Box bgGradient={gradientSetting} minHeight="100vh">
+    <Box bgColor={"rcoinBlue.1000"} minHeight="100vh">
       <Grid gap={1}>
         <AuditHeader />
         <TransactionTable
