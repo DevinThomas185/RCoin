@@ -306,50 +306,26 @@ class TransactionLogItem:
 def _fix_transaction_format(transaction, public_key: str) -> TransactionLogItem:
     amount = transaction["amount"] / (10 ** (TOKEN_DECIMALS))
 
-    if amount < 0:
-        if transaction["sender"] == public_key:
-            if transaction["recipient"] == str(TOKEN_OWNER):
-                transaction_type = TransactionType.Deposit
-            else:
-                transaction_type = TransactionType.Recieve
-
+    if transaction["sender"] == public_key:
+        if transaction["recipient"] == str(TOKEN_OWNER):
+            transaction_type = TransactionType.Withdraw
         else:
-            if transaction["sender"] == str(TOKEN_OWNER):
-                transaction_type = TransactionType.Withdraw
-            else:
-                transaction_type = TransactionType.Send
-
-        fixed_transaction = TransactionLogItem(
-            transaction_type,
-            sender=transaction["recipient"],
-            recipient=transaction["sender"],
-            amount=(-amount),
-            signature=transaction["signature"],
-            block_time=transaction["block_time"],
-        )
+            transaction_type = TransactionType.Send
 
     else:
-        # Flipped
-        if transaction["sender"] == public_key:
-            if transaction["recipient"] == str(TOKEN_OWNER):
-                transaction_type = TransactionType.Withdraw
-            else:
-                transaction_type = TransactionType.Send
-
+        if transaction["sender"] == str(TOKEN_OWNER):
+            transaction_type = TransactionType.Deposit
         else:
-            if transaction["sender"] == str(TOKEN_OWNER):
-                transaction_type = TransactionType.Deposit
-            else:
-                transaction_type = TransactionType.Recieve
+            transaction_type = TransactionType.Recieve
 
-        fixed_transaction = TransactionLogItem(
-            transaction_type,
-            sender=transaction["sender"],
-            recipient=transaction["recipient"],
-            amount=amount,
-            signature=transaction["signature"],
-            block_time=transaction["block_time"],
-        )
+    fixed_transaction = TransactionLogItem(
+        transaction_type,
+        sender=transaction["sender"],
+        recipient=transaction["recipient"],
+        amount=amount,
+        signature=transaction["signature"],
+        block_time=transaction["block_time"],
+    )
 
     return fixed_transaction.__dict__
 

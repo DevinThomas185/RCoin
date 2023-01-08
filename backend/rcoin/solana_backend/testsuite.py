@@ -1,4 +1,5 @@
 from solana.keypair import Keypair
+from solana.publickey import PublicKey
 from solana.transaction import Transaction
 
 from rcoin.solana_backend import api
@@ -128,3 +129,12 @@ def finalise_trisig_transaction(transaction: Transaction, secret_key: bytes):
     result: CustomResponse = api.send_and_confirm_transaction(transaction)
 
     assert isinstance(result, Success)
+
+def test_get_transaction_history(public_key: str):
+    resp: CustomResponse = api.get_stablecoin_transactions(public_key)
+
+    print(resp.to_json()[
+        "transaction_history"
+    ])
+
+
