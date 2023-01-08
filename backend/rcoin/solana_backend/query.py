@@ -19,6 +19,7 @@ from solders.transaction_status import (
 from spl.token.constants import TOKEN_PROGRAM_ID
 
 from rcoin.solana_backend.common import (
+    FEE_ACCOUNT,
     RESERVE_ACCOUNT,
     SOLANA_CLIENT,
     LAMPORTS_PER_SOL,
@@ -160,18 +161,19 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
             continue
 
         # We are looking for transactions involving the transfer of tokens,
-        # hence we expect that there are precisely 2 accounts involved
-        # in the transaction and hence we expect that the list indicating
-        # the balances of the accounts involved after the transaction has the
-        # length of 2. We don't consider the list of pre_token_balances,
+        # hence we expect that there are 2 or 3 accounts involved
+        # (3 in case of a transfer when the fee account is involved)
+        # in the transaction. When checking the length of the list ,
+        # we don't consider the list of pre_token_balances,
         # because there is an edge case when we send to an account which doesn't
         # have an associated token account and then the token account is created
         # but not included in pre_token_balances as it doesn't exist at that
         # point.
-        if len(post_token_balances) != 2:
+        if len(post_token_balances) != 2 and len(post_token_balances) != 3:
             continue
 
         is_relevant = True
+
         # We are searching only for transactions which involved some transfer
         # of our stablecoin tokens. Hence, if the mint associated with either
         # of the two accounts is not equal to the address of our mint account,
@@ -190,27 +192,43 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
         if not is_relevant:
             continue
 
-        if (
-            pre_token_balances[0].account_index == post_token_balances[0].account_index
-            and len(pre_token_balances) == 2
-        ):
-            # Both sender's and recipient's token accounts existed before
-            # the transaction (usual scenario)
-            sender = str(post_token_balances[0].owner)
-            recipient = str(post_token_balances[1].owner)
-            amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
-                post_token_balances[0].ui_token_amount.amount
-            )
-        else:
-            # Edge case when the recipient didn't have a token account before
-            # transaction and it was created on request.
-            sender = str(pre_token_balances[0].owner)
-            recipient = str(post_token_balances[0].owner)
-            amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
-                post_token_balances[1].ui_token_amount.amount
-            )
+        def get_balances_map(balances_list):
+            balance_map = {}
+            for token_balance in balances_list:
+                owner: str = str(token_balance.owner)
+                balance_map[owner] = int(token_balance.ui_token_amount.amount)
 
-        # processed_transactions.append((signature, sender, recipient, amount))
+            return balance_map
+
+        pre_balances_map = get_balances_map(pre_token_balances)
+        post_balances_map = get_balances_map(post_token_balances)
+
+        balance_deltas_map = {}
+        for owner, post_balance in post_balances_map.items():
+            # If the pre_balances_map doesn't have an entry for the owner
+            # it means that he didn't have a token account before the transaction
+            # and it was created for him as a part of the transfer. In which case
+            # we set the pre_balance to 0.
+            if owner not in pre_balances_map.keys():
+                pre_balances_map[owner] = 0
+
+            balance_deltas_map[owner] = post_balance - pre_balances_map[owner]
+
+        sender = None
+        recipient = None
+        amount = None
+        for owner, delta in balance_deltas_map.items():
+            if delta < 0:
+                # Sender of money is the one whose amount decreases as a result
+                # of the transaction i.e. has a negative delta.
+                sender = owner
+            elif owner != str(TOKEN_OWNER):
+                # If the owner is not the owner of the fee account,
+                # then he must be the recipient of the transaction as he has
+                # a positive delta.
+                recipient = owner
+                amount = delta
+
         processed_transactions.append(
             {
                 "signature": signature,
