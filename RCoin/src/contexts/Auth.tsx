@@ -36,11 +36,32 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${_authData.token}`,
           },
-        }).then(res => {
-          if (res.ok) {
-            setAuthData(_authData);
-          }
-        });
+        })
+          .then(res => {
+            if (!res.ok) {
+              throw new Error('Fetching user data failed');
+            }
+            return res.json();
+          })
+          .then(data_ => {
+            const authData = {
+              token: _authData.token,
+              token_type: _authData.token_type,
+              token_info: {
+                user_id: data_['user_id'],
+                email: data_['email'],
+                name: data_['name'],
+                trust_score: data_['trust_score'],
+                suspended: data_['suspended'],
+                wallet_id: data_['walled_id'],
+                is_merchant: data_['is_merchant'],
+              },
+            };
+            setAuthData(authData);
+          })
+          .catch(error => {
+            console.log(error);
+          });
       }
     } catch (error) {
     } finally {
