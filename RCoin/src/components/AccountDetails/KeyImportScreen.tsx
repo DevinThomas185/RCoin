@@ -15,6 +15,7 @@ import {useKeypair} from '../../contexts/Keypair';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../../contexts/Auth';
 import {Table, TableWrapper, Cell} from 'react-native-table-component';
+import Style from '../../style/style';
 
 export const KeyImportScreen = ({
   setOpen,
@@ -115,6 +116,7 @@ export const KeyImportScreen = ({
       </View>
 
       <Button
+        backgroundColor={Style.rcoin}
         label="Submit"
         onPress={handleSubmit}
         disabled={isDisabled}
