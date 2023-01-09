@@ -14,7 +14,6 @@ const ExplanationPage = ({ onGetStarted }: { onGetStarted: () => void }) => {
 
   return (
     <InformationPane colour={"rcoinBlue.1000"}>
-      {/* <ExplanationHeader /> */}
       <VStack alignSelf="center" gap={gap}>
         <SolanaExplanation />
         <AuditExplanation onGetStarted={onGetStarted} />

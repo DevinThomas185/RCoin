@@ -168,14 +168,14 @@ const TransactionDetailsPopup = ({ transaction }: { transaction: any }) => {
 const TransactionFlow = ({ transaction }: { transaction: any }) => {
   const rcoinAmount = (
     <HStack>
-      <Image src="small_logo.png" boxSize="25px" marginLeft="9px" />
-      <Text fontWeight="bold" color="rcoinBlue.500">
+      <Image src="small_logo.png" boxSize="25px" />
+      <Text fontWeight="bold" width="fit-content" color="rcoinBlue.500">
         {transaction.amount}
       </Text>
     </HStack>
   );
   const zarAmount = (
-    <Text fontWeight="bold" color="rcoinBlue.800">
+    <Text fontWeight="bold" width="fit-content" color="rcoinBlue.800">
       ZAR {transaction.amount}
     </Text>
   );
@@ -186,12 +186,7 @@ const TransactionFlow = ({ transaction }: { transaction: any }) => {
       : [rcoinAmount, zarAmount];
 
   return (
-    <HStack
-      marginLeft="auto"
-      marginRight="auto"
-      minWidth="200px"
-      maxWidth="200px"
-    >
+    <HStack margin="auto" width="fit-content">
       {firstEntry}
       <Image src="exchange_block.png" boxSize="30px" />
       {secondEntry}
@@ -253,9 +248,9 @@ const WordDescription = ({ transaction }: { transaction: any }) => {
   const tail =
     transaction.type === "issue"
       ? `ZAR was deposited
-        into the reserve account and ${transaction.amount} Rcoins were issued.`
+        into the reserve account and ${transaction.amount} RCoins were issued.`
       : `ZAR was withdrawn
-        from the reserve account and ${transaction.amount} Rcoins were burned.`;
+        from the reserve account and ${transaction.amount} RCoins were burned.`;
 
   return isMobileView ? (
     <Text width="fit-content"></Text>

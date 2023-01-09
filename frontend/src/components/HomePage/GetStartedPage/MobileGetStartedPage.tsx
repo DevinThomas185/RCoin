@@ -31,7 +31,6 @@ const WorkflowStageCard = ({
 
   const cardDirection = useMobileView ? "column" : "row";
   const width = useMobileView ? "100%" : "1080px";
-  const imageLeftOffset = useMobileView ? "auto" : "60px";
 
   return (
     <Grid
@@ -84,7 +83,7 @@ const WorkflowStageCard = ({
 
 const workflowHeadings = [
   "Make a Deposit",
-  "Transfer Rcoins",
+  "Transfer RCoins",
   "Withdraw your funds",
 ];
 const workflowImages = ["ZtoR.png", "RtoR.png", "RtoZ.png"];
@@ -92,23 +91,23 @@ const workflowImages = ["ZtoR.png", "RtoR.png", "RtoZ.png"];
 const depositDescription = (
   <Text>
     {" "}
-    To get started, simply purchase Rcoin using your Paystack account*. We will
-    then issue an equal number of Rcoin into your token account. After that you
-    can exchange Rcoins with other users free of charge.
+    To get started, simply purchase RCoin using your Paystack account*. We will
+    then issue an equal number of RCoin into your token account. After that you
+    can exchange RCoins with other users free of charge.
   </Text>
 );
 const transferDescription = (
   <Text>
     Harness the power of on-chain transactions. Thanks to the speed of Solana
-    blockchain you can transfer Rcoins instantly. We'll cover all on-chain
-    transaction fees. You can send Rcoin to any other user, simply enter the
+    blockchain you can transfer RCoins instantly. We'll cover all on-chain
+    transaction fees. You can send RCoin to any other user, simply enter the
     email of the account and choose the amount.
   </Text>
 );
 const withdrawDescription = (
   <Text>
     Thanks to our real-time auditing system, you can be sure that all of your
-    Rcoins are fully backed by Rand in our reserve account. Therefore, every
+    RCoins are fully backed by Rand in our reserve account. Therefore, every
     user can withdraw RCoin as Rand at any time. The transaction will appear on
     both your account’s history and the real time audit.
   </Text>
@@ -174,12 +173,9 @@ const GetStartedPage = () => {
         <Text
           marginTop="30px"
           marginBottom="25px"
-          // borderRadius="3xl"
           fontSize="50px"
           fontWeight="bold"
           color="rcoinBlue.1000"
-          // bg="rcoinBlue.600"
-          // boxShadow="lg"
         >
           How you can use RCoin
         </Text>
@@ -193,15 +189,21 @@ const GetStartedPage = () => {
           p={3}
         >
           {gridContents}
+        </Grid>
+        <Box margin="auto" width="fit-content">
           <Link to={"/download"}>
-            <Button variant={"reactive"} onClick={() => window.scrollTo(0, 0)}>
+            <Button
+              align-self="center"
+              variant={"reactive"}
+              onClick={() => window.scrollTo(0, 0)}
+            >
               Download The App
             </Button>
           </Link>
-          <Box fontSize="xs" textAlign="right" color={"rcoinBlue.1000"}>
-            *Fees apply.
-          </Box>
-        </Grid>
+        </Box>
+        <Box fontSize="xs" textAlign="right" color={"rcoinBlue.1000"}>
+          *Fees apply.
+        </Box>
       </InformationPane>
     </Box>
   );

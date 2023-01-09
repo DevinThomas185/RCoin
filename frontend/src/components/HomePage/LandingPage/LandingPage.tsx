@@ -8,10 +8,11 @@ import {
   VStack,
   HStack,
   useBreakpointValue,
+  Button,
 } from "@chakra-ui/react";
 import InformationPane from "../../Common/InformationPane";
 import RightPane from "./RightPane";
-import MockupPhone from "./MockupPhone";
+import { Link } from "react-router-dom";
 
 const DesktopLandingPage = ({ onLearnMore }: { onLearnMore: () => void }) => {
   return (
@@ -46,6 +47,21 @@ const DesktopLandingPage = ({ onLearnMore }: { onLearnMore: () => void }) => {
             Solana Blockchain.
           </chakra.span>
         </Box>
+        <HStack>
+          <Link to={"/audit"} onClick={() => window.scrollTo(0, 0)}>
+            <Button variant="reactiveOutline" color="rcoinBlue.1000" size="lg">
+              Check our Audit
+            </Button>
+          </Link>
+          <Button
+            onClick={onLearnMore}
+            variant="reactiveOutline"
+            color="rcoinBlue.1000"
+            size="lg"
+          >
+            Learn More
+          </Button>
+        </HStack>
       </VStack>
     </Box>
   );
