@@ -6,6 +6,7 @@ import AuditPage from "./components/AuditPage/AuditPage";
 import DownloadPage from "./components/DownloadPage/DownloadPage";
 import "./main.css";
 import NavBar from "./components/Nav/NavBar";
+import AuditorSignupPage from "./components/AuditorSignup/AuditorSignupPage";
 
 const App = () => {
   return (
@@ -18,7 +19,7 @@ const App = () => {
           <Route path="/" element={<Home />}></Route>
           <Route path="/audit" element={<AuditPage />}></Route>
           <Route path="/download" element={<DownloadPage />}></Route>
-          <Route path="/auditExplanation" element={<AuditPage />}></Route>
+          <Route path="/auditorSignup" element={<AuditorSignupPage />}></Route>
         </Routes>
       </Router>
     </ChakraProvider>

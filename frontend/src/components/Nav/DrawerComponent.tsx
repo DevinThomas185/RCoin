@@ -51,6 +51,11 @@ function DrawerComponent({
                   Real-Time Audit
                 </Button>
               </Link>
+              <Link to="/auditorSignup">
+                <Button variant="reactive" width="100%">
+                  Become an Auditor
+                </Button>
+              </Link>
               <Link to="/download">
                 <Button variant="reactive" width="100%">
                   Download Rcoin App

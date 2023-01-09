@@ -88,7 +88,7 @@ const DesktopSolanaExplanation = () => {
         <Image src="big_solana.png" fit="contain" />
         <Link justifySelf="center" href="https://solana.com" isExternal>
           <Button variant="reactive" size="lg">
-            Learn more about Solana
+            Learn More About Solana
           </Button>
         </Link>
       </Grid>

@@ -46,7 +46,7 @@ const TransactionLog = ({
   return (
     <Grid ref={ref} onClick={onToggle} gap={1}>
       <Box
-        borderRadius="5"
+        borderRadius="5px"
         bg="rcoinBlue.50"
         width={width}
         transition="transform 0.15s ease-out, background 0.15s ease-out"

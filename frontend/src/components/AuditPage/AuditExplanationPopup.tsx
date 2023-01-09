@@ -8,13 +8,18 @@ import {
   Button,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
+const becomeAnAuditorButton = (
+  <Link to={"/auditorSignup"} onClick={() => window.scrollTo(0, 0)}>
+    <Button maxWidth="300px" variant="reactiveDark">
+      Become an Auditor
+    </Button>
+  </Link>
+);
 const auditingInfoButton = (
   <Button
     maxWidth="300px"
-    justifySelf="right"
-    marginBottom="10px"
-    marginRight="10px"
     variant="reactiveDark"
     onClick={() => {
       window.open(
@@ -51,6 +56,7 @@ const AuditExplanationPopup = () => {
         textAlign="left"
         fontSize="4xl"
         marginLeft="20px"
+        marginRight="20px"
         fontWeight="bold"
         color="rcoinBlue.1100"
       >
@@ -77,10 +83,15 @@ const AuditExplanationPopup = () => {
           in our reserve account. That way we can prove that at any given time,
           our reserve has enough liquidity to allow all users to withdraw their
           funds. It also ensures that RCoin is not inflationary and 1 RCoin is
-          always worth exactly 1 Rand.
+          always worth exactly 1 Rand. You can sign up to become an auditor and
+          get view access to our reserve account to make sure that all RCoins
+          are proprely backed.
         </Text>
       </HStack>
-      {auditingInfoButton}
+      <HStack justifySelf="right" margin="10px">
+        {becomeAnAuditorButton}
+        {auditingInfoButton}
+      </HStack>
     </Grid>
   );
 };
