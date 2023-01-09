@@ -25,7 +25,7 @@ const DataCard = ({
   const color = valueColor ? valueColor : "black";
   return (
     <Grid
-      borderRadius="2px"
+      borderRadius="3px"
       bg="rcoinBlue.1100"
       boxShadow="md"
       marginLeft="10px"
