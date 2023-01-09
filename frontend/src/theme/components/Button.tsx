@@ -50,6 +50,42 @@ const reactiveButton = defineStyle((props) => {
     },
   };
 });
+const reactiveButtonOutline = defineStyle((props) => {
+  const { colorScheme: c } = props;
+  return {
+    fontFamily: "sans-serif",
+    bg: `${c}.1100`,
+    fontWeight: "semibold",
+    color: `${c}.1000`,
+    borderRadius: "3xl",
+    borderColor: `${c}.100`,
+    border: "1px",
+    transition: "transform 0.15s ease-out, background 0.15s ease-out",
+
+    _dark: {
+      bg: `${c}.200`,
+      color: "gray.800",
+    },
+
+    _hover: {
+      transform: "scale(1.05, 1.05)",
+      bg: `${c}.1400`,
+
+      _dark: {
+        bg: `${c}.300`,
+      },
+    },
+
+    _active: {
+      bg: `${c}.600`,
+      transform: "scale(1, 1)",
+
+      _dark: {
+        bg: `${c}.500`,
+      },
+    },
+  };
+});
 
 const reactiveButtonDark = defineStyle((props) => {
   const { colorScheme: c } = props;
@@ -93,6 +129,7 @@ export const buttonTheme = defineStyleConfig({
   variants: {
     reactive: reactiveButton,
     reactiveDark: reactiveButtonDark,
+    reactiveOutline: reactiveButtonOutline,
   },
   defaultProps: {
     colorScheme: "rcoinBlue",

@@ -19,10 +19,9 @@ const AuditPointer = ({
 }) => {
   const width = maxWidth ? maxWidth : "35%";
   return (
-    <Grid>
+    <Grid maxWidth={width} margin="auto">
       <Image
         src="blockchain_loop.png"
-        maxWidth={width}
         height={imageHeight}
         justifySelf="center"
         fit="contain"
@@ -49,10 +48,9 @@ const GetStartedPointer = ({
 }) => {
   const width = maxWidth ? maxWidth : "35%";
   return (
-    <Grid>
+    <Grid maxWidth={width} minWidth={width} margin="auto">
       <Image
         src="parity.png"
-        maxWidth={width}
         height={imageHeight}
         justifySelf="center"
         fit="contain"
@@ -71,14 +69,11 @@ const GetStartedPointer = ({
 const MobileButtonGroup = ({ onGetStarted }: { onGetStarted: () => void }) => {
   return (
     <HStack marginTop="25px" marginBottom="25px">
-      <AuditPointer
-        // imageHeight="100px"
-        maxWidth="80%"
-      />
+      <AuditPointer imageHeight="70px" maxWidth="50%" />
       <GetStartedPointer
-        // imageHeight="100px"
+        imageHeight="70px"
         onGetStarted={onGetStarted}
-        maxWidth="80%"
+        maxWidth="50%"
       />
     </HStack>
   );
@@ -129,12 +124,9 @@ const MobileAuditDescription = ({
 const AuditDescription = ({ overrideWidth }: { overrideWidth?: string }) => {
   const width = overrideWidth ? overrideWidth : "fit-content";
 
-  const fontSize = "46px";
   return (
     <Box
       bg="white"
-      // justifySelf="right"
-      // alignItems="center"
       maxWidth="50%"
       height="fit-content"
       padding="3"

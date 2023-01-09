@@ -1,4 +1,14 @@
-import { Grid, Image, Box, chakra, VStack, Flex } from "@chakra-ui/react";
+import {
+  Grid,
+  Image,
+  Box,
+  chakra,
+  VStack,
+  Flex,
+  HStack,
+  Button,
+} from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 const MobileLeftPane = ({ onLearnMore }: { onLearnMore: () => void }) => {
   return (
@@ -15,7 +25,7 @@ const MobileLeftPane = ({ onLearnMore }: { onLearnMore: () => void }) => {
 
       <Box
         textAlign="center"
-        fontSize="5xl"
+        fontSize="4xl"
         fontWeight="medium"
         color="rcoinBlue.1000"
         display="flex"
@@ -27,7 +37,7 @@ const MobileLeftPane = ({ onLearnMore }: { onLearnMore: () => void }) => {
       <VStack alignItems="Center">
         <Box
           textAlign="center"
-          fontSize="2xl"
+          fontSize="xl"
           fontWeight="bold"
           color="rcoinBlue.1000"
         >
@@ -39,7 +49,7 @@ const MobileLeftPane = ({ onLearnMore }: { onLearnMore: () => void }) => {
         </Box>
         <Box
           textAlign="center"
-          fontSize="2xl"
+          fontSize="xl"
           fontWeight="bold"
           color="rcoinBlue.1000"
         >
@@ -48,6 +58,21 @@ const MobileLeftPane = ({ onLearnMore }: { onLearnMore: () => void }) => {
             Solana Blockchain.
           </chakra.span>
         </Box>
+        <HStack>
+          <Link to={"/audit"} onClick={() => window.scrollTo(0, 0)}>
+            <Button variant="reactiveOutline" color="rcoinBlue.1000" size="lg">
+              Check our Audit
+            </Button>
+          </Link>
+          <Button
+            onClick={onLearnMore}
+            variant="reactiveOutline"
+            color="rcoinBlue.1000"
+            size="lg"
+          >
+            Learn More
+          </Button>
+        </HStack>
       </VStack>
     </Box>
   );

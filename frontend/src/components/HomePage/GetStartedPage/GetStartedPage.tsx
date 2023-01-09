@@ -25,10 +25,7 @@ const LandingPage = ({ onLearnMore }: { onLearnMore: () => void }) => {
   );
 
   return (
-    <InformationPane colour="rcoinBlue.1100">
-      {pageContent}
-      {/* Row containing image and logo with tagline */}
-    </InformationPane>
+    <InformationPane colour="rcoinBlue.1100">{pageContent}</InformationPane>
   );
 };
 
