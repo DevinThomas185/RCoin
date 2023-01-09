@@ -141,7 +141,6 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
         (str(status.signature), get_transaction_details(status.signature))
         for status in resp.value
     ]
-
     confirmed_transactions: list[EncodedConfirmedTransactionWithStatusMeta] = [
         (signature, transaction.value.transaction, transaction.value.block_time)
         for signature, transaction in transactions
@@ -217,17 +216,35 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
         sender = None
         recipient = None
         amount = None
-        for owner, delta in balance_deltas_map.items():
-            if delta < 0:
-                # Sender of money is the one whose amount decreases as a result
-                # of the transaction i.e. has a negative delta.
-                sender = owner
-            elif owner != str(TOKEN_OWNER):
-                # If the owner is not the owner of the fee account,
-                # then he must be the recipient of the transaction as he has
-                # a positive delta.
-                recipient = owner
-                amount = delta
+
+        if len(balance_deltas_map) == 2:
+            # If there are only two accounts involved, we are dealing with
+            # issue/withdraw without the fee.
+            for owner, delta in balance_deltas_map.items():
+                if delta < 0:
+                    # Sender of money is the one whose amount decreases as a result
+                    # of the transaction i.e. has a negative delta.
+                    sender = owner
+                else:
+                    recipient = owner
+                    amount = delta
+
+        else:
+            # If there are more than 2 accounts involved, we are making a on-chain
+            # transfer and one of the accounts is the fee account owned by the
+            # TOKEN_OWNER.
+            for owner, delta in balance_deltas_map.items():
+                print(owner, delta)
+                if delta < 0:
+                    # Sender of money is the one whose amount decreases as a result
+                    # of the transaction i.e. has a negative delta.
+                    sender = owner
+                elif owner != str(TOKEN_OWNER):
+                    # If the owner is not the owner of the fee account,
+                    # then he must be the recipient of the transaction as he has
+                    # a positive delta.
+                    recipient = owner
+                    amount = delta
 
         processed_transactions.append(
             {
