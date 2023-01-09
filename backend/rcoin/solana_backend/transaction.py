@@ -97,7 +97,7 @@ def construct_token_transfer(
     try:
         # If sending tokens between users apply the fee.
         # Solana fees are $0.00025 which equates to less than 0.1 ZAR.
-        SOLANA_FEE = 0.0043
+        SOLANA_FEE = 0.01
         if is_trade_transfer(source_account, dest_account):
             transaction.add(
                 transfer(
