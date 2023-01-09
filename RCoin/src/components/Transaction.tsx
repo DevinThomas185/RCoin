@@ -48,9 +48,15 @@ const Transaction = ({
         style={style.transactionIcon}
       />
       <View flexG>
-        <Text text70 grey10>
-          {numberWithCommas(amount)} RCoin
-        </Text>
+        <View row centerV>
+          <Image
+            source={require('../style/ThinRCoin.png')}
+            style={{width: 9, height: 12}}
+          />
+          <Text text70 grey10>
+            {numberWithCommas(amount)}
+          </Text>
+        </View>
         <View row>
           <View flexG>
             <Text text80 grey10 style={{fontWeight: 'bold'}}>
@@ -74,9 +80,15 @@ const Transaction = ({
         style={style.transactionIcon}
       />
       <View flexG>
-        <Text text70 grey10 left>
-          {numberWithCommas(-amount)} RCoin
-        </Text>
+        <View row centerV>
+          <Image
+            source={require('../style/ThinRCoin.png')}
+            style={{width: 9, height: 12}}
+          />
+          <Text text70 grey10>
+            {numberWithCommas(-amount)}
+          </Text>
+        </View>
         <View row>
           <View flexG>
             <Text text80 grey10 left>
@@ -101,9 +113,15 @@ const Transaction = ({
         style={style.transactionIcon}
       />
       <View flexG>
-        <Text text70 grey10 left>
-          {numberWithCommas(amount)} RCoin
-        </Text>
+        <View row centerV>
+          <Image
+            source={require('../style/ThinRCoin.png')}
+            style={{width: 9, height: 12}}
+          />
+          <Text text70 grey10>
+            {numberWithCommas(amount)}
+          </Text>
+        </View>
         <View row>
           <View flexG>
             <Text text80 grey10 left>
@@ -129,9 +147,15 @@ const Transaction = ({
         style={style.transactionIcon}
       />
       <View flexG>
-        <Text text70 grey10 left>
-          {numberWithCommas(-amount)} RCoin
-        </Text>
+        <View row centerV>
+          <Image
+            source={require('../style/ThinRCoin.png')}
+            style={{width: 9, height: 12}}
+          />
+          <Text text70 grey10>
+            {numberWithCommas(-amount)}
+          </Text>
+        </View>
         <View row>
           <View flexG>
             <Text text80 grey10 left>

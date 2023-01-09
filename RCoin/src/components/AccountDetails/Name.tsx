@@ -70,7 +70,8 @@ const NameDetail = () => {
             onChangeText={(value: string) => {
               setNewFirstName(value);
             }}
-            marginH-20
+            marginH-10
+            marginV-5
           />
           <TextField
             placeholder="New Last Name"
@@ -79,7 +80,7 @@ const NameDetail = () => {
             onChangeText={(value: string) => {
               setNewLastName(value);
             }}
-            marginH-20
+            marginH-10
           />
           <View center marginB-5>
             {responded ? (
@@ -93,7 +94,7 @@ const NameDetail = () => {
             )}
           </View>
           <Button
-            marginH-30
+            marginH-10
             marginB-10
             onPress={changeName}
             label="Change Name"

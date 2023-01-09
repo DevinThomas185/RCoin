@@ -61,7 +61,7 @@ const EmailDetail = () => {
             onChangeText={(value: string) => {
               setNewEmail(value);
             }}
-            marginH-20
+            marginH-10
           />
           <View center marginB-5>
             {responded ? (
@@ -75,7 +75,7 @@ const EmailDetail = () => {
             )}
           </View>
           <Button
-            marginH-30
+            marginH-10
             marginB-10
             onPress={changeEmail}
             label="Change Email"

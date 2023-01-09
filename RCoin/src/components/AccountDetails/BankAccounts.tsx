@@ -195,7 +195,7 @@ const BankAccounts = () => {
               onChangeText={(value: string) => {
                 setNewBankAccount(value);
               }}
-              marginH-20
+              marginH-10
             />
             <TextField
               placeholder="Sortcode"
@@ -203,7 +203,7 @@ const BankAccounts = () => {
               onChangeText={(value: string) => {
                 setNewSortcode(value);
               }}
-              marginH-20
+              marginH-10
             />
             <View center marginB-5>
               {responded ? (
@@ -217,7 +217,7 @@ const BankAccounts = () => {
               )}
             </View>
             <Button
-              marginH-30
+              marginH-10
               marginB-10
               onPress={addBankAccount}
               label="Add Bank Account"

@@ -18,8 +18,8 @@ const TransferReciept = ({email, amount}: {email: string; amount: number}) => {
   return (
     <Card enableShadow>
       <View center padding-10>
-        <View marginH-5 marginV-10>
-          <Text text60 center color={styles.rcoin}>
+        <View center marginH-5 marginV-10>
+          <Text text60 color={styles.rcoin}>
             You are sending
           </Text>
           <View marginH-5 row center>
@@ -27,14 +27,22 @@ const TransferReciept = ({email, amount}: {email: string; amount: number}) => {
               source={require('../../style/Logo.png')}
               style={{width: 40, height: 40}}
             />
-            <Text text60 color={styles.rcoin}>
+            <Text text50 color={styles.rcoin}>
               {numberWithCommas(amount)}
             </Text>
           </View>
-          <Text>for a fee</Text>
-          <Text text40 color={styles.rcoin}>
-            {numberWithCommas(ON_CHAIN_FEE)} Rand
+          <Text center color={styles.rcoin}>
+            for a fee of
           </Text>
+          <View marginH-5 row center>
+            <Image
+              source={require('../../style/Logo.png')}
+              style={{width: 40, height: 40}}
+            />
+            <Text text60 color={styles.rcoin}>
+              {ON_CHAIN_FEE}
+            </Text>
+          </View>
         </View>
         <Image
           source={require('../../style/RCoin-RCoin.png')}

@@ -4,6 +4,7 @@ import {Button, Incubator, Text, View} from 'react-native-ui-lib';
 import {useAuth} from '../../contexts/Auth';
 import {useKeypair} from '../../contexts/Keypair';
 import {Table, Rows} from 'react-native-table-component';
+import Style from '../../style/style';
 
 const {TextField} = Incubator;
 
@@ -44,9 +45,10 @@ export const Mnemonic = () => {
     <View style={styles.screen}>
       {mnemonic === '' ? (
         <>
-          <Text style={styles.title}>View Secret Phrase</Text>
+          <Text center color={Style.rcoin} text50>
+            View Secret Phrase
+          </Text>
           <TextField
-            margin-10
             placeholder={'Wallet Password'}
             placeholderTextColor={'gray'}
             onChangeText={(password: string) => setWalletPass(password)}
@@ -55,6 +57,7 @@ export const Mnemonic = () => {
           />
 
           <Button
+            backgroundColor={Style.rcoin}
             label="Submit"
             onPress={handleSubmit}
             disabled={walletPass === ''}
@@ -62,7 +65,9 @@ export const Mnemonic = () => {
         </>
       ) : (
         <>
-          <Text style={styles.title}>Secret Phrase</Text>
+          <Text center color={Style.rcoin} text50>
+            Secret Phrase
+          </Text>
           <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
             <Rows data={tableData} textStyle={styles.text} />
           </Table>
