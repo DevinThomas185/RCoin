@@ -31,6 +31,7 @@ from rcoin.solana_backend.common import (
     RESERVE_ACCOUNT,
     SOLANA_CLIENT,
     FEE_ACCOUNT,
+    TOKEN_OWNER,
 )
 
 from rcoin.solana_backend.exceptions import (
@@ -38,6 +39,7 @@ from rcoin.solana_backend.exceptions import (
     TransactionCreationFailedException,
     InvalidInputException,
 )
+
 
 def construct_transaction_safely(
     construction_function: Callable[[], CustomResponse]
@@ -129,8 +131,10 @@ def construct_token_transfer(
 
     return transaction
 
+
 def is_trade_transfer(source: PublicKey, destination: PublicKey) -> bool:
     return source is not RESERVE_ACCOUNT and destination is not RESERVE_ACCOUNT
+
 
 def stamp_blockhash(transaction: Transaction):
     blockhash_resp = SOLANA_CLIENT.get_latest_blockhash()
@@ -168,7 +172,7 @@ def get_associated_token_account(public_key: PublicKey) -> PublicKey:
 
     # When issuing coins, the token account associated with the MULTISIG_ACCOUNT
     # is the reserve account which holds all of the minted tokens.
-    if public_key == MULTISIG_ACCOUNT:
+    if public_key == MULTISIG_ACCOUNT or public_key == TOKEN_OWNER:
         return RESERVE_ACCOUNT
 
     resp = SOLANA_CLIENT.get_token_accounts_by_owner(
