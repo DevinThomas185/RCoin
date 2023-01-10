@@ -3,9 +3,7 @@ import {useWindowDimensions} from 'react-native';
 import {Image, Text, TouchableOpacity, View} from 'react-native-ui-lib';
 import {useBalance} from '../../contexts/BalanceContext';
 import Style from '../../style/style';
-import DecimalButton from './DecimalButton';
-import DeleteButton from './DeleteButton';
-import NumberButton from './NumberButton';
+import {Numpad} from './NumPad';
 
 const LEAST_LIMIT = 0;
 const MAX_LIMIT = 100000000000;
@@ -80,79 +78,16 @@ const NumberKeyboard = ({
           {formatNumberString()}
         </Text>
       </View>
-      <View row style={{justifyContent: 'space-between'}}>
-        {['1', '2', '3'].map(label => (
-          <NumberButton
-            key={label}
-            current_number={numberString}
-            style={button_style}
-            label={label}
-            dot_present={dot_present}
-            decimals={decimals}
-            setNumberString={setNumberString}
-            setDecimals={setDecimals}
-          />
-        ))}
-      </View>
-      <View row style={{justifyContent: 'space-between'}}>
-        {['4', '5', '6'].map(label => (
-          <NumberButton
-            key={label}
-            current_number={numberString}
-            style={button_style}
-            label={label}
-            dot_present={dot_present}
-            decimals={decimals}
-            setNumberString={setNumberString}
-            setDecimals={setDecimals}
-          />
-        ))}
-      </View>
-      <View row style={{justifyContent: 'space-between'}}>
-        {['7', '8', '9'].map(label => (
-          <NumberButton
-            key={label}
-            current_number={numberString}
-            style={button_style}
-            label={label}
-            dot_present={dot_present}
-            decimals={decimals}
-            setNumberString={setNumberString}
-            setDecimals={setDecimals}
-          />
-        ))}
-      </View>
-      <View row style={{justifyContent: 'space-between'}}>
-        <DecimalButton
-          current_number={numberString}
-          style={button_style}
-          dot_present={dot_present}
-          setNumberString={setNumberString}
-          setDotPresent={setDotPresent}
-        />
-        <NumberButton
-          current_number={numberString}
-          style={button_style}
-          label="0"
-          dot_present={dot_present}
-          decimals={decimals}
-          setNumberString={s => {
-            if (numberString != '0') {
-              setNumberString(s);
-            }
-          }}
-          setDecimals={setDecimals}
-        />
-        <DeleteButton
-          current_number={numberString}
-          style={button_style}
-          dot_present={dot_present}
-          decimals={decimals}
-          setNumberString={setNumberString}
-          setDotPresent={setDotPresent}
-          setDecimals={setDecimals}
-        />
-      </View>
+      <Numpad
+        hasPoint={true}
+        numberString={numberString}
+        button_style={button_style}
+        dot_present={dot_present}
+        decimals={decimals}
+        setNumberString={setNumberString}
+        setDecimals={setDecimals}
+        setDotPresent={setDotPresent}
+      />
     </View>
   );
 };

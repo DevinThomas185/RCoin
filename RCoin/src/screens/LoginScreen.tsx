@@ -8,6 +8,7 @@ import {NavigationScreenProp} from 'react-navigation';
 import LinearGradient from 'react-native-linear-gradient';
 
 import {useAuth} from '../contexts/Auth';
+import Style from '../style/style';
 
 export const LoginScreen = ({
   navigation,
@@ -16,6 +17,7 @@ export const LoginScreen = ({
 }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [failed, setFailed] = useState(false);
   const auth = useAuth();
 
   return (
@@ -33,7 +35,7 @@ export const LoginScreen = ({
 
       <View
         marginH-10
-        marginV-40
+        marginT-40
         backgroundColor="white"
         style={{borderRadius: 10}}>
         <TextField
@@ -54,13 +56,22 @@ export const LoginScreen = ({
           floatingPlaceholderStyle={{alignSelf: 'center'}}
         />
       </View>
+      {failed && (
+        <Text color={Style.white} center marginV-10>
+          Incorrect email/password. Please try again.
+        </Text>
+      )}
       <Button
         marginH-30
         marginB-20
+        marginT-30
         backgroundColor={styles.paystack}
         label={'Log In'}
         onPress={() => {
-          auth.signIn(email, password);
+          setFailed(false);
+          auth.signIn(email, password).then(succeeded => {
+            setFailed(!succeeded);
+          });
         }}
       />
       <Button

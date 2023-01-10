@@ -5,16 +5,18 @@ import NameDetail from '../../components/AccountDetails/Name';
 import BankAccounts from '../../components/AccountDetails/BankAccounts';
 import {ScrollView} from 'react-native';
 import {Wallet} from '../../components/AccountDetails/Wallet';
+import PinSettings from '../../components/AccountDetails/PinSettings';
 
 const AccountDetails = () => {
   const auth = useAuth();
 
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
-      <Wallet />
       <NameDetail />
       <EmailDetail />
+      <Wallet />
       <BankAccounts />
+      <PinSettings />
     </ScrollView>
   );
 };

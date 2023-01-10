@@ -10,6 +10,7 @@ Style = {
   failed: '#B31515',
   tiffany_blue: '#3CBBB1',
   white: '#FFFFFF',
+  red: '#1D1D1D',
 
   solana_surge_green: '#00FFA3',
   solana_ocean_blue: '#03E1FF',

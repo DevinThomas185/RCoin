@@ -19,6 +19,12 @@ const NumberButton = ({
   setNumberString: React.Dispatch<React.SetStateAction<string>>;
   setDecimals: React.Dispatch<React.SetStateAction<number>>;
 }) => {
+  var textColor = 'white';
+
+  if ('color' in style) {
+    textColor = style.color;
+  }
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -30,7 +36,7 @@ const NumberButton = ({
         }
       }}>
       <View center style={style}>
-        <Text text40 center color={Style.white}>
+        <Text text40 center color={textColor}>
           {label}
         </Text>
       </View>
