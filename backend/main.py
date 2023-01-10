@@ -45,6 +45,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from fastapi import Depends, FastAPI, Response, Request, HTTPException, status
 from fastapi_utils.tasks import repeat_every
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import FileResponse
 from rcoin.data_models import (
     AddAuditorRequest,
     CompleteRedeemTransaction,
@@ -1314,6 +1315,11 @@ async def add_auditor(req: AddAuditorRequest, response: Response):
 
     if not success:
         response.status_code = 500
+
+
+@app.get("/api/download_release_build")
+async def download_release_build():
+    return FileResponse(path="./app-release.apk", filename="RCoin")
 
 
 app.add_middleware(SessionMiddleware, secret_key="random-string")

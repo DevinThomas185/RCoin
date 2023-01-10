@@ -36,7 +36,7 @@ LogBox.ignoreLogs(['Invalid prop textStyle of type array supplied to Cell']);
 
 const App = () => {
   const AuthRouter = ({children}: {children: JSX.Element}) => {
-    const {authData, loading} = useAuth();
+    const {authData, loading, signOut} = useAuth();
 
     if (authData?.token_info.suspended) {
       return (
@@ -64,7 +64,12 @@ const App = () => {
             You will be contacted by a member of the RCoin team shortly to help
             to resolve this and hopefully get you back online with RCoin!
           </Text>
-          <Image href="./src/style/Logo.png" />
+          <Button
+            marginV-10
+            onPress={signOut} //navigate to transfer page
+            label="Return to Log In"
+            backgroundColor={styles.rcoin}
+          />
         </View>
       );
     }

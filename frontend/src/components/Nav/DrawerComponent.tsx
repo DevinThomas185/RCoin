@@ -58,7 +58,7 @@ function DrawerComponent({
               </Link>
               <Link to="/download">
                 <Button variant="reactive" width="100%">
-                  Download Rcoin App
+                  Download RCoin App
                 </Button>
               </Link>
             </Stack>

@@ -32,6 +32,8 @@ export const StepThree = ({
   const [key, setKey] = useState('');
   const [isValid, setIsValid] = useState(true);
 
+  const [remembers, setRemembers] = useState(false);
+
   const [passwordText, setPasswordText] = useState('Show');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -47,6 +49,10 @@ export const StepThree = ({
     setShowConfirmPassword(!showConfirmPassword);
     setConfirmPasswordText(confirmPasswordText === 'Show' ? 'Hide' : 'Show');
   };
+
+  useEffect(() => {
+    setDisabled(true);
+  }, []);
 
   return (
     <View>
@@ -82,10 +88,12 @@ export const StepThree = ({
           onChangeText={(password: string) => {
             if (password !== key) {
               setIsValid(false);
+              setDisabled(true);
               return;
             }
 
             setIsValid(true);
+            setDisabled(!remembers);
             setSignUpDetails(prev => ({
               ...prev,
               encryption_password: password,
@@ -104,8 +112,9 @@ export const StepThree = ({
         <Checkbox
           label="I remember this password"
           color={Style.rcoin}
-          value={!disabled}
+          value={remembers}
           onValueChange={(v: boolean) => {
+            setRemembers(v);
             setDisabled(!v || !isValid);
           }}
         />
