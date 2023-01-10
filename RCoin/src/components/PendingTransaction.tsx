@@ -44,12 +44,15 @@ const PendingTransaction = ({type, rcoin}: {type: string; rcoin: number}) => {
       />
       <View flexG>
         <View row centerV>
+          <Text text70 grey10>
+            -
+          </Text>
           <Image
             source={require('../style/ThinRCoin.png')}
             style={{width: 9, height: 12}}
           />
           <Text text70 grey10>
-            {numberWithCommas(-amount)}
+            {numberWithCommas(amount)}
           </Text>
         </View>
         <Text text80 grey10 left>

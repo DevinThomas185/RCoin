@@ -10,6 +10,17 @@ import {
 import InformationPane from "../Common/InformationPane";
 import MockupPhone from "../HomePage/LandingPage/MockupPhone";
 
+const download_app = () => {
+  fetch("/api/download_release_build", { method: "GET" })
+    .then((res) => res.blob())
+    .then((data) => {
+      var a = document.createElement("a");
+      a.href = window.URL.createObjectURL(data);
+      a.download = "RCoin.apk";
+      a.click();
+    });
+};
+
 const MainLogo = () => {
   return <Image margin="auto" src="big_logo.png" height="80px" fit="contain" />;
 };
@@ -23,7 +34,8 @@ const StoresStack = () => {
       />
       <StoreButton
         pictureSrc="ios.svg"
-        websiteLink="https://www.apple.com/app-store/"
+        // websiteLink="https://www.apple.com/app-store/"
+        websiteLink="https://drive.proton.me/urls/2E82K47PZ4#phHLBdfJt4Cn"
       />
     </HStack>
   );
@@ -48,7 +60,11 @@ const StoreButton = ({
         transform: "scale(1.03, 1.03)",
       }}
       onClick={() => {
-        window.open(websiteLink);
+        if (pictureSrc == "android.svg") {
+          download_app();
+        } else {
+          window.open(websiteLink);
+        }
       }}
     />
   );

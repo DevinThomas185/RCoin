@@ -81,12 +81,15 @@ const Transaction = ({
       />
       <View flexG>
         <View row centerV>
+          <Text text70 grey10>
+            -
+          </Text>
           <Image
             source={require('../style/ThinRCoin.png')}
             style={{width: 9, height: 12}}
           />
           <Text text70 grey10>
-            {numberWithCommas(-amount)}
+            {numberWithCommas(amount)}
           </Text>
         </View>
         <View row>
@@ -148,12 +151,15 @@ const Transaction = ({
       />
       <View flexG>
         <View row centerV>
+          <Text text70 grey10>
+            -
+          </Text>
           <Image
             source={require('../style/ThinRCoin.png')}
             style={{width: 9, height: 12}}
           />
           <Text text70 grey10>
-            {numberWithCommas(-amount)}
+            {numberWithCommas(amount)}
           </Text>
         </View>
         <View row>
