@@ -248,9 +248,9 @@ const WordDescription = ({ transaction }: { transaction: any }) => {
   const tail =
     transaction.type === "issue"
       ? `ZAR was deposited
-        into the reserve account and ${transaction.amount} RCoins were issued.`
+        into the reserve account and ${transaction.amount} RCoin were issued.`
       : `ZAR was withdrawn
-        from the reserve account and ${transaction.amount} RCoins were burned.`;
+        from the reserve account and ${transaction.amount} RCoin were burned.`;
 
   return isMobileView ? (
     <Text width="fit-content"></Text>

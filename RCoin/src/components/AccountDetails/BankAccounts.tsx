@@ -91,9 +91,7 @@ const BankAccounts = () => {
       ),
     })
       .then(res => {
-        setResponded(true);
         if (res.status == 200) {
-          setSuccess(true);
           refresh();
         }
       })
