@@ -39,7 +39,14 @@ export const StepFour = ({
     Alert.alert(
       'There was a problem while signing up.',
       'Please go back and try again',
-      [{text: 'Ok', onPress: () => console.log('OK Pressed')}],
+      [
+        {
+          text: 'Ok',
+          onPress: () => {
+            console.log('Affirmed');
+          },
+        },
+      ],
     );
 
   useEffect(() => {

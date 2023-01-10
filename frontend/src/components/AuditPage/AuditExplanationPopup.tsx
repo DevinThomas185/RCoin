@@ -79,13 +79,13 @@ const AuditExplanationPopup = () => {
         >
           To ensure that your funds are safe with us, we have built a real-time
           auditing system. It allows all users to check the total number of
-          RCoins that were issued and make sure that it is fully backed by Rand
+          RCoin that were issued and make sure that it is fully backed by Rand
           in our reserve account. That way we can prove that at any given time,
           our reserve has enough liquidity to allow all users to withdraw their
           funds. It also ensures that RCoin is not inflationary and 1 RCoin is
           always worth exactly 1 Rand. You can sign up to become an auditor and
-          get view access to our reserve account to make sure that all RCoins
-          are proprely backed.
+          get view access to our reserve account to make sure that all RCoin are
+          proprely backed.
         </Text>
       </HStack>
       <HStack justifySelf="right" margin="10px">

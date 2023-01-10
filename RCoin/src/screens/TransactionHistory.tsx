@@ -7,9 +7,11 @@ import Transaction from '../components/Transaction';
 import PendingLoader from '../components/PendingLoader';
 import Config from 'react-native-config';
 import PendingTransaction from '../components/PendingTransaction';
+import {useBalance} from '../contexts/BalanceContext';
 
 const TransactionHistory = () => {
   const auth = useAuth();
+  const balance_context = useBalance();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -17,6 +19,8 @@ const TransactionHistory = () => {
   const [transaction_history, setTransactionHistory] = useState<{
     [key: string]: any[];
   }>({});
+
+  const [raw_transactions, setRawTransactions] = useState<any[]>([]);
 
   const [pending_transactions, setPendingTransactions] = useState<any[]>([]);
 
@@ -31,6 +35,7 @@ const TransactionHistory = () => {
     })
       .then(res => res.json())
       .then(data => {
+        setRawTransactions(data['transaction_history']);
         const transactions: {[key: string]: any[]} = {};
         for (let t in data['transaction_history']) {
           let transaction = data['transaction_history'][t];
@@ -64,6 +69,7 @@ const TransactionHistory = () => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     updateTransactionHistory();
+    balance_context.refresh();
     setRefreshing(false);
   }, []);
 
@@ -77,7 +83,7 @@ const TransactionHistory = () => {
         custom_fail_message="Failed to fetch your Transaction History"
       />
     );
-  } else {
+  } else if (!loading && raw_transactions.length > 0) {
     return (
       <Card paddingH-10 enableShadow>
         <ScrollView
@@ -96,7 +102,7 @@ const TransactionHistory = () => {
                 Pending Transactions
               </Text>
               {pending_transactions.map(transaction => (
-                <View>
+                <View key={transaction.date}>
                   <View marginV-5>
                     <PendingTransaction
                       type={transaction.type}
@@ -138,6 +144,23 @@ const TransactionHistory = () => {
               <View style={style.thinDivider} />
             </View>
           ))}
+        </ScrollView>
+      </Card>
+    );
+  } else {
+    return (
+      <Card padding-10 enableShadow>
+        <ScrollView
+          contentContainerStyle={{flex: 1}}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          <Text center color={style.rcoin} text50>
+            No transactions to show!
+          </Text>
+          <Text center color={style.rcoin} text60>
+            Swipe down to refresh
+          </Text>
         </ScrollView>
       </Card>
     );
