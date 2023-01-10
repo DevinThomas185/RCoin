@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   frontend:
-    image: 146.169.40.88:5000/rcoin-frontend
+    image: 146.169.40.88:5000/rcoin-frontend:${CI_COMMIT_SHA}
     ports:
       - 443:443
     depends_on:
@@ -12,7 +12,7 @@ services:
       - main
 
   backend:
-    image: 146.169.40.88:5000/rcoin-backend
+    image: 146.169.40.88:5000/rcoin-backend:${CI_COMMIT_SHA}
     environment:
       - SOLANA_CLIENT=${SOLANA_CLIENT}
       - MINT_ACCOUNT=${MINT_ACCOUNT}
@@ -69,14 +69,14 @@ services:
       - main
 
   signer-backend:
-    image: 146.169.40.88:5000/rcoin-signer-backend
+    image: 146.169.40.88:5000/rcoin-signer-backend:${CI_COMMIT_SHA}
     environment:
       - SIGNER_2=${SIGNER_2}
     profiles:
       - signer
 
   signer-proxy:
-    image: 146.169.40.88:5000/rcoin-signer-proxy
+    image: 146.169.40.88:5000/rcoin-signer-proxy:${CI_COMMIT_SHA}
     ports:
       - 80:80
     depends_on:
