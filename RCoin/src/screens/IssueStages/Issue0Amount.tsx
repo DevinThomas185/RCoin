@@ -22,16 +22,13 @@ const IssueAmount = ({
   const [valid, setValid] = useState(false);
 
   const setRands = (coins: number) => {
-    fetch(
-      `${Config.API_URL}:8000/api/get_rand_to_pay?amount=` + coins.toString(),
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.authData?.token}`,
-        },
+    fetch(`${Config.API_URL}/api/get_rand_to_pay?amount=` + coins.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.authData?.token}`,
       },
-    )
+    })
       .then(res => res.json())
       .then(data => {
         setRandToPay(data['rand_to_pay']);

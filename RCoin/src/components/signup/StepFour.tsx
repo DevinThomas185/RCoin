@@ -63,7 +63,7 @@ export const StepFour = ({
     setTableData(tableData_);
 
     publicKey.then((pk: PublicKey | undefined) => {
-      fetch(`${Config.API_URL}:8000/api/signup`, {
+      fetch(`${Config.API_URL}/api/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

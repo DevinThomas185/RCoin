@@ -24,7 +24,7 @@ const FriendElement = ({
   const friends_context = useFriends();
 
   const deleteFriend = () => {
-    fetch(`${Config.API_URL}:8000/api/delete_friend`, {
+    fetch(`${Config.API_URL}/api/delete_friend`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',

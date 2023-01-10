@@ -16,7 +16,7 @@ const SupportScreen = () => {
 
   const sendMessage = () => {
     setMessageSent(true);
-    fetch(`${Config.API_URL}:8000/api/send_message`, {
+    fetch(`${Config.API_URL}/api/send_message`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

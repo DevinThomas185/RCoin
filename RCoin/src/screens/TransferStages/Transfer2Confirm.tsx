@@ -39,7 +39,7 @@ const Transfer2Confirm = ({
     setLoading(true);
     setConfirmClicked(true);
     setResponseState(0);
-    fetch(`${Config.API_URL}:8000/api/trade`, {
+    fetch(`${Config.API_URL}/api/trade`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ const Transfer2Confirm = ({
             const signData = message.serialize();
             const signature = nacl.sign.detached(signData, secretKey);
 
-            fetch(`${Config.API_URL}:8000/api/complete-trade`, {
+            fetch(`${Config.API_URL}/api/complete-trade`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

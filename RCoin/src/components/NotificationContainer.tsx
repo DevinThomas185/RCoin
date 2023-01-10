@@ -20,7 +20,7 @@ export const NotificationContainer = ({children}: {children: JSX.Element}) => {
   const auth = useAuth();
 
   const postDeviceToken = (deviceToken: string) => {
-    fetch(`${Config.API_URL}:8000/api/register-device-token`, {
+    fetch(`${Config.API_URL}/api/register-device-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

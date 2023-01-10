@@ -38,7 +38,7 @@ const WithdrawStage2 = ({
     setLoading(true);
     setConfirmClicked(true);
     setResponseState(0);
-    fetch(`${Config.API_URL}:8000/api/redeem`, {
+    fetch(`${Config.API_URL}/api/redeem`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ const WithdrawStage2 = ({
             const signData = message.serialize();
             const signature = nacl.sign.detached(signData, secretKey);
 
-            fetch(`${Config.API_URL}:8000/api/complete-redeem`, {
+            fetch(`${Config.API_URL}/api/complete-redeem`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

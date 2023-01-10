@@ -22,7 +22,7 @@ const TransactionHistory = () => {
 
   const updateTransactionHistory = () => {
     setLoading(true);
-    fetch(`${Config.API_URL}:8000/api/transaction_history`, {
+    fetch(`${Config.API_URL}/api/transaction_history`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
