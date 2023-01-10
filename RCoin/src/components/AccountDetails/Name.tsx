@@ -16,7 +16,7 @@ const NameDetail = () => {
   const [success, setSuccess] = useState(false);
 
   const changeName = () => {
-    fetch(`${Config.API_URL}:8000/api/change_name`, {
+    fetch(`${Config.API_URL}/api/change_name`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',

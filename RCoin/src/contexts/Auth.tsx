@@ -30,7 +30,7 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
       const authDataSerialized = await AsyncStorage.getItem('@AuthData');
       if (authDataSerialized) {
         const _authData: AuthData = JSON.parse(authDataSerialized);
-        fetch(`${Config.API_URL}:8000/api/user`, {
+        fetch(`${Config.API_URL}/api/user`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
   };
 
   const refresh = () => {
-    fetch(`${Config.API_URL}:8000/api/user`, {
+    fetch(`${Config.API_URL}/api/user`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

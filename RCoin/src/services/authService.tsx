@@ -23,7 +23,7 @@ const signIn = (
 ): Promise<AuthData | undefined> => {
   return new Promise(resolve => {
     setTimeout(() => {
-      fetch(`${Config.API_URL}:8000/api/login`, {
+      fetch(`${Config.API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ const signIn = (
           return res.json();
         })
         .then(data => {
-          fetch(`${Config.API_URL}:8000/api/user`, {
+          fetch(`${Config.API_URL}/api/user`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

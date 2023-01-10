@@ -15,7 +15,7 @@ const EmailDetail = () => {
   const [success, setSuccess] = useState(false);
 
   const changeEmail = () => {
-    fetch(`${Config.API_URL}:8000/api/change_email`, {
+    fetch(`${Config.API_URL}/api/change_email`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',

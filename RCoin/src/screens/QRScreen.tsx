@@ -41,7 +41,7 @@ const AccountScreen = ({
 
   async function getMerchantTransaction(transaction_id: string): Promise<void> {
     fetch(
-      `${Config.API_URL}:8000/api/complete_merchant_transaction/?transaction_id=` +
+      `${Config.API_URL}/api/complete_merchant_transaction/?transaction_id=` +
         transaction_id,
       {
         method: 'GET',

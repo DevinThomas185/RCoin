@@ -23,7 +23,7 @@ const Transfer0Email = ({
   const {friends} = useFriends();
 
   function isEmailValid(email: string): Promise<boolean> {
-    return fetch(`${Config.API_URL}:8000/api/trade-email-valid`, {
+    return fetch(`${Config.API_URL}/api/trade-email-valid`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

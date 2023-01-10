@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   frontend:
-    build: ./frontend
+    image: 146.169.40.88:5000/rcoin-frontend
     ports:
       - 443:443
     depends_on:
@@ -12,7 +12,7 @@ services:
       - main
 
   backend:
-    build: ./backend
+    image: 146.169.40.88:5000/rcoin-backend
     environment:
       - SOLANA_CLIENT=${SOLANA_CLIENT}
       - MINT_ACCOUNT=${MINT_ACCOUNT}
@@ -37,8 +37,8 @@ services:
       - 8000:8000
     depends_on:
       - db
-    volumes:
-      - /etc/certs:/etc/nginx/certs
+    # volumes:
+    #   - /etc/certs:/etc/nginx/certs
     profiles:
       - main
 
@@ -69,14 +69,14 @@ services:
       - main
 
   signer-backend:
-    build: ./signer
+    image: 146.169.40.88:5000/rcoin-signer-backend
     environment:
       - SIGNER_2=${SIGNER_2}
     profiles:
       - signer
 
   signer-proxy:
-    build: ./signer/nginx
+    image: 146.169.40.88:5000/rcoin-signer-proxy
     ports:
       - 80:80
     depends_on:

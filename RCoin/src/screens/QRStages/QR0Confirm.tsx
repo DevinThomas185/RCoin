@@ -49,7 +49,7 @@ const QR0Confirm = ({
       ),
     );
 
-    return fetch(`${Config.API_URL}:8000/api/sign_merchant_transaction`, {
+    return fetch(`${Config.API_URL}/api/sign_merchant_transaction`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const QR0Confirm = ({
     setConfirmClicked(true);
     setResponseState(0);
 
-    fetch(`${Config.API_URL}:8000/api/trade`, {
+    fetch(`${Config.API_URL}/api/trade`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const QR0Confirm = ({
             const signData = message.serialize();
             const signature = nacl.sign.detached(signData, secretKey);
 
-            fetch(`${Config.API_URL}:8000/api/complete-trade`, {
+            fetch(`${Config.API_URL}/api/complete-trade`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

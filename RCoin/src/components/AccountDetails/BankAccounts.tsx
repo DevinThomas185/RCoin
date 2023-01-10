@@ -35,7 +35,7 @@ const BankAccounts = () => {
   });
 
   const refresh = () => {
-    fetch(`${Config.API_URL}:8000/api/get_bank_accounts`, {
+    fetch(`${Config.API_URL}/api/get_bank_accounts`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
@@ -50,7 +50,7 @@ const BankAccounts = () => {
         console.log(error);
       });
 
-    fetch(`${Config.API_URL}:8000/api/get_default_bank_account`, {
+    fetch(`${Config.API_URL}/api/get_default_bank_account`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
@@ -74,7 +74,7 @@ const BankAccounts = () => {
     bank_account: string,
     sort_code: string,
   ) => {
-    fetch(`${Config.API_URL}:8000/api/set_default_bank_account`, {
+    fetch(`${Config.API_URL}/api/set_default_bank_account`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
@@ -104,7 +104,7 @@ const BankAccounts = () => {
   };
 
   const addBankAccount = () => {
-    fetch(`${Config.API_URL}:8000/api/add_bank_account`, {
+    fetch(`${Config.API_URL}/api/add_bank_account`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',

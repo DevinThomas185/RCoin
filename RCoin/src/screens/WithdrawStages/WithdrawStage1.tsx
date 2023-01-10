@@ -30,7 +30,7 @@ const WithdrawStage1 = ({
   );
 
   useEffect(() => {
-    fetch(`${Config.API_URL}:8000/api/get_default_bank_account`, {
+    fetch(`${Config.API_URL}/api/get_default_bank_account`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
@@ -46,7 +46,7 @@ const WithdrawStage1 = ({
         console.log(error);
       });
 
-    fetch(`${Config.API_URL}:8000/api/get_bank_accounts`, {
+    fetch(`${Config.API_URL}/api/get_bank_accounts`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',

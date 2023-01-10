@@ -75,7 +75,7 @@ const AuditProvider = ({children}: {children: React.ReactNode}) => {
   const refresh = async () => {
     if (auth.authData?.token) {
       setLoading(true);
-      fetch(`${Config.API_URL}:8000/api/audit`, {
+      fetch(`${Config.API_URL}/api/audit`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

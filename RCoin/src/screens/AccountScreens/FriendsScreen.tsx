@@ -18,7 +18,7 @@ const FriendsScreen = () => {
   const friends_context = useFriends();
 
   function isEmailValid(email: string): Promise<boolean> {
-    return fetch(`${Config.API_URL}:8000/api/trade-email-valid`, {
+    return fetch(`${Config.API_URL}/api/trade-email-valid`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ const FriendsScreen = () => {
   }
 
   const addFriend = () => {
-    fetch(`${Config.API_URL}:8000/api/add_friend`, {
+    fetch(`${Config.API_URL}/api/add_friend`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',

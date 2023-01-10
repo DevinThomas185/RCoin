@@ -25,7 +25,7 @@ const MerchantScreen = ({
 
   async function generateTransaction(coins: number) {
     fetch(
-      `${Config.API_URL}:8000/api/create_merchant_transaction/?amount=` +
+      `${Config.API_URL}/api/create_merchant_transaction/?amount=` +
         coins.toString(),
       {
         method: 'GET',

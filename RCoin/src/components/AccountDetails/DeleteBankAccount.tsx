@@ -26,7 +26,7 @@ const DeleteBankAccount = ({
   const auth = useAuth();
 
   const handleSubmit = () => {
-    fetch(`${Config.API_URL}:8000/api/delete_bank_account`, {
+    fetch(`${Config.API_URL}/api/delete_bank_account`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',

@@ -42,7 +42,7 @@ const Merchant1Code = ({
       console.log(timeout);
       console.log('>>>>>>' + transactionId);
       fetch(
-        `${Config.API_URL}:8000/api/merchant_transaction_status?transaction_id=` +
+        `${Config.API_URL}/api/merchant_transaction_status?transaction_id=` +
           transaction_id,
         {
           method: 'GET',
