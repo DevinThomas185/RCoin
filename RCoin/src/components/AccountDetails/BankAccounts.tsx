@@ -136,22 +136,20 @@ const BankAccounts = () => {
   };
 
   return (
-    <View>
-      <Card
-        style={{marginBottom: 15}}
-        onPress={() => {
-          setOpen(!open);
-        }}
-        enableShadow>
-        <View margin-20 spread row centerV>
-          <Text text60 $textDefault>
-            Bank Accounts
-          </Text>
-          <Ionicons size={30} name={open ? 'chevron-up' : 'chevron-down'} />
-        </View>
-      </Card>
+    <Card
+      style={{marginBottom: 15}}
+      onPress={() => {
+        setOpen(!open);
+      }}
+      enableShadow>
+      <View margin-20 spread row centerV>
+        <Text text60 $textDefault>
+          Bank Accounts
+        </Text>
+        <Ionicons size={30} name={open ? 'chevron-up' : 'chevron-down'} />
+      </View>
       {open ? (
-        <Card spread centerV onPress enableShadow>
+        <View spread centerV>
           {bank_accounts.map((acc, i) => (
             <View row spread marginH-20 marginV-5 centerV key={i}>
               <Ionicons
@@ -224,7 +222,7 @@ const BankAccounts = () => {
               backgroundColor={styles.rcoin}
             />
           </View>
-        </Card>
+        </View>
       ) : (
         <></>
       )}
@@ -235,7 +233,7 @@ const BankAccounts = () => {
         setIsVisible={setDeleteVisible}
         onSuccess={refresh}
       />
-    </View>
+    </Card>
   );
 };
 

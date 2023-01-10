@@ -27,6 +27,8 @@ import {NotificationContainer} from './src/components/NotificationContainer';
 import {LogBox} from 'react-native';
 import {AuditProvider} from './src/contexts/AuditContext';
 import {FriendProvider} from './src/contexts/FriendContext';
+import {PinLoginScreen} from './src/screens/login/PinLoginScreen';
+import {PinSetupStack} from './src/screens/login/PinSetupStack';
 
 const Tab = createBottomTabNavigator();
 LogBox.ignoreLogs(['Invalid prop textStyle of type array supplied to Cell']);
@@ -36,7 +38,7 @@ LogBox.ignoreLogs(['Invalid prop textStyle of type array supplied to Cell']);
 
 const App = () => {
   const AuthRouter = ({children}: {children: JSX.Element}) => {
-    const {authData, loading, signOut} = useAuth();
+    const {authData, authDataLocal, loading, signOut} = useAuth();
 
     if (authData?.token_info.suspended) {
       return (
@@ -78,13 +80,25 @@ const App = () => {
       return <SpinningRCoin />;
     }
 
+    if (authData) {
+      return (
+        <NavigationContainer>
+          {authDataLocal ? (
+            <NotificationContainer>{children}</NotificationContainer>
+          ) : (
+            <PinSetupStack />
+          )}
+        </NavigationContainer>
+      );
+    }
+
+    if (authDataLocal) {
+      return <PinLoginScreen authDataLocal={authDataLocal} />;
+    }
+
     return (
       <NavigationContainer>
-        {authData ? (
-          <NotificationContainer>{children}</NotificationContainer>
-        ) : (
-          <AuthStack />
-        )}
+        <AuthStack />
       </NavigationContainer>
     );
   };

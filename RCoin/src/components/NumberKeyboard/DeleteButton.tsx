@@ -19,6 +19,11 @@ const DeleteButton = ({
   setDotPresent: React.Dispatch<React.SetStateAction<boolean>>;
   setDecimals: React.Dispatch<React.SetStateAction<number>>;
 }) => {
+  var textColor = 'white';
+
+  if ('color' in style) {
+    textColor = style.color;
+  }
   return (
     <TouchableOpacity
       onPress={() => {
@@ -39,7 +44,7 @@ const DeleteButton = ({
         setNumberString(current_number.slice(0, -1));
       }}>
       <View center style={style}>
-        <Text text40 center color={Style.white}>
+        <Text text40 center color={textColor}>
           ←
         </Text>
       </View>
