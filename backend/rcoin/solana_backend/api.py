@@ -363,18 +363,18 @@ def get_transfer_amount_for_transaction(signature: str) -> CustomResponse:
             sleep(1)
 
     except BlockchainQueryFailedException as exception:
-        return Failure("exception", exception)
+        return Failure(exception)
 
     if resp == GetTransactionResp(None):
-        return Failure("exception", TransactionTimeoutException())
+        return Failure(TransactionTimeoutException())
 
     if resp.value is None:
-        return Failure("exception", InvalidGetTransactionRespException())
+        return Failure(InvalidGetTransactionRespException())
 
     confirmed_transaction: EncodedTransactionWithStatusMeta = resp.value.transaction
 
     if confirmed_transaction.meta is None:
-        return Failure("exception", InvalidGetTransactionRespException())
+        return Failure(InvalidGetTransactionRespException())
 
     pre_token_balances = confirmed_transaction.meta.pre_token_balances
     post_token_balances = confirmed_transaction.meta.post_token_balances
@@ -384,7 +384,7 @@ def get_transfer_amount_for_transaction(signature: str) -> CustomResponse:
         or post_token_balances is None
         or len(post_token_balances) != 2
     ):
-        return Failure("exception", InvalidGetTransactionRespException())
+        return Failure(InvalidGetTransactionRespException())
 
     if (
         pre_token_balances[0].account_index == post_token_balances[0].account_index
@@ -402,7 +402,9 @@ def get_transfer_amount_for_transaction(signature: str) -> CustomResponse:
             post_token_balances[1].ui_token_amount.amount
         )
 
-    return Success("amount", amount / 10**TOKEN_DECIMALS)
+    # We return the absolute value of the amount because we always transfer
+    # positive amounts of coins.
+    return Success("amount", abs(amount) / 10**TOKEN_DECIMALS)
 
 
 def get_recipient_for_trade_transaction(signature: str) -> CustomResponse:
