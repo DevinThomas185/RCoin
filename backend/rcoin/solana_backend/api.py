@@ -35,6 +35,7 @@ from rcoin.solana_backend.common import (
     TOTAL_SUPPLY,
 )
 
+
 from rcoin.solana_backend.exceptions import (
     BlockchainQueryFailedException,
     InvalidGetTransactionRespException,
@@ -55,6 +56,7 @@ from rcoin.solana_backend.query import (
     get_reserve_balance,
     get_token_balance,
     get_transaction_details,
+    extract_transaction_details,
     has_token_account,
     get_sol_balance,
 )
@@ -379,32 +381,9 @@ def get_transfer_amount_for_transaction(signature: str) -> CustomResponse:
     pre_token_balances = confirmed_transaction.meta.pre_token_balances
     post_token_balances = confirmed_transaction.meta.post_token_balances
 
-    if (
-        pre_token_balances is None
-        or post_token_balances is None
-        or len(post_token_balances) != 2
-    ):
-        return Failure(InvalidGetTransactionRespException())
+    transaction_details = extract_transaction_details(pre_token_balances, post_token_balances)
 
-    if (
-        pre_token_balances[0].account_index == post_token_balances[0].account_index
-        and len(pre_token_balances) == 2
-    ):
-        # Both sender's and recipient's token accounts existed before
-        # the transaction (usual scenario)
-        amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
-            post_token_balances[0].ui_token_amount.amount
-        )
-    else:
-        # Edge case when the recipient didn't have a token account before
-        # transaction and it was created on request.
-        amount = int(pre_token_balances[0].ui_token_amount.amount) - int(
-            post_token_balances[1].ui_token_amount.amount
-        )
-
-    # We return the absolute value of the amount because we always transfer
-    # positive amounts of coins.
-    return Success("amount", abs(amount) / 10**TOKEN_DECIMALS)
+    return Success("amount", transaction_details["amount"] / 10**TOKEN_DECIMALS)
 
 
 def get_recipient_for_trade_transaction(signature: str) -> CustomResponse:
@@ -420,18 +399,18 @@ def get_recipient_for_trade_transaction(signature: str) -> CustomResponse:
             sleep(1)
 
     except BlockchainQueryFailedException as exception:
-        return Failure("exception", exception)
+        return Failure(exception)
 
     if resp == GetTransactionResp(None):
-        return Failure("exception", TransactionTimeoutException())
+        return Failure(TransactionTimeoutException())
 
     if resp.value is None:
-        return Failure("exception", InvalidGetTransactionRespException())
+        return Failure(InvalidGetTransactionRespException())
 
     confirmed_transaction: EncodedTransactionWithStatusMeta = resp.value.transaction
 
     if confirmed_transaction.meta is None:
-        return Failure("exception", InvalidGetTransactionRespException())
+        return Failure(InvalidGetTransactionRespException())
 
     # Copied from query.py should abstract:
 
