@@ -196,7 +196,6 @@ def not_fraudulent(func):
     @functools.wraps(func)
     async def check_function(*args, **kwargs):
 
-        db = kwargs["db"]
         response = kwargs["response"]
         user = kwargs["user"] if "user" in kwargs else kwargs["sender"]
         assert isinstance(user, User)

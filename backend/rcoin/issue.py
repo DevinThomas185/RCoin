@@ -23,7 +23,7 @@ class ShouldIssueStage(Enum):
 
 # is amount actually a float??
 async def get_should_issue_stage(
-    transaction_id: str, user: User, amount: float, db: "Session"
+    transaction_id: str, user: User, amount: float
 ) -> Optional[Tuple[ShouldIssueStage, Optional[str]]]:
     """gets stage that webhook should continue from for issue
 
@@ -34,7 +34,7 @@ async def get_should_issue_stage(
 
     # If this transaction is not in the db, we haven't yet attempted to issue so we are safe to
     issue_write: Optional[Issue] = await get_user_issue_for_bank_transaction(
-        user.id, transaction_id, db
+        user.id, transaction_id
     )
     print(f"issue write is {issue_write}")
     if not issue_write:
@@ -72,7 +72,7 @@ async def get_should_issue_stage(
 
         missing_transactions = []
 
-        database_transactions = await get_issue_transactions_for_user(user.id, db)
+        database_transactions = await get_issue_transactions_for_user(user.id)
 
         database_blockchain_ids = set(
             map(lambda t: t.blockchain_transaction_id, database_transactions)
