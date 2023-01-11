@@ -264,11 +264,11 @@ def extract_transaction_details(pre_token_balances, post_token_balances) -> Any:
                 recipient = owner
                 amount = delta
 
-        return {
-            "sender": sender,
-            "recipient": recipient,
-            "amount": amount,
-        }
+    return {
+        "sender": sender,
+        "recipient": recipient,
+        "amount": amount,
+    }
 
 def get_transaction_details(transaction_signature: Signature) -> GetTransactionResp:
     try:
