@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   frontend:
-    image: 146.169.40.88:5000/rcoin-frontend:${CI_COMMIT_SHA}
+    image: 146.169.40.88:5000/rcoin-frontend
     ports:
       - 443:443
     depends_on:
@@ -18,7 +18,7 @@ services:
 
   backend:
     # build: ./backend
-    image: 146.169.40.88:5000/rcoin-backend:${CI_COMMIT_SHA}
+    image: 146.169.40.88:5000/rcoin-backend
     environment:
       - SOLANA_CLIENT=${SOLANA_CLIENT}
       - MINT_ACCOUNT=${MINT_ACCOUNT}
