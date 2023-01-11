@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Union, Any
 from pydantic import BaseModel
 
@@ -11,10 +12,46 @@ class UserInformation(BaseModel):
     bank_account: str
     sort_code: str
     document_number: str
-    recipient_code: str
+    is_merchant: bool
 
     class Config:
         orm_mode = True
+
+
+class UserTableInfo(BaseModel):
+    email: str
+    password: Union[str, bytes]
+    first_name: str
+    last_name: str
+    wallet_id: Union[str, bytes]
+    document_number: str
+    is_merchant: bool
+
+    class Config:
+        orm_mode = True
+
+
+class BankAccount(BaseModel):
+    user_id: int
+    bank_account: str
+    sort_code: str
+    recipient_code: str
+    default: bool
+
+
+class AlterBankAccount(BaseModel):
+    user_id: int
+    bank_account: str
+    sort_code: str
+
+
+class Friend(BaseModel):
+    email: str
+
+
+class MerchantTransaction(BaseModel):
+    transaction_id: str
+    signature: str
 
 
 class LoginInformation(BaseModel):
@@ -29,6 +66,12 @@ class IssueTransaction(BaseModel):
     # email: str
     # wallet: str
     amount_in_rands: float
+
+
+class AuditTransactionsRequest(BaseModel):
+    offset: int
+    limit: int
+    first_query_time: datetime
 
 
 class TradeTransaction(BaseModel):
@@ -69,3 +112,11 @@ class TokenBalance(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
+
+
+class RegisterDeviceToken(BaseModel):
+    device_token: str
+
+
+class AddAuditorRequest(BaseModel):
+    email: str

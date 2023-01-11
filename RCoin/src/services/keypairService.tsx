@@ -3,17 +3,20 @@ import * as RNFS from 'react-native-fs';
 const CryptoJS = require('crypto-js');
 // import * as bs58 from 'bs58';
 
-import {Keypair, Signer} from '@solana/web3.js';
+import {Keypair, PublicKey, Signer} from '@solana/web3.js';
 import ReactNativeBiometrics from 'react-native-biometrics';
-import {useAuth} from '../contexts/Auth';
+import * as bip39 from '../best_practice_here/bip39';
 
 export type KeypairData = {
   sk: string;
   pk: string;
 };
 
-const SECRET_KEY_NAME = 'corn';
-const BIO_SECRET_KEY_NAME = 'cream';
+const getSecretKeyName = (pk: string) => {
+  return `corn-${pk}`;
+};
+
+const bioSecretKeyName = 'cream';
 
 const rnBiometrics = new ReactNativeBiometrics();
 
@@ -42,45 +45,68 @@ const handleCheckBioKeys = async (): Promise<boolean> => {
   return keysExist;
 };
 
+const deleteBio = () => {
+  RNFS.unlink(RNFS.DocumentDirectoryPath + `/${bioSecretKeyName}.txt`)
+    .then(() => {
+      console.log(`Deleted ${bioSecretKeyName}`);
+    })
+    .catch(e => {
+      console.log(`/${bioSecretKeyName}.txt`, e);
+    });
+  handleDeleteBioKeys();
+};
+
 // TODO[pg1919] return success or truth or smth
-const _writePair = (kp: Keypair, encryptionKey: string, filename: string) => {
+const _writePair = (
+  contents: string,
+  encryptionKey: string,
+  filename: string,
+) => {
   const path = RNFS.DocumentDirectoryPath + `/${filename}.txt`;
 
   RNFS.writeFile(
     path,
-    CryptoJS.AES.encrypt(
-      JSON.stringify({secretKey: kp.secretKey, publicKey: kp.publicKey}),
-      encryptionKey,
-    ).toString(),
+    CryptoJS.AES.encrypt(contents, encryptionKey).toString(),
     'utf8',
   )
     .then(() => {
-      console.log('Created file shhhh!');
+      console.log(`Created file ${filename} shhhh!`);
     })
     .catch((err: any) => {
       console.log(err.message);
     });
 };
 
-const writePair = (kp: Keypair, encryptionKey: string) => {
-  RNFS.unlink(RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`).catch(
-    e => {
-      console.log(`/${BIO_SECRET_KEY_NAME}.txt`, e);
-    },
-  );
-  handleDeleteBioKeys();
+const writePair = async (
+  mnemonic: string,
+  encryptionKey: string,
+): Promise<PublicKey> => {
+  const seed = await bip39.mnemonicToSeed(mnemonic, encryptionKey);
+  const kp: Keypair = Keypair.fromSeed(seed.subarray(0, 32));
 
-  _writePair(kp, encryptionKey, SECRET_KEY_NAME);
+  console.log(mnemonic);
+
+  _writePair(
+    mnemonic,
+    encryptionKey,
+    getSecretKeyName(kp.publicKey.toString()),
+  );
+
+  return kp.publicKey;
 };
 
 const writePairBio = (kp: Keypair, encryptionKey: string) => {
-  _writePair(kp, encryptionKey, BIO_SECRET_KEY_NAME);
+  _writePair(
+    JSON.stringify({secretKey: kp.secretKey, publicKey: kp.publicKey}),
+    encryptionKey,
+    bioSecretKeyName,
+  );
 };
 
-const readPair = (
+const _readContents = (
   decryptionKey: string,
-  filename: string = SECRET_KEY_NAME,
-): Promise<Keypair | undefined> => {
+  filename: string,
+): Promise<string | undefined> => {
   const path = RNFS.DocumentDirectoryPath + `/${filename}.txt`;
 
   return new Promise(resolve => {
@@ -90,11 +116,8 @@ const readPair = (
           contents,
           decryptionKey,
         ).toString(CryptoJS.enc.Utf8);
-        const signer: Signer = JSON.parse(decryptedContents);
-        const kp = Keypair.fromSecretKey(
-          new Uint8Array(Object.values(signer.secretKey)),
-        );
-        resolve(kp);
+
+        resolve(decryptedContents);
       })
       .catch((err: any) => {
         console.log(err.message, err.code);
@@ -103,8 +126,80 @@ const readPair = (
   });
 };
 
-const readPairBio = (decryptionKey: string): Promise<Keypair | undefined> => {
-  return readPair(decryptionKey, BIO_SECRET_KEY_NAME);
+const readMnemonic = async (
+  decryptionKey: string,
+  pk: string,
+): Promise<string | undefined> => {
+  const decryptedContents = await _readContents(
+    decryptionKey,
+    getSecretKeyName(pk),
+  );
+
+  return decryptedContents;
+};
+
+const readPair = async (
+  decryptionKey: string,
+  pk: string,
+): Promise<Keypair | undefined> => {
+  const mnemonic = await readMnemonic(decryptionKey, pk);
+
+  if (mnemonic === undefined) {
+    return undefined;
+  }
+
+  const seed: Buffer = await bip39.mnemonicToSeed(mnemonic, decryptionKey);
+
+  return Keypair.fromSeed(seed.subarray(0, 32));
+};
+
+const readPairBio = async (
+  decryptionKey: string,
+): Promise<Keypair | undefined> => {
+  const decryptedContents = await _readContents(
+    decryptionKey,
+    bioSecretKeyName,
+  );
+  if (decryptedContents === undefined) {
+    return undefined;
+  }
+
+  const signer: Signer = JSON.parse(decryptedContents);
+  const kp = Keypair.fromSecretKey(
+    new Uint8Array(Object.values(signer.secretKey)),
+  );
+
+  return kp;
+};
+
+const restoreSecretKey = async (
+  mnemonic: string,
+  password: string,
+  pk: string,
+): Promise<boolean> => {
+  try {
+    const seed: Buffer = await bip39.mnemonicToSeed(mnemonic, password);
+    const kp: Keypair = Keypair.fromSeed(seed.subarray(0, 32));
+
+    if (kp.publicKey.toString() === pk) {
+      writePair(mnemonic, password);
+      return true;
+    } else {
+      console.log(
+        'Mnemonic and password provided does not match the public key associated with this account',
+      );
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+const secretKeyExists = async (pk: string): Promise<boolean> => {
+  return RNFS.exists(
+    RNFS.DocumentDirectoryPath + `/${getSecretKeyName(pk)}.txt`,
+  );
 };
 
 const bioSecretKeyExitsts = async (): Promise<boolean> => {
@@ -116,23 +211,25 @@ const bioSecretKeyExitsts = async (): Promise<boolean> => {
 
   if (!keyExists) {
     handleCreateBioKeys();
-    RNFS.unlink(
-      RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`,
-    ).catch(e => {
-      console.log(`/${BIO_SECRET_KEY_NAME}.txt`, e);
-    });
+    RNFS.unlink(RNFS.DocumentDirectoryPath + `/${bioSecretKeyName}.txt`).catch(
+      e => {
+        console.log(`/${bioSecretKeyName}.txt`, e);
+      },
+    );
     return false;
   }
 
-  return RNFS.exists(
-    RNFS.DocumentDirectoryPath + `/${BIO_SECRET_KEY_NAME}.txt`,
-  );
+  return RNFS.exists(RNFS.DocumentDirectoryPath + `/${bioSecretKeyName}.txt`);
 };
 
 export const keypairService = {
+  readMnemonic,
   readPair,
   readPairBio,
   writePair,
   writePairBio,
+  secretKeyExists,
+  restoreSecretKey,
   bioSecretKeyExitsts,
+  deleteBio,
 };

@@ -1,49 +1,63 @@
-import { Box, Image, Grid, HStack, Skeleton } from "@chakra-ui/react";
+import {
+  Box,
+  Image,
+  Grid,
+  HStack,
+  Skeleton,
+  Flex,
+  Spacer,
+  ResponsiveValue,
+} from "@chakra-ui/react";
 
-const RatioBox = ({
-  ratio,
-  isLoaded,
-}: {
-  ratio: number;
-  isLoaded: boolean;
-}) => {
-  const color = ratio > 1 ? "green" : "red";
-  return (
-    <Box
-      textAlign="center"
-      bg="rcoinBlue.50"
-      borderRadius="15px"
-      fontSize="3xl"
-      fontWeight="bold"
-      paddingLeft="10px"
-      paddingRight="10px"
-      color={color}
-    >
-      <CustomSkeleton isLoaded={isLoaded} overrideWidth="100px">
-        <HStack>
-          <Box fontSize="xl">Ratio =</Box>
-          <Box fontSize="5xl">{ratio}</Box>
-        </HStack>
-      </CustomSkeleton>
-    </Box>
-  );
-};
-
-const CustomSkeleton = ({
+const DataCard = ({
+  title,
+  value,
+  valueColor,
   children,
-  isLoaded,
-  overrideWidth,
+  topMargin,
 }: {
-  children: any;
-  isLoaded: boolean;
-  overrideWidth?: string;
+  title: string;
+  value: number;
+  valueColor?: string;
+  children: JSX.Element | JSX.Element[];
+  topMargin?: string;
 }) => {
-  const minWidth =
-    typeof overrideWidth == "undefined" ? "200px" : overrideWidth;
+  const color = valueColor ? valueColor : "black";
   return (
-    <Skeleton minWidth={minWidth} isLoaded={isLoaded} borderRadius="10px">
-      {children}
-    </Skeleton>
+    <Grid
+      borderRadius="3px"
+      bg="rcoinBlue.1100"
+      boxShadow="md"
+      marginLeft="10px"
+      marginTop={topMargin}
+    >
+      <Box
+        textAlign="left"
+        fontSize="2xl"
+        marginLeft="15px"
+        fontWeight="bold"
+        color="rcoinBlue.1000"
+      >
+        {title}
+      </Box>
+      <HStack
+        borderRadius="2px"
+        bg="rcoinBlue.50"
+        paddingLeft="10px"
+        paddingRight="10px"
+      >
+        {children}
+        <Box
+          fontWeight="bold"
+          color={color}
+          paddingRight="10px"
+          paddingLeft="10px"
+          fontSize="3xl"
+        >
+          {value}
+        </Box>
+      </HStack>
+    </Grid>
   );
 };
 
@@ -52,61 +66,56 @@ const AuditTotals = ({
   amountIssued,
   ratio,
   isLoaded,
+  useMobileView,
 }: {
   amountInReserve: number;
   amountIssued: number;
   ratio: number;
   isLoaded: boolean;
+  useMobileView: boolean | undefined;
 }) => {
+  const ratioColor = ratio > 1 ? "green" : "red";
+  const direction = useMobileView ? "column" : "row";
+  const itemTopMargin = useMobileView ? "10px" : "0px";
   return (
-    <HStack justifyContent="center">
-      <Grid
-        textAlign="center"
-        borderRadius="25px"
-        paddingLeft="10px"
-        paddingRight="10px"
-        bg="rcoinBlue.50"
-      >
-        <Box
-          textAlign="center"
-          fontSize="3xl"
-          fontWeight="bold"
-          color="rcoinBlue.700"
+    <Skeleton borderRadius="5px" isLoaded={isLoaded}>
+      <Flex direction={direction} justifyContent="center">
+        <DataCard
+          title="In Reserve"
+          value={amountInReserve}
+          topMargin={itemTopMargin}
         >
-          In Reserve
-        </Box>
-        <HStack>
-          <Box fontWeight="bold" fontSize="4xl">
-            ZAR{" "}
+          <Box fontWeight="bold" fontSize="3xl">
+            ZAR
           </Box>
-          <CustomSkeleton isLoaded={isLoaded}>
-            <Box fontWeight="bold" fontSize="4xl">
-              {amountInReserve}
-            </Box>
-          </CustomSkeleton>
-        </HStack>
-      </Grid>
-      <RatioBox ratio={ratio} isLoaded={isLoaded} />
-      <Grid
-        textAlign="center"
-        borderRadius="25px"
-        paddingLeft="10px"
-        paddingRight="10px"
-        bg="rcoinBlue.50"
-      >
-        <Box fontSize="3xl" fontWeight="bold" color="rcoinBlue.700">
-          Coins Issued
-        </Box>
-        <HStack>
-          <Image src="small_logo.png" boxSize="35px" marginLeft="9px" />
-          <CustomSkeleton isLoaded={isLoaded}>
-            <Box fontWeight="bold" fontSize="4xl" color="rcoinBlue.500">
-              {amountIssued}
-            </Box>
-          </CustomSkeleton>
-        </HStack>
-      </Grid>
-    </HStack>
+        </DataCard>
+        <Spacer />
+        <DataCard
+          title="Coins Issued"
+          value={amountIssued}
+          valueColor="rcoinBlue.500"
+          topMargin={itemTopMargin}
+        >
+          <Image
+            src="small_logo.png"
+            boxSize="35px"
+            marginRight="16px"
+            marginLeft="9px"
+          />
+        </DataCard>
+        <Spacer />
+        <DataCard
+          title="Reserve/Issued"
+          value={ratio}
+          valueColor={ratioColor}
+          topMargin={itemTopMargin}
+        >
+          <Box fontSize="3xl" fontWeight="bold" color={ratioColor}>
+            Ratio =
+          </Box>
+        </DataCard>
+      </Flex>
+    </Skeleton>
   );
 };
 

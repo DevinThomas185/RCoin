@@ -1,73 +1,64 @@
-import React, {useEffect} from 'react';
-import {Text, View, Button, Image} from 'react-native-ui-lib';
-import Balance from '../../components/Balances/Balance';
-import {useAuth} from '../../contexts/Auth';
+import React, {useState} from 'react';
+import {Text, View, Button} from 'react-native-ui-lib';
 import styles from '../../style/style';
-import Config from 'react-native-config';
-
-const LEAST_LIMIT = 0;
+import ChangingBalanceCard from '../../components/Balances/ChangingBalanceCard';
+import NumberKeyboard from '../../components/NumberKeyboard/NumberKeyboard';
 
 // Select the amount
 const WithdrawStage0 = ({
   nextStage,
-  setRandsBeingCredited,
   coins_to_withdraw,
+  setCoinsToWithdraw,
 }: {
   nextStage: React.Dispatch<void>;
-  setRandsBeingCredited: React.Dispatch<React.SetStateAction<number>>;
   coins_to_withdraw: number;
+  setCoinsToWithdraw: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-  const auth = useAuth();
-
-  useEffect(() => {
-    fetch(
-      `${Config.API_URL}:8000/api/get_rand_to_return/?amount=` +
-        coins_to_withdraw.toString(),
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.authData?.token}`,
-        },
-      },
-    )
-      .then(res => res.json())
-      .then(data => {
-        setRandsBeingCredited(data['rand_to_return']);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }, [coins_to_withdraw]);
+  const [valid, setValid] = useState(false);
 
   return (
-    <View flex>
-      <Text text40 style={styles.title}>
-        Make a Withdrawal
-      </Text>
-      <View marginH-30>
-        <Text text60 marginB-10>
-          Withdraw RCoin and receive Rand
+    <View flex marginH-10>
+      <View marginV-10>
+        <Text text40 style={styles.title}>
+          Make a Withdrawal
         </Text>
-        <Text>
-          The transaction will appear in your transaction history and on the
-          real-time audit.
+        <Text text70>
+          Withdraw RCoin into Rand, deposited into your chosen bank account.
         </Text>
       </View>
 
-      <View marginH-30>
-        <Balance />
+      <View>
+        <ChangingBalanceCard increment={-coins_to_withdraw} />
       </View>
-      <Image
-        source={require('../../style/RCoin-ZAR.png')}
-        style={{width: '100%', height: 130, marginVertical: 30}}
-      />
 
-      <View flex bottom marginH-30 marginB-10>
+      <View flex bottom marginV-10>
+        <NumberKeyboard
+          style={{
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+          }}
+          number={coins_to_withdraw}
+          setNumber={x => {
+            setCoinsToWithdraw(x);
+          }}
+          setValid={setValid}
+          limit_to_balance={true}
+        />
         <Button
-          onPress={nextStage}
-          label="Continue to Choose Amount"
-          backgroundColor={styles.rcoin}
+          style={{
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            borderBottomLeftRadius: 10,
+            borderBottomRightRadius: 10,
+          }}
+          onPress={() => {
+            nextStage();
+          }}
+          label="Continue to Select Bank Account"
+          disabled={!valid}
+          backgroundColor={styles.paystack}
         />
       </View>
     </View>

@@ -7,4 +7,5 @@ export interface UserSignUp {
   bankAccountNumber: string;
   bankCode: string;
   IDNumber: string;
+  is_merchant: boolean;
 }

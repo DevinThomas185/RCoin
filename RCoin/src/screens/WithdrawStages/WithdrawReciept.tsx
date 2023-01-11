@@ -15,11 +15,9 @@ const {TextField} = Incubator;
 // Select the amount
 const Reciept = ({
   coins,
-  rands,
   bank_account,
 }: {
   coins: number;
-  rands: number;
   bank_account: {[key: string]: string};
 }) => {
   const numberWithCommas = (x: number) => {
@@ -31,32 +29,50 @@ const Reciept = ({
   };
 
   return (
-    <View>
-      <Text style={styles.buttonCaption}>
-        You are withdrawing{'\n'}
-        <Text text40 color={styles.rcoin}>
-          {numberWithCommas(coins)} Rand
-        </Text>
-        {'\n'}
-        into
-      </Text>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text style={styles.bankDetails}>
-          {bank_account['sort_code']}
-          {'\n'}
-          {bank_account['bank_account']}
-        </Text>
-        <Text style={styles.bankDetailsLabel}>
-          Bank Code{'\n'}
-          Account Number
-        </Text>
+    <Card enableShadow>
+      <View center padding-10>
+        <View marginV-10>
+          <Text text60 center color={styles.rcoin}>
+            You are withdrawing
+          </Text>
+        </View>
+        <View marginH-5 row center>
+          <Image
+            source={require('../../style/Logo.png')}
+            style={{width: 40, height: 40}}
+          />
+          <Text text60 color={styles.rcoin}>
+            {numberWithCommas(coins)}
+          </Text>
+        </View>
+        <Image
+          source={require('../../style/RCoin-ZAR.png')}
+          style={{width: '60%', height: 130 * 0.6}}
+        />
+        <View marginH-5 marginV-10>
+          <Text text60 center color={styles.rcoin}>
+            as ZAR {numberWithCommas(coins)} into
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text style={styles.bankDetails}>
+              {bank_account['bank_account']}
+              {'\n'}
+              {bank_account['sort_code']}
+            </Text>
+            <Text style={styles.bankDetailsLabel}>
+              Account Number
+              {'\n'}
+              Bank Code
+            </Text>
+          </View>
+        </View>
       </View>
-    </View>
+    </Card>
   );
 };
 

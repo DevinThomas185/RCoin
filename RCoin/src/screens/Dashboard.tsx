@@ -1,63 +1,75 @@
 import React from 'react';
-import {Text, View, Image, TouchableOpacity} from 'react-native-ui-lib';
-import Balance from '../components/Balances/Balance';
-import ServiceLink from '../components/ServiceLink';
+import {View, Image, TouchableOpacity, Button, Text} from 'react-native-ui-lib';
 import style from '../style/style';
 import {NavigationScreenProp} from 'react-navigation';
+import BalanceCard from '../components/Balances/BalanceCard';
+import AuditCard from '../components/Balances/AuditCard';
+import TransactionHistory from './TransactionHistory';
+import FriendsWidget from '../components/FriendsWidget/FriendsWidget';
+import {useAuth} from '../contexts/Auth';
 
-const HomeScreen = ({
+const Dashboard = ({
   navigation,
 }: {
   navigation: NavigationScreenProp<any, any>;
 }) => {
-  const divider = <View style={style.thinDivider} />;
-
+  const auth = useAuth();
   return (
     <View flex>
-      <TouchableOpacity onPress={() => navigation.navigate('Balance')}>
-        <View margin-30>
-          <Text text40>RCoin Balance</Text>
-          <Balance margin-30 />
-          <View style={style.divider}>
-            <Image source={require('../style/Divider.png')} />
-          </View>
+      <View row centerV margin-10 style={{justifyContent: 'space-between'}}>
+        <View flexG marginR-5>
+          <BalanceCard />
         </View>
-      </TouchableOpacity>
-
-      <Text marginH-30 text40 marginB-20>
-        Services
-      </Text>
-
-      {divider}
-      <TouchableOpacity onPress={() => navigation.navigate('Deposit')}>
-        <ServiceLink
-          title="Deposit"
-          message={
-            'Make a payment to acquire your RCoin.\nCompleted securely through Paystack.'
-          }
-        />
-      </TouchableOpacity>
-      {divider}
-      <TouchableOpacity onPress={() => navigation.navigate('Transfer')}>
-        <ServiceLink
-          title="Transfer"
-          message={
-            'Send your RCoin to another user.\nYour transfer will be signed on the blockchain.'
-          }
-        />
-      </TouchableOpacity>
-      {divider}
-      <TouchableOpacity onPress={() => navigation.navigate('Withdraw')}>
-        <ServiceLink
-          title="Withdraw"
-          message={
-            'Withdraw your RCoin as Rand.\nCompleted securely through Paystack.'
-          }
-        />
-      </TouchableOpacity>
-      {divider}
+        <View flexS marginL-5>
+          <TouchableOpacity onPress={() => navigation.navigate('Code')}>
+            <Image
+              style={style.qrIcon}
+              source={require('../style/QR-Icon.png')}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View
+        style={{flexDirection: 'row', justifyContent: 'space-between'}}
+        margin-10>
+        <View flex marginR-5>
+          <Button
+            label="Top Up"
+            backgroundColor={style.rcoin}
+            onPress={() => {
+              navigation.navigate('Deposit');
+            }}
+          />
+        </View>
+        {auth.authData?.token_info.is_merchant && (
+          <View flex marginL-5>
+            <Button
+              label="Merchant Terminal"
+              backgroundColor={style.rcoin}
+              onPress={() => {
+                navigation.navigate('Merchant');
+              }}
+            />
+          </View>
+        )}
+      </View>
+      <View margin-10>
+        <AuditCard />
+      </View>
+      <View margin-10>
+        {/* <Text text50 marginB-5>
+          Quick Contacts
+        </Text> */}
+        <FriendsWidget navigation={navigation} />
+      </View>
+      <View margin-10 flex>
+        {/* <Text text50 marginB-5>
+          Transaction History
+        </Text> */}
+        <TransactionHistory />
+      </View>
     </View>
   );
 };
 
-export default HomeScreen;
+export default Dashboard;

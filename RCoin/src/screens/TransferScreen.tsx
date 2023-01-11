@@ -1,21 +1,70 @@
-import React, {useState} from 'react';
-import {View, Wizard} from 'react-native-ui-lib';
+import React, {useEffect, useState} from 'react';
+import {Text, View, Wizard} from 'react-native-ui-lib';
 import TransferEmail from './TransferStages/Transfer0Email';
 import TransferAmount from './TransferStages/Transfer1Amount';
 import TransferConfirm from './TransferStages/Transfer2Confirm';
 import TransferSuccess from './TransferStages/Transfer3Success';
 import {useBackHandler} from '../services/BackHandler';
 import styles from '../style/style';
+import {RouteProp} from '@react-navigation/native';
+import {useAuth} from '../contexts/Auth';
+import {useKeypair} from '../contexts/Keypair';
+import MissingWallet from './MissingWallet';
+import {NavigationScreenProp} from 'react-navigation';
 
-const TransferScreen = () => {
+type RootStackParamList = {
+  MerchantTransaction: {qr_recipient: string; qr_amount: number};
+};
+
+const TransferScreen = ({
+  navigation,
+  route,
+}: {
+  navigation: NavigationScreenProp<any, any>;
+  route: RouteProp<RootStackParamList, 'MerchantTransaction'>;
+}) => {
   const [stage, setStage] = useState(0);
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState(0.0);
+
+  const [recipient2, setRecipient2] = useState('');
+  const [amount2, setAmount2] = useState(0.0);
+
   const [transactionId, setTransactionId] = useState('');
+
+  useEffect(() => {
+    // Mount
+    return () => {
+      // Unmount
+      navigation.setParams({qr_recipient: '', qr_amount: 0.0});
+    };
+  }, []);
+
+  if (route.params.qr_recipient != recipient2) {
+    setStage(1);
+    setAmount2(route.params.qr_amount);
+    setAmount(route.params.qr_amount);
+    setRecipient2(route.params.qr_recipient);
+    setRecipient(route.params.qr_recipient);
+  }
+  console.log('^^^^^^^^^^^^^^');
+  console.log('ACTUAL: ' + amount + recipient);
+  console.log('stage is now: ' + stage);
+  const [keyExists, setKeyExsts] = useState(true);
+  const auth = useAuth();
+  const keyPair = useKeypair();
+
+  keyPair
+    .secretKeyExists(auth.authData?.token_info.wallet_id!)
+    .then((exists: boolean) => {
+      setKeyExsts(exists);
+    });
 
   const backHandlerAction = () => {
     switch (stage) {
       case 1:
+        setRecipient('');
+        setRecipient2('');
       case 2:
         setStage(stage - 1);
         return true;
@@ -37,15 +86,18 @@ const TransferScreen = () => {
             setStage(1);
           }}
           setRecipient={setRecipient}
+          navigation={navigation}
         />
       );
     } else if (stage == 1) {
       return (
         <TransferAmount
+          amount={amount}
           nextStage={() => {
             setStage(2);
           }}
           setAmount={setAmount}
+          recipient={recipient}
         />
       );
     } else if (stage == 2) {
@@ -62,6 +114,7 @@ const TransferScreen = () => {
     } else {
       return (
         <TransferSuccess
+          navigation={navigation}
           nextStage={() => {
             setStage(0);
           }}
@@ -86,33 +139,41 @@ const TransferScreen = () => {
 
   return (
     <View flex>
-      <Wizard activeIndex={stage}>
-        <Wizard.Step
-          state={getStageState(0)}
-          label={'Choose Recipient'}
-          circleColor={styles.rcoin}
-          color={styles.rcoin}
-        />
-        <Wizard.Step
-          state={getStageState(1)}
-          label={'Choose Amount'}
-          circleColor={styles.rcoin}
-          color={styles.rcoin}
-        />
-        <Wizard.Step
-          state={getStageState(2)}
-          label={'Confirmation'}
-          circleColor={styles.rcoin}
-          color={styles.rcoin}
-        />
-        <Wizard.Step
-          state={getStageState(3)}
-          label={'Successful'}
-          circleColor={styles.rcoin}
-          color={styles.rcoin}
-        />
-      </Wizard>
-      {renderCurrentStage()}
+      {keyExists ? (
+        <>
+          <Wizard activeIndex={stage}>
+            <Wizard.Step
+              state={getStageState(0)}
+              label={'Choose Recipient'}
+              circleColor={styles.rcoin}
+              color={styles.rcoin}
+            />
+            <Wizard.Step
+              state={getStageState(1)}
+              label={'Choose Amount'}
+              circleColor={styles.rcoin}
+              color={styles.rcoin}
+            />
+            <Wizard.Step
+              state={getStageState(2)}
+              label={'Confirmation'}
+              circleColor={styles.rcoin}
+              color={styles.rcoin}
+            />
+            <Wizard.Step
+              state={getStageState(3)}
+              label={'Successful'}
+              circleColor={styles.rcoin}
+              color={styles.rcoin}
+            />
+          </Wizard>
+          {renderCurrentStage()}
+        </>
+      ) : (
+        <>
+          <MissingWallet navigation={navigation} />
+        </>
+      )}
     </View>
   );
 };

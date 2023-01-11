@@ -5,11 +5,11 @@ import {
   Grid,
   HStack,
   IconButton,
-  Skeleton,
-  Spacer,
   Collapse,
   useDisclosure,
   useOutsideClick,
+  useBreakpointValue,
+  Flex,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import AuditExplanationPopup from "./AuditExplanationPopup";
@@ -25,6 +25,13 @@ const AuditHeader = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const { isOpen, onToggle } = useDisclosure();
   const ref = useRef<any>();
+
+  const useMobileView = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+
+  const headerDirection = useMobileView ? "column" : "row";
 
   useOutsideClick({
     ref: ref,
@@ -56,50 +63,73 @@ const AuditHeader = () => {
   });
 
   return (
-    <Grid maxWidth="1080px" gap={1} marginLeft="auto" marginRight="auto">
-      <Box
-        textAlign="center"
-        fontSize="5xl"
-        fontWeight="bold"
-        color="rcoinBlue.600"
-      >
-        Real-Time Audit
-        <IconButton
-          ref={ref}
-          aria-label="Learn More about the Audit"
-          marginLeft="10px"
-          variant="reactive"
-          size="sm"
-          onClick={onToggle}
-          icon={<QuestionIcon />}
-        ></IconButton>
-      </Box>
-      <AuditTotals
-        amountInReserve={rand_in_reserve}
-        amountIssued={issued_coins}
-        ratio={ratio}
-        isLoaded={isLoaded}
-      />
-      <HStack
+    <Grid
+      gap={2}
+      marginLeft="auto"
+      marginRight="auto"
+      marginBottom="20px"
+      marginTop="20px"
+    >
+      <Flex
+        direction={headerDirection}
         marginLeft="auto"
         marginRight="auto"
-        paddingLeft="10px"
-        bg="rcoinBlue.100"
-        paddingRight="10px"
-        borderRadius="25px"
-        width="fit-content"
-        justifyContent="center"
+        bg="rcoinBlue.1000"
+        borderRadius="5px"
+        padding="10px"
       >
-        <Text fontSize="sm"> Last Updated: </Text>
-        <Box fontWeight="bold" fontSize="md">
-          {" "}
-          {date}{" "}
+        <Box
+          textAlign="center"
+          fontSize="4xl"
+          fontWeight="bold"
+          color="rcoinBlue.1100"
+        >
+          <Grid>
+            <Box marginBottom="5px">Real-Time Audit</Box>
+            <HStack
+              marginLeft="auto"
+              marginTop="-5px"
+              paddingLeft="10px"
+              color="black"
+              bg="rcoinBlue.1000"
+              borderRadius="5px"
+              width="fit-content"
+            >
+              <Text fontSize="sm"> Last Update:</Text>
+              <Box fontWeight="bold" fontSize="md">
+                {" "}
+                {date}{" "}
+              </Box>
+              <Box
+                fontWeight="bold"
+                fontSize="md"
+                width={"100px"}
+                marginRight="auto"
+              >
+                {" "}
+                {time}{" "}
+              </Box>
+              <IconButton
+                ref={ref}
+                aria-label="Learn More about the Audit"
+                marginLeft="auto"
+                marginRight="auto"
+                variant="reactive"
+                size="sm"
+                onClick={onToggle}
+                icon={<QuestionIcon />}
+              ></IconButton>
+            </HStack>
+          </Grid>
         </Box>
-        <Box fontWeight="bold" fontSize="md">
-          {" "}
-          {time}{" "}
-        </Box>
-      </HStack>
+        <AuditTotals
+          amountInReserve={rand_in_reserve}
+          amountIssued={issued_coins}
+          ratio={ratio}
+          isLoaded={isLoaded}
+          useMobileView={useMobileView}
+        />
+      </Flex>
       <Collapse animateOpacity in={isOpen}>
         <AuditExplanationPopup />
       </Collapse>

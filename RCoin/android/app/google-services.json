@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "999016110023",
+    "project_id": "rcoin-2d202",
+    "storage_bucket": "rcoin-2d202.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999016110023:android:0bda241a5ca4261dacabe2",
+        "android_client_info": {
+          "package_name": "com.rcoin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "999016110023-o0u3356h254f5oclmf8pd3d1tir34294.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBD6M1XnKy-EdL19hd2oOgJOjmvae3jtFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "999016110023-o0u3356h254f5oclmf8pd3d1tir34294.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

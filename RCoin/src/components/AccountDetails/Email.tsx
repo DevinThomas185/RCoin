@@ -15,7 +15,7 @@ const EmailDetail = () => {
   const [success, setSuccess] = useState(false);
 
   const changeEmail = () => {
-    fetch(`${Config.API_URL}:8000/api/change_email`, {
+    fetch(`${Config.API_URL}/api/change_email`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
@@ -27,11 +27,13 @@ const EmailDetail = () => {
         setResponded(true);
         if (res.status == 200) {
           setSuccess(true);
+          setNewEmail('');
         }
       })
       .catch(error => {
         console.log(error);
       });
+    auth.refresh();
   };
 
   return (
@@ -55,10 +57,11 @@ const EmailDetail = () => {
           <TextField
             placeholder="New Email"
             style={styles.input}
+            value={new_email}
             onChangeText={(value: string) => {
               setNewEmail(value);
             }}
-            marginH-20
+            marginH-10
           />
           <View center marginB-5>
             {responded ? (
@@ -72,7 +75,7 @@ const EmailDetail = () => {
             )}
           </View>
           <Button
-            marginH-30
+            marginH-10
             marginB-10
             onPress={changeEmail}
             label="Change Email"

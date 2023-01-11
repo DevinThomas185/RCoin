@@ -1,34 +1,38 @@
 import {useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
-import {View, Button, Incubator, Text, LoaderScreen} from 'react-native-ui-lib'; //eslint-disable-line
+import {
+  View,
+  Button,
+  Incubator,
+  Text,
+  LoaderScreen,
+  Checkbox,
+} from 'react-native-ui-lib'; //eslint-disable-line
 import {UserSignUp} from '../../types/SignUp';
 const {TextField} = Incubator;
 import {NavigationScreenProp} from 'react-navigation';
 
 // https://github.com/uuidjs/uuid/issues/416
 import {v4 as uuidv4} from 'uuid'; // Very important, do not remove plz!!!!!
-
-import {useKeypair} from '../../contexts/Keypair';
-import {
-  Transaction,
-  Connection,
-  sendAndConfirmTransaction,
-  Keypair,
-  Signer,
-  PublicKey,
-} from '@solana/web3.js';
+import Style from '../../style/style';
 
 export const StepThree = ({
   navigation,
   signUpDetails,
   setSignUpDetails,
+  setDisabled,
+  disabled,
 }: {
   navigation: NavigationScreenProp<any, any>;
   signUpDetails: UserSignUp;
   setSignUpDetails: React.Dispatch<React.SetStateAction<UserSignUp>>;
+  setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  disabled: boolean;
 }) => {
   const [key, setKey] = useState('');
   const [isValid, setIsValid] = useState(true);
+
+  const [remembers, setRemembers] = useState(false);
 
   const [passwordText, setPasswordText] = useState('Show');
   const [showPassword, setShowPassword] = useState(false);
@@ -46,18 +50,25 @@ export const StepThree = ({
     setConfirmPasswordText(confirmPasswordText === 'Show' ? 'Hide' : 'Show');
   };
 
+  useEffect(() => {
+    setDisabled(true);
+  }, []);
+
   return (
     <View>
-      <Text style={styles.title}>Enter a wallet password</Text>
-      <Text color="red" style={styles.subtext}>
-        IT IS VERY IMPORTANT THAT YOU SAVE THIS PASSWORD OR YOU WILL LOSE ACCESS
-        TO YOUR MONEY PERMANENTLY
+      <Text color={Style.rcoin} style={styles.title}>
+        Wallet Password
+      </Text>
+      <Text marginV-10 color="red" style={styles.subtext}>
+        IT IS VERY IMPORTANT THAT YOU REMEMBER THIS PASSWORD OR YOU WILL LOSE
+        ACCESS TO YOUR MONEY PERMANENTLY
       </Text>
       <View>
         <TextField
+          marginV-10
           style={styles.inputField}
-          dasdad
           placeholder={'Password'}
+          placeholderTextColor={'gray'}
           onChangeText={(password: string) => {
             setKey(password);
           }}
@@ -70,16 +81,19 @@ export const StepThree = ({
       </View>
       <View>
         <TextField
+          marginV-10
           style={styles.inputField}
-          dasdad
           placeholder={'Confirm Password'}
+          placeholderTextColor={'gray'}
           onChangeText={(password: string) => {
             if (password !== key) {
               setIsValid(false);
+              setDisabled(true);
               return;
             }
 
             setIsValid(true);
+            setDisabled(!remembers);
             setSignUpDetails(prev => ({
               ...prev,
               encryption_password: password,
@@ -94,6 +108,17 @@ export const StepThree = ({
         </Text>
       </View>
       {!isValid && <Text color="red">Passwords must match</Text>}
+      <View marginV-10>
+        <Checkbox
+          label="I remember this password"
+          color={Style.rcoin}
+          value={remembers}
+          onValueChange={(v: boolean) => {
+            setRemembers(v);
+            setDisabled(!v || !isValid);
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -103,17 +128,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 30,
     textAlign: 'left',
-    marginLeft: 20,
   },
 
   subtext: {
-    padding: 20,
     color: 'red',
   },
 
   floatingPlaceholder: {
     zIndex: 0,
-    margin: 20,
     fontSize: 20,
   },
 
@@ -126,7 +148,6 @@ const styles = StyleSheet.create({
     borderColor: '#d1d1d1',
     borderWidth: 1,
     borderRadius: 5,
-    margin: 10,
   },
 
   passwordToggleButton: {
@@ -138,8 +159,6 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    padding: 14,
-    margin: 20,
     width: '80%',
     justifyContent: 'center',
     alignSelf: 'center',

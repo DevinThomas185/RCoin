@@ -1,0 +1,97 @@
+version: "3.8"
+services:
+  frontend:
+    image: 146.169.40.88:5000/rcoin-frontend:${CI_COMMIT_SHA}
+    ports:
+      - 443:443
+    depends_on:
+      - backend
+    volumes:
+      - /etc/certs:/etc/nginx/certs
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      placement:
+        constraints:
+            - node.role == manager
+
+  backend:
+    # build: ./backend
+    image: 146.169.40.88:5000/rcoin-backend:${CI_COMMIT_SHA}
+    environment:
+      - SOLANA_CLIENT=${SOLANA_CLIENT}
+      - MINT_ACCOUNT=${MINT_ACCOUNT}
+      - RESERVE_ACCOUNT=${RESERVE_ACCOUNT}
+      - MULTISIG_ACCOUNT=${MULTISIG_ACCOUNT}
+      - SIGNER_1=${SIGNER_1}
+      - SIGNER_2=${SIGNER_2}
+      - SIGNER_1_PUBKEY=${SIGNER_1_PUBKEY}
+      - SIGNER_2_PUBKEY=${SIGNER_2_PUBKEY}
+      - FEE_ACCOUNT=${FEE_ACCOUNT}
+      - SIGNER_BACKEND_URL=${SIGNER_BACKEND_URL}
+      - TOKEN_OWNER=${TOKEN_OWNER}
+      - PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_PASS=${REDIS_PASS}
+      - GMAIL_PASS=${GMAIL_PASS}
+      - FIREBASE_JSON=${FIREBASE_JSON}
+      - PAYSTACK_EMAIL=${PAYSTACK_EMAIL}
+      - PAYSTACK_PASSWORD=${PAYSTACK_PASSWORD}
+      - PAYSTACK_INTEGRATION=${PAYSTACK_INTEGRATION}
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    deploy:
+      mode: replicated
+      replicas: 4
+      endpoint_mode: vip
+
+
+  db:
+    image: postgres:alpine
+    restart: always
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
+        mode: host
+    environment:
+      - POSTGRES_USER=stablecoin_database
+      - POSTGRES_PASSWORD=stablecoin
+      - POSTGRES_HOST=localhost
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+      placement:
+        constraints:
+            - node.role == manager
+    volumes:
+      - db:/var/lib/postgresql/data/
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - target: 6379
+        published: 6379
+        protocol: tcp
+        mode: host
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASS}
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+      placement:
+        constraints:
+            - node.role == manager
+    volumes:
+      - redis:/data
+
+volumes:
+  db:
+    driver: local
+  redis:
+    driver: local

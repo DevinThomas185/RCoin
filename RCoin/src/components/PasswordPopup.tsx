@@ -7,6 +7,8 @@ import {useKeypair} from '../contexts/Keypair';
 import {Keypair} from '@solana/web3.js';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import {useAuth} from '../contexts/Auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Style from '../style/style';
 
 const PasswordPopup = ({
   isVisible,
@@ -22,18 +24,23 @@ const PasswordPopup = ({
   const keyPair = useKeypair();
   const rnBiometrics = new ReactNativeBiometrics();
   const auth = useAuth();
-  const [isBio, setBio2] = useState(false);
+  const [isBioEnabled, setIsBioAvailable] = useState(false);
+  const [bioKeyExists, setBioKeyExists] = useState(false);
 
-  const setBio = (v: boolean) => {
-    console.log('Setting bio:', v);
-    setBio2(v);
+  const checkBioAvailable = async () => {
+    const {available} = await rnBiometrics.isSensorAvailable();
+    const enabled = await AsyncStorage.getItem('@BioToken');
+    if (!available || enabled === null) {
+      return;
+    }
+
+    setIsBioAvailable(true);
+    setBioKeyExists(await keyPair.bioSecretKeyExitsts());
   };
 
-  const isSensorAvailable = rnBiometrics
-    .isSensorAvailable()
-    .then(({available}) => {
-      return available;
-    });
+  useEffect(() => {
+    checkBioAvailable();
+  });
 
   const handleClose = () => {
     setIsVisible(false);
@@ -42,80 +49,62 @@ const PasswordPopup = ({
   };
 
   const onShow = () => {
-    isSensorAvailable.then((isAvailable: boolean) => {
-      keyPair.bioSecretKeyExitsts().then((res: boolean) => {
-        setBio(isAvailable && res);
-      });
-
-      handleUseBiometrics();
-    });
+    checkBioAvailable();
+    handleUseBiometrics();
   };
 
   const createBio = async (kp: Keypair) => {
-    if (isBio) {
+    if (!isBioEnabled || bioKeyExists) {
       return;
     }
 
-    handleBiometricLogin().then((password: string | undefined) => {
-      if (password === undefined) {
+    getBioSignature().then((signature: string | undefined) => {
+      if (!signature) {
         return;
       }
 
-      keyPair.writePairBio(kp, password);
-      setBio(true);
+      keyPair.writePairBio(kp, signature);
+      setBioKeyExists(true);
     });
   };
 
   const handleSubmit = () => {
-    keyPair.readPair(input).then((v: Keypair | undefined) => {
-      if (v === undefined) {
-        setFailed(true);
-      } else {
-        setFailed(false);
-        onSuccess(v.secretKey);
-        isSensorAvailable.then((res: boolean) => {
-          if (res) {
-            createBio(v);
-            setBio(true);
-          }
-        });
-        handleClose();
-      }
-    });
+    keyPair
+      .readPair(input, auth.authData!.token_info.wallet_id)
+      .then((v: Keypair | undefined) => {
+        if (v === undefined) {
+          setFailed(true);
+        } else {
+          setFailed(false);
+          onSuccess(v.secretKey);
+          createBio(v);
+          handleClose();
+        }
+      });
   };
 
   const handleUseBiometrics = () => {
-    isSensorAvailable.then((isAvailable: boolean) => {
-      keyPair.bioSecretKeyExitsts().then((res: boolean) => {
-        setBio(isAvailable && res);
+    if (!isBioEnabled || !bioKeyExists) {
+      return;
+    }
 
-        if (!(isAvailable && res)) {
-          return;
+    getBioSignature().then((password: string | undefined) => {
+      if (password === undefined) {
+        return;
+      }
+
+      keyPair.readPairBio(password).then((v: Keypair | undefined) => {
+        if (v !== undefined) {
+          onSuccess(v.secretKey);
+          handleClose();
         }
-
-        handleBiometricLogin().then((password: string | undefined) => {
-          if (password === undefined) {
-            return;
-          }
-
-          keyPair.readPairBio(password).then((v: Keypair | undefined) => {
-            if (v !== undefined) {
-              onSuccess(v.secretKey);
-              handleClose();
-            }
-          });
-        });
       });
     });
   };
 
   const handleTextChange = (v: string) => setInput(v);
 
-  const handleBiometricLogin = (): Promise<string | undefined> => {
-    // const epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
-    // const payload = epochTimeSeconds + 'some message'
-
-    //[kk1219] TODO, ADD UNIQUE IDENTIFIER TO PAYLOAD
+  const getBioSignature = (): Promise<string | undefined> => {
     const payload = 'password' + auth.authData?.token_info.user_id;
 
     return rnBiometrics
@@ -164,7 +153,6 @@ const PasswordPopup = ({
     },
     button: {
       flexDirection: 'row',
-      flex: 1,
       justifyContent: 'space-evenly',
       paddingTop: 5,
     },
@@ -207,22 +195,24 @@ const PasswordPopup = ({
                   <Button
                     label="Cancel"
                     onPress={handleClose}
-                    backgroundColor={Colors.blue10}
+                    backgroundColor={Style.rcoin}
                   />
                   <Button
                     label="Submit"
                     onPress={handleSubmit}
-                    backgroundColor={Colors.blue10}
+                    backgroundColor={Style.rcoin}
                   />
                 </View>
-                <View style={styles.button}>
-                  <Button
-                    label="Use Biometrics"
-                    onPress={handleUseBiometrics}
-                    backgroundColor={Colors.blue10}
-                    disabled={!isBio}
-                  />
-                </View>
+                {isBioEnabled && (
+                  <View style={styles.button}>
+                    <Button
+                      label="Use Biometrics"
+                      onPress={handleUseBiometrics}
+                      backgroundColor={Style.rcoin}
+                      disabled={!bioKeyExists}
+                    />
+                  </View>
+                )}
               </View>
             </CustomModal.Footer>
           </View>

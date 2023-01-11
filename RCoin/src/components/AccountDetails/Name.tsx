@@ -16,7 +16,7 @@ const NameDetail = () => {
   const [success, setSuccess] = useState(false);
 
   const changeName = () => {
-    fetch(`${Config.API_URL}:8000/api/change_name`, {
+    fetch(`${Config.API_URL}/api/change_name`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
@@ -35,11 +35,14 @@ const NameDetail = () => {
         setResponded(true);
         if (res.status == 200) {
           setSuccess(true);
+          setNewFirstName('');
+          setNewLastName('');
         }
       })
       .catch(error => {
         console.log(error);
       });
+    auth.refresh();
   };
 
   return (
@@ -63,18 +66,21 @@ const NameDetail = () => {
           <TextField
             placeholder="New First Name"
             style={styles.input}
+            value={new_first_name}
             onChangeText={(value: string) => {
               setNewFirstName(value);
             }}
-            marginH-20
+            marginH-10
+            marginV-5
           />
           <TextField
             placeholder="New Last Name"
             style={styles.input}
+            value={new_last_name}
             onChangeText={(value: string) => {
               setNewLastName(value);
             }}
-            marginH-20
+            marginH-10
           />
           <View center marginB-5>
             {responded ? (
@@ -88,7 +94,7 @@ const NameDetail = () => {
             )}
           </View>
           <Button
-            marginH-30
+            marginH-10
             marginB-10
             onPress={changeName}
             label="Change Name"

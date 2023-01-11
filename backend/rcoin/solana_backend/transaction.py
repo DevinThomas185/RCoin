@@ -1,63 +1,65 @@
-from solana.keypair import Keypair
+from typing import Callable
 from solana.transaction import Transaction
 from solana.rpc.types import TokenAccountOpts
 from solana.publickey import PublicKey
-from solana.transaction import Transaction
-from solders.transaction import Transaction as SoldersTx
 from solders.signature import Signature
 from solana.blockhash import Blockhash, BlockhashCache
-
 
 # Spl-token dependencies
 from spl.token.constants import TOKEN_PROGRAM_ID
 from spl.token.instructions import (
-    transfer_checked,
-    TransferCheckedParams,
+    TransferParams,
+    transfer,
 )
-from rcoin.solana_backend.response import Failure, Success
+
+from rcoin.solana_backend.exceptions import (
+    InvalidInputException,
+    TransactionCreationFailedException,
+)
+
+from rcoin.solana_backend.response import (
+    CustomResponse,
+    TransactionConstructionFailure,
+)
 
 from rcoin.solana_backend.common import (
+    MULTISIG_ACCOUNT,
     MINT_ACCOUNT,
-    SECRET_KEY,
+    SIGNER_1_PUBKEY,
+    SIGNER_2_PUBKEY,
     TOKEN_DECIMALS,
-    RESERVE_ACCOUNT_ADDRESS,
+    RESERVE_ACCOUNT,
     SOLANA_CLIENT,
+    FEE_ACCOUNT,
     TOKEN_OWNER,
 )
 
 from rcoin.solana_backend.exceptions import (
     NoTokenAccountException,
     TransactionCreationFailedException,
+    InvalidInputException,
 )
 
 
-def send_transaction_from_signature(
-    transaction_bytes: bytes, signer: bytes, signer_wallet: str
-):
+def construct_transaction_safely(
+    construction_function: Callable[[], CustomResponse]
+) -> CustomResponse:
     try:
-        solderstxn = SoldersTx.from_bytes(transaction_bytes)
-        transaction = Transaction.from_solders(solderstxn)
 
-        pub_key = PublicKey(signer_wallet)
-        signature = Signature.from_bytes(signer)
+        response: CustomResponse = construction_function()
+        print("Transaction created successfully!")
+        return response
 
-        # Sign by mint account
-        signers = Keypair.from_secret_key(SECRET_KEY)
-        transaction.sign_partial(signers)
-
-        # Sign by token owner
-        transaction.add_signature(pub_key, signature)
-
-        final_bytes = transaction.serialize()
-
-        resp = SOLANA_CLIENT.send_raw_transaction(final_bytes)
-    except Exception as e:
-        return Failure("exception", e)
-
-    return Success("signature", str(resp.value))
+    except ValueError as exception:
+        return TransactionConstructionFailure(
+            InvalidInputException("Invalid public key.")
+        )
+    except (TransactionCreationFailedException, InvalidInputException) as exception:
+        print(exception)
+        return TransactionConstructionFailure(exception)
 
 
-def construct_stablecoin_transfer(
+def construct_token_transfer(
     sender: PublicKey, amount: float, recipient: PublicKey
 ) -> Transaction:
     """Creates a transfer transaction to move stablecoin tokens from one
@@ -73,7 +75,11 @@ def construct_stablecoin_transfer(
         transaction and decomposed into bytes.
 
     """
-    transaction = Transaction(fee_payer=TOKEN_OWNER)
+
+    if amount < 0:
+        raise InvalidInputException("The amount to transfer has to be positive.")
+
+    transaction = Transaction(fee_payer=SIGNER_1_PUBKEY)
 
     source_account = None
     dest_account = None
@@ -89,29 +95,67 @@ def construct_stablecoin_transfer(
     assert dest_account is not None
 
     try:
+        # If sending tokens between users apply the fee.
+        # Solana fees are $0.00025 which equates to less than 0.1 ZAR.
+        SOLANA_FEE = 0.01
+        if is_trade_transfer(source_account, dest_account):
+            transaction.add(
+                transfer(
+                    TransferParams(
+                        program_id=TOKEN_PROGRAM_ID,
+                        source=source_account,
+                        dest=FEE_ACCOUNT,
+                        owner=sender,
+                        amount=int(SOLANA_FEE * (10**TOKEN_DECIMALS)),
+                        signers=get_transfer_signers(sender),
+                    )
+                )
+            )
         transaction.add(
-            transfer_checked(
-                TransferCheckedParams(
+            transfer(
+                TransferParams(
                     program_id=TOKEN_PROGRAM_ID,
                     source=source_account,
-                    mint=MINT_ACCOUNT,
                     dest=dest_account,
                     owner=sender,
                     amount=int(amount * (10**TOKEN_DECIMALS)),
-                    decimals=TOKEN_DECIMALS,
-                    signers=[TOKEN_OWNER, sender],
+                    signers=get_transfer_signers(sender),
                 )
             )
         )
 
-        blockhash_resp = SOLANA_CLIENT.get_latest_blockhash()
-        recent_blockhash = Blockhash(str(blockhash_resp.value.blockhash))
-        transaction.recent_blockhash = recent_blockhash
+        stamp_blockhash(transaction)
 
     except Exception as exception:
         raise TransactionCreationFailedException(exception)
 
     return transaction
+
+
+def is_trade_transfer(source: PublicKey, destination: PublicKey) -> bool:
+    return source is not RESERVE_ACCOUNT and destination is not RESERVE_ACCOUNT
+
+
+def stamp_blockhash(transaction: Transaction):
+    blockhash_resp = SOLANA_CLIENT.get_latest_blockhash()
+    recent_blockhash = Blockhash(str(blockhash_resp.value.blockhash))
+    transaction.recent_blockhash = recent_blockhash
+
+
+def get_transfer_signers(sender: PublicKey) -> list[PublicKey]:
+    """Given the transfer sender determines who is supposed to sign the
+    transaction. We always require that both signers sign the transaction.
+    (One signature per backend server). If the transaction is coming from a
+    user (i.e. sender is not the MULTISIG_ACCOUNT), then that user is also
+    required to sign the transaction.
+    """
+
+    signers = [SIGNER_1_PUBKEY, SIGNER_2_PUBKEY]
+
+    if sender is not MULTISIG_ACCOUNT:
+        signers.append(sender)
+
+    return signers
 
 
 def get_associated_token_account(public_key: PublicKey) -> PublicKey:
@@ -126,10 +170,10 @@ def get_associated_token_account(public_key: PublicKey) -> PublicKey:
 
     """
 
-    # When issuing coins, the token account associated with the owner is the
-    # reserve account which holds all of the minted tokens.
-    if public_key == TOKEN_OWNER:
-        return RESERVE_ACCOUNT_ADDRESS
+    # When issuing coins, the token account associated with the MULTISIG_ACCOUNT
+    # is the reserve account which holds all of the minted tokens.
+    if public_key == MULTISIG_ACCOUNT or public_key == TOKEN_OWNER:
+        return RESERVE_ACCOUNT
 
     resp = SOLANA_CLIENT.get_token_accounts_by_owner(
         public_key, TokenAccountOpts(mint=MINT_ACCOUNT)
@@ -140,7 +184,6 @@ def get_associated_token_account(public_key: PublicKey) -> PublicKey:
     # of creating token accounts will not allow for creating multiple token
     # accounts per user. Here we assume that only one such account exists and
     # therefore we access the fist item in the list.
-
     if resp.value == []:
         print(
             "There are no token accounts associated with the wallet: {}".format(
@@ -156,7 +199,3 @@ def get_associated_token_account(public_key: PublicKey) -> PublicKey:
     )
 
     return token_account_key
-
-
-def transaction_to_bytes(transaction: Transaction) -> list[int]:
-    return list(transaction.to_solders().__bytes__())

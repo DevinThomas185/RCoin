@@ -1,18 +1,17 @@
 import { Box, Grid } from "@chakra-ui/react";
 
 const InformationPane = ({
-  gradientDirection,
-  gradientStrength,
+  colour,
   children,
+  overrideMaxHeight,
 }: {
-  gradientDirection: string;
-  gradientStrength: number;
+  colour: string;
   children: JSX.Element | JSX.Element[];
-  overrideMaxWidth?: string;
+  overrideMaxHeight?: string;
 }) => {
-  const gradientSetting = `linear(${gradientDirection}, white, rcoinBlue.${gradientStrength})`;
+  const maxHeight = overrideMaxHeight ? overrideMaxHeight : "90%";
   return (
-    <Box maxHeight="90%" bgGradient={gradientSetting}>
+    <Box maxHeight={maxHeight} bgColor={colour}>
       <Grid
         minH="100vh"
         maxW="1080px"

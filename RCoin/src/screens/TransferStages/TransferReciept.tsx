@@ -1,8 +1,10 @@
 import React from 'react';
-import {Text, View} from 'react-native-ui-lib';
+import {Card, Image, Text, View} from 'react-native-ui-lib';
+import {useFriends} from '../../contexts/FriendContext';
 import styles from '../../style/style';
 
-const TransferReciept = ({email, amount}: {email: String; amount: number}) => {
+const TransferReciept = ({email, amount}: {email: string; amount: number}) => {
+  const ON_CHAIN_FEE = 0.01;
   const numberWithCommas = (x: number) => {
     const options = {
       minimumFractionDigits: 2,
@@ -11,17 +13,51 @@ const TransferReciept = ({email, amount}: {email: String; amount: number}) => {
     return Number(x).toLocaleString('en', options);
   };
 
+  const friends_context = useFriends();
+
   return (
-    <View center>
-      <Text>You are sending</Text>
-      <Text text40 color={styles.rcoin}>
-        {numberWithCommas(amount)} RCoin
-      </Text>
-      <Text>to</Text>
-      <Text text40 color={styles.rcoin}>
-        {email}
-      </Text>
-    </View>
+    <Card enableShadow>
+      <View center padding-10>
+        <View center marginH-5 marginV-10>
+          <Text text60 color={styles.rcoin}>
+            You are sending
+          </Text>
+          <View marginH-5 row center>
+            <Image
+              source={require('../../style/Logo.png')}
+              style={{width: 40, height: 40}}
+            />
+            <Text text50 color={styles.rcoin}>
+              {numberWithCommas(amount)}
+            </Text>
+          </View>
+          <Text center color={styles.rcoin}>
+            for a fee of
+          </Text>
+          <View marginH-5 row center>
+            <Image
+              source={require('../../style/Logo.png')}
+              style={{width: 40, height: 40}}
+            />
+            <Text text60 color={styles.rcoin}>
+              {ON_CHAIN_FEE}
+            </Text>
+          </View>
+        </View>
+        <Image
+          source={require('../../style/RCoin-RCoin.png')}
+          style={{width: '60%', height: 130 * 0.6}}
+        />
+        <View marginB-10>
+          <Text text60 center color={styles.rcoin}>
+            to
+          </Text>
+          <Text text60 center color={styles.rcoin}>
+            {friends_context.match_email(email)}
+          </Text>
+        </View>
+      </View>
+    </Card>
   );
 };
 

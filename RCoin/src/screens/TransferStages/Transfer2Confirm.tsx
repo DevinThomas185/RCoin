@@ -10,6 +10,8 @@ import nacl from 'tweetnacl';
 import PasswordPopup from '../../components/PasswordPopup';
 import PendingLoader from '../../components/PendingLoader';
 import Config from 'react-native-config';
+import SuspectedFraudError from '../../errors/SuspectedFraudError';
+import ChangingBalanceCard from '../../components/Balances/ChangingBalanceCard';
 
 const Transfer2Confirm = ({
   nextStage,
@@ -23,7 +25,6 @@ const Transfer2Confirm = ({
   setTransactionId: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const auth = useAuth();
-  const keyPair = useKeypair();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [secretKey, setSecretKey] = useState<Uint8Array>();
@@ -38,7 +39,7 @@ const Transfer2Confirm = ({
     setLoading(true);
     setConfirmClicked(true);
     setResponseState(0);
-    fetch(`${Config.API_URL}:8000/api/trade`, {
+    fetch(`${Config.API_URL}/api/trade`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,8 +52,10 @@ const Transfer2Confirm = ({
       ),
     })
       .then(res => {
-        if (!res.ok) {
-          throw new Error('initial redeem failed');
+        if (res.status == 409) {
+          throw new SuspectedFraudError();
+        } else if (!res.ok) {
+          throw new Error('Initial Trade Failed');
         }
         return res.json();
       })
@@ -69,7 +72,7 @@ const Transfer2Confirm = ({
             const signData = message.serialize();
             const signature = nacl.sign.detached(signData, secretKey);
 
-            fetch(`${Config.API_URL}:8000/api/complete-trade`, {
+            fetch(`${Config.API_URL}/api/complete-trade`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -109,34 +112,53 @@ const Transfer2Confirm = ({
         }
       })
       .catch(error => {
-        setResponseState(-1);
+        if (error instanceof SuspectedFraudError) {
+          setResponseState(-2);
+        } else {
+          setResponseState(-1);
+        }
         setLoading(false);
         console.log(error);
       });
   };
 
   return (
-    <View flex>
-      <Text text40 style={styles.title} margin-30>
-        Confirm your transaction
-      </Text>
-      <View margin-30>
-        <ChangingBalance deduction={amount} />
+    <View flex marginH-10>
+      <View marginV-10>
+        <Text text40 style={styles.title}>
+          Confirm Transfer
+        </Text>
+      </View>
+
+      <View marginV-10>
         <TransferReceipt email={recipient} amount={amount} />
       </View>
-      <PendingLoader
-        loading={loading}
-        show={confirm_clicked}
-        response_state={response_state}
-        loading_page_message={loading_page_message}
-        custom_fail_message="Transfer failed, please confirm again"
-      />
-      <View flex bottom marginH-30 marginB-50>
+
+      <View flex>
+        {loading ? (
+          <PendingLoader
+            loading={loading}
+            show={confirm_clicked}
+            response_state={response_state}
+            loading_page_message={loading_page_message}
+            custom_fail_message="Transfer failed, please confirm again"
+          />
+        ) : (
+          <ChangingBalanceCard increment={-amount} />
+        )}
+      </View>
+      <View flex bottom marginV-10>
         <Button
           onPress={() => setIsModalVisible(true)}
-          label="Confirm Transfer"
-          disabled={loading}
-          backgroundColor={styles.rcoin}
+          label={
+            loading
+              ? 'Loading'
+              : response_state == -2
+              ? 'Account Suspended'
+              : 'Confirm Transfer'
+          }
+          disabled={loading || response_state == -2}
+          backgroundColor={styles.paystack}
         />
       </View>
       <PasswordPopup

@@ -30,15 +30,23 @@ const MockupPhone = ({
   };
 
   return (
-    <Box justifySelf="right" alignItems="center" onClick={onPhoneClick}>
+    // <Box justifySelf="right" alignItems="center" onClick={onPhoneClick}>
+    //   <Image
+    //     src={mockupScreen}
+    //     maxHeight={height}
+    //     fit="contain"
+    //     transition="transform 0.15s ease-out, background 0.15s ease-out"
+    //     _hover={{
+    //       transform: "scale(1.03, 1.03)",
+    //     }}
+    //   />
+    // </Box>
+    <Box>
       <Image
-        src={mockupScreen}
-        maxHeight={height}
+        src="phonemockup.png"
+        // boxSize="300px"
+        // width={""}
         fit="contain"
-        transition="transform 0.15s ease-out, background 0.15s ease-out"
-        _hover={{
-          transform: "scale(1.03, 1.03)",
-        }}
       />
     </Box>
   );

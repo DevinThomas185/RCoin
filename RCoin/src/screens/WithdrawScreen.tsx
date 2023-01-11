@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Wizard} from 'react-native-ui-lib';
+import {Text, View, Wizard} from 'react-native-ui-lib';
 import WithdrawStage0 from './WithdrawStages/WithdrawStage0';
 import WithdrawStage1 from './WithdrawStages/WithdrawStage1';
 import WithdrawStage2 from './WithdrawStages/WithdrawStage2';
@@ -8,18 +8,31 @@ import {useAuth} from '../contexts/Auth';
 import {useBackHandler} from '../services/BackHandler';
 import styles from '../style/style';
 import Config from 'react-native-config';
+import {useKeypair} from '../contexts/Keypair';
+import MissingWallet from './MissingWallet';
+import {NavigationScreenProp} from 'react-navigation';
 
-const WithdrawScreen = () => {
+const WithdrawScreen = ({
+  navigation,
+}: {
+  navigation: NavigationScreenProp<any, any>;
+}) => {
   const [stage, setStage] = useState(0);
   const [coins_to_withdraw, setCoinstoWithdraw] = useState(0.0);
-  const [rands_being_credited, setRandsBeingCredited] = useState(0.0);
   const [bank_account, setBankAccount] = useState<{[key: string]: string}>({
     bank_account: '',
     sort_code: '',
   });
-  const [token_balance, setTokenBalance] = useState(0.0);
   const [transactionId, setTransactionId] = useState('');
+  const [keyExists, setKeyExsts] = useState(true);
   const auth = useAuth();
+  const keyPair = useKeypair();
+
+  keyPair
+    .secretKeyExists(auth.authData?.token_info.wallet_id!)
+    .then((exists: boolean) => {
+      setKeyExsts(exists);
+    });
 
   const backHandlerAction = () => {
     switch (stage) {
@@ -37,23 +50,6 @@ const WithdrawScreen = () => {
 
   useBackHandler(backHandlerAction);
 
-  useEffect(() => {
-    fetch(`${Config.API_URL}:8000/api/get_token_balance`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${auth.authData?.token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        setTokenBalance(data['token_balance']);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }, []);
-
   const renderCurrentStage = () => {
     switch (stage) {
       case 0:
@@ -62,8 +58,8 @@ const WithdrawScreen = () => {
             nextStage={() => {
               setStage(1);
             }}
-            setRandsBeingCredited={setRandsBeingCredited}
             coins_to_withdraw={coins_to_withdraw}
+            setCoinsToWithdraw={setCoinstoWithdraw}
           />
         );
       case 1:
@@ -72,9 +68,8 @@ const WithdrawScreen = () => {
             nextStage={() => {
               setStage(2);
             }}
-            setCoinsToWithdraw={setCoinstoWithdraw}
-            setRandsBeingCredited={setRandsBeingCredited}
             setBankAccount={setBankAccount}
+            current_bank_account={bank_account}
           />
         );
       case 2:
@@ -84,20 +79,18 @@ const WithdrawScreen = () => {
               setStage(3);
             }}
             coins_to_withdraw={coins_to_withdraw}
-            rands_being_credited={rands_being_credited}
             current_bank_account={bank_account}
-            token_balance={token_balance}
             setTransactionId={setTransactionId}
           />
         );
       case 3:
         return (
           <WithdrawStage3
+            navigation={navigation}
             nextStage={() => {
               setStage(0);
             }}
             coins_to_withdraw={coins_to_withdraw}
-            rands_being_credited={rands_being_credited}
             bank_account={bank_account}
             transactionId={transactionId}
           />
@@ -118,33 +111,41 @@ const WithdrawScreen = () => {
 
   return (
     <View flex>
-      <Wizard activeIndex={stage}>
-        <Wizard.Step
-          state={getStageState(0)}
-          label={'Make A Withdrawal'}
-          circleColor={styles.rcoin}
-          color={styles.rcoin}
-        />
-        <Wizard.Step
-          state={getStageState(1)}
-          label={'Select Amount'}
-          circleColor={styles.rcoin}
-          color={styles.rcoin}
-        />
-        <Wizard.Step
-          state={getStageState(2)}
-          label={'Confirmation'}
-          circleColor={styles.rcoin}
-          color={styles.rcoin}
-        />
-        <Wizard.Step
-          state={getStageState(3)}
-          label={'Success'}
-          circleColor={styles.rcoin}
-          color={styles.rcoin}
-        />
-      </Wizard>
-      {renderCurrentStage()}
+      {keyExists ? (
+        <>
+          <Wizard activeIndex={stage}>
+            <Wizard.Step
+              state={getStageState(0)}
+              label={'Make A Withdrawal'}
+              circleColor={styles.rcoin}
+              color={styles.rcoin}
+            />
+            <Wizard.Step
+              state={getStageState(1)}
+              label={'Select Bank Account'}
+              circleColor={styles.rcoin}
+              color={styles.rcoin}
+            />
+            <Wizard.Step
+              state={getStageState(2)}
+              label={'Confirmation'}
+              circleColor={styles.rcoin}
+              color={styles.rcoin}
+            />
+            <Wizard.Step
+              state={getStageState(3)}
+              label={'Success'}
+              circleColor={styles.rcoin}
+              color={styles.rcoin}
+            />
+          </Wizard>
+          {renderCurrentStage()}
+        </>
+      ) : (
+        <>
+          <MissingWallet navigation={navigation} />
+        </>
+      )}
     </View>
   );
 };

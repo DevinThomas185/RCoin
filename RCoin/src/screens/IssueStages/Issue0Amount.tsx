@@ -1,52 +1,37 @@
-import React, {useEffect, useState} from 'react';
-import {
-  Text,
-  View,
-  Card,
-  Button,
-  Colors,
-  Incubator,
-  Image,
-} from 'react-native-ui-lib';
-import AmountEntry from '../../components/AmountEntry';
+import React, {useEffect, useRef, useState} from 'react';
+import {Text, View, Button, Image} from 'react-native-ui-lib';
 import {useAuth} from '../../contexts/Auth';
 import styles from '../../style/style';
 import Config from 'react-native-config';
-
-const LEAST_LIMIT = 0;
+import NumberKeyboard from '../../components/NumberKeyboard/NumberKeyboard';
+import ChangingBalanceCard from '../../components/Balances/ChangingBalanceCard';
 
 // Select the amount
 const IssueAmount = ({
   nextStage,
   setCoinsToIssue,
-  setRandToPay,
   coins_to_issue,
+  setRandToPay,
 }: {
   nextStage: React.Dispatch<void>;
   setCoinsToIssue: React.Dispatch<React.SetStateAction<number>>;
-  setRandToPay: React.Dispatch<React.SetStateAction<number>>;
   coins_to_issue: number;
+  setRandToPay: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   const auth = useAuth();
   const [valid, setValid] = useState(false);
 
-  // TODO: CHANGE TO GET RAND TO PAY
   const setRands = (coins: number) => {
-    fetch(
-      `${Config.API_URL}:8000/api/get_rand_to_return/?amount=` +
-        coins.toString(),
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.authData?.token}`,
-        },
+    fetch(`${Config.API_URL}/api/get_rand_to_pay?amount=` + coins.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.authData?.token}`,
       },
-    )
+    })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
-        setRandToPay(data['rand_to_return']);
+        setRandToPay(data['rand_to_pay']);
       })
       .catch(error => {
         console.log(error);
@@ -54,41 +39,50 @@ const IssueAmount = ({
   };
 
   return (
-    <View flex>
-      <Text text40 style={styles.title}>
-        Making A Deposit
-      </Text>
-      <View margin-30>
-        <Text text60 marginB-10>
-          Exchange Rand for RCoin
+    <View flex marginH-10>
+      <View marginV-10>
+        <Text text40 style={styles.title}>
+          Make a Deposit
         </Text>
-        <Text>
-          The transaction will appear in your transaction history and on the
-          real-time audit.
+        <Text text70>
+          Top up your RCoin balance. Enter the amount and pay via our partner,
+          Paystack.
         </Text>
-      </View>
-      <Image
-        source={require('../../style/ZAR-RCoin.png')}
-        style={{width: '100%', height: 130, marginVertical: 30}}
-      />
-      <View marginH-30>
-        <AmountEntry
-          setAmount={setCoinsToIssue}
-          least_limit={LEAST_LIMIT}
-          max_limit={1000000}
-          tellButton={setValid}
-        />
       </View>
 
-      <View flex bottom marginH-30 marginB-50>
-        <Button
-          onPress={() => {
-            nextStage();
-            setRands(coins_to_issue);
+      <View>
+        <ChangingBalanceCard increment={coins_to_issue} />
+      </View>
+
+      <View flex bottom marginV-10>
+        <NumberKeyboard
+          style={{
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
           }}
+          number={coins_to_issue}
+          setNumber={x => {
+            setCoinsToIssue(x);
+          }}
+          setValid={setValid}
+          limit_to_balance={false}
+        />
+        <Button
+          style={{
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            borderBottomLeftRadius: 10,
+            borderBottomRightRadius: 10,
+          }}
+          onPress={() => {
+            setRands(coins_to_issue);
+            nextStage();
+          }}
+          label="Continue to Confirmation"
           disabled={!valid}
-          label="Continue"
-          backgroundColor={styles.rcoin}
+          backgroundColor={styles.paystack}
         />
       </View>
     </View>

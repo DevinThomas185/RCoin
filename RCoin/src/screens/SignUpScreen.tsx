@@ -17,6 +17,7 @@ import {UserSignUp} from '../types/SignUp';
 import {NavigationScreenProp} from 'react-navigation';
 import {useBackHandler} from '../services/BackHandler';
 import style from '../style/style';
+import Style from '../style/style';
 
 export const SignUpScreen = ({
   navigation,
@@ -24,9 +25,9 @@ export const SignUpScreen = ({
   navigation: NavigationScreenProp<any, any>;
 }) => {
   const [stage, setStage] = useState(0);
-  const [signUpDetails, setSignUpDetails] = useState<UserSignUp>(
-    {} as UserSignUp,
-  );
+  const [signUpDetails, setSignUpDetails] = useState<UserSignUp>({
+    is_merchant: false,
+  } as UserSignUp);
 
   // Without "dummy" final page which is the underlying signup component
   const NUM_PAGES = 3;
@@ -41,6 +42,8 @@ export const SignUpScreen = ({
   };
 
   useBackHandler(backHandlerAction);
+
+  const [disabled, setDisabled] = useState(false);
 
   const conditionalComponent = () => {
     switch (stage) {
@@ -64,6 +67,8 @@ export const SignUpScreen = ({
             navigation={navigation}
             signUpDetails={signUpDetails}
             setSignUpDetails={setSignUpDetails}
+            setDisabled={setDisabled}
+            disabled={disabled}
           />
         );
       case 3:
@@ -112,9 +117,10 @@ export const SignUpScreen = ({
       <View style={styles.controls}>
         {stage < NUM_PAGES && (
           <Button
-            style={styles.button}
+            backgroundColor={Style.paystack}
             label={'Continue'}
             onPress={handleContinue}
+            disabled={disabled}
           />
         )}
         {stage > 0 && (
@@ -143,7 +149,7 @@ const styles = StyleSheet.create({
     width: '90%',
     height: '60%',
     backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignSelf: 'center',
     marginTop: '10%',
     marginBottom: '10%',

@@ -5,38 +5,53 @@ import {
   HStack,
   Grid,
   Skeleton,
+  useBreakpointValue,
 } from "@chakra-ui/react";
+import { UIEventHandler } from "react";
 import TransactionLog from "./TransactionLog";
 
 const TransactionTable = ({
   transactions,
   isLoaded,
+  onScroll,
 }: {
   transactions: any[];
   isLoaded: boolean;
+  onScroll: UIEventHandler<HTMLDivElement>;
 }) => {
+  const useMobileView = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+
+  const maxWidth = useMobileView ? "400px" : "1200px";
+  const minWidth = useMobileView ? "300px" : "1150px";
+
   return (
     <Grid gap={2}>
-      <TransactionTableHeader />
+      <TransactionTableHeader isMobileView={useMobileView} />
       <Skeleton
         justifySelf="center"
-        maxWidth="1200px"
-        minWidth="1150px"
+        maxWidth={maxWidth}
+        minWidth={minWidth}
         minHeight="600px"
-        borderRadius="25px"
+        borderRadius="5px"
         isLoaded={isLoaded}
       >
         <TableContainer
           overflowY="auto"
-          maxWidth="1200px"
-          minWidth="1150px"
           marginLeft="auto"
           marginRight="auto"
-          maxHeight="600px"
+          maxHeight="800px"
+          padding="10px"
+          onScroll={onScroll}
         >
           <Grid gap={1} justifyItems="center">
             {transactions.map((transaction) => (
-              <TransactionLog transaction={transaction} />
+              <TransactionLog
+                transaction={transaction}
+                isMobileView={useMobileView}
+              />
             ))}
           </Grid>
         </TableContainer>
@@ -45,23 +60,35 @@ const TransactionTable = ({
   );
 };
 
-const TransactionTableHeader = () => {
+const TransactionTableHeader = ({
+  isMobileView,
+}: {
+  isMobileView: boolean | undefined;
+}) => {
+  const width = isMobileView ? "90%" : "1080px";
+  const leftOffset = isMobileView ? "50px" : "40px";
+  const additionalHeaders = isMobileView
+    ? null
+    : [
+        <HeaderEntry text="Type" width="110px" />,
+        <HeaderEntry text="Bank Transfer ID" width="250px" />,
+        <HeaderEntry text="Solana Transaction ID" width="250px" />,
+      ];
+
   return (
     <Box
-      borderRadius="25"
+      borderRadius="5"
       bg="rcoinBlue.50"
-      width="1100px"
+      width={width}
       marginLeft="auto"
       marginRight="auto"
     >
       <HStack spacing={3}>
-        <HeaderEntry text="" width="40px" />
+        <HeaderEntry text="" width={leftOffset} />
         <HeaderEntry text="Amount" width="110px" />
-        <HeaderEntry text="Type" width="110px" />
-        <HeaderEntry text="Bank Transfer ID" width="250px" />
-        <HeaderEntry text="Solana Transaction ID" width="250px" />
+        {additionalHeaders}
         <Text fontWeight="bold" textAlign="center">
-          Transaction Date
+          Date
         </Text>
       </HStack>
     </Box>

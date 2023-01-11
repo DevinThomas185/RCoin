@@ -17,13 +17,23 @@ else:
         },
     ]
 
-lock_manager = Aioredlock(redis_conf)
+lock_manager = Aioredlock(
+    redis_connections=redis_conf,
+    retry_count=10,
+    retry_delay_min=10,
+    retry_delay_max=12,
+)
 
 
 @asynccontextmanager
 async def redis_lock(name: str, timeout: int = None):
-    lock = await lock_manager.lock(name, lock_timeout=timeout)
+
+    lock = await lock_manager.lock(
+        name,
+        lock_timeout=timeout,
+    )
     print(f"got lock for {name}")
+
     try:
         yield lock
     finally:

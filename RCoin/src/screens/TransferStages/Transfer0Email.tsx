@@ -4,20 +4,26 @@ import {useAuth} from '../../contexts/Auth';
 const {TextField} = Incubator;
 import styles from '../../style/style';
 import Config from 'react-native-config';
+import FriendsWidget from '../../components/FriendsWidget/FriendsWidget';
+import {NavigationScreenProp} from 'react-navigation';
+import {useFriends} from '../../contexts/FriendContext';
 
 // Select the recipient
 const Transfer0Email = ({
   nextStage,
   setRecipient,
+  navigation,
 }: {
   nextStage: React.Dispatch<void>;
   setRecipient: React.Dispatch<React.SetStateAction<string>>;
+  navigation: NavigationScreenProp<any, any>;
 }) => {
   const auth = useAuth();
   const [valid, setValid] = useState(false);
+  const {friends} = useFriends();
 
   function isEmailValid(email: string): Promise<boolean> {
-    return fetch(`${Config.API_URL}:8000/api/trade-email-valid`, {
+    return fetch(`${Config.API_URL}/api/trade-email-valid`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,50 +49,60 @@ const Transfer0Email = ({
   }
 
   return (
-    <View flex>
-      <Text text40 style={styles.title}>
-        Make a Transfer
-      </Text>
-      <View margin-30>
-        <Text text60 marginB-10>
-          Send RCoin to someone
+    <View flex marginH-10>
+      <View marginV-10>
+        <Text text40 style={styles.title}>
+          Make a Transfer
         </Text>
-        <Text>
-          You can send RCoin to any other user. Simply enter the email of the
-          recipient and choose the amount.
+        <Text text70>
+          Send RCoin to someone by using Quick Contacts or entering a user's
+          email.
         </Text>
       </View>
 
-      <View marginH-30>
-        <Text>Who would you like to send RCoin to?</Text>
-        <TextField
-          placeholder="Email of Recipient"
-          style={styles.input}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          onChangeText={(email: string) => {
-            setRecipient(email);
-          }}
-          enableErrors
-          validateOnBlur
-          validationMessage={[
-            'Email is required',
-            'Email must be associated to an account',
-          ]}
-          validate={[
-            'required',
-            (email: string) => {
-              (async () => await isEmailValid(email))();
-              return !valid;
-            },
-          ]}
+      {friends.length > 0 && (
+        <View marginV-10>
+          <Text text50>Quick Contacts</Text>
+          <FriendsWidget navigation={navigation} />
+        </View>
+      )}
+
+      <View flex centerV style={{justifyContent: 'space-evenly'}}>
+        <View>
+          {friends.length > 0 ? (
+            <Text text60>Or, enter recipient's email</Text>
+          ) : (
+            <Text text60>Enter recipient's email</Text>
+          )}
+          <TextField
+            placeholder="Email of Recipient"
+            style={styles.input}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            onChangeText={(email: string) => {
+              setRecipient(email);
+            }}
+            enableErrors
+            validateOnBlur
+            validationMessage={[
+              'Email is required',
+              'Email must be associated to an account',
+            ]}
+            validate={[
+              'required',
+              (email: string) => {
+                (async () => await isEmailValid(email))();
+                return !valid;
+              },
+            ]}
+          />
+        </View>
+        <Image
+          source={require('../../style/RCoin-RCoin.png')}
+          style={{width: '100%', height: 130}}
         />
       </View>
-      <Image
-        source={require('../../style/RCoin-RCoin.png')}
-        style={{width: '100%', height: 130}}
-      />
-      <View flex bottom marginH-30 marginB-50>
+      <View bottom marginV-10>
         <Button
           onPress={nextStage}
           disabled={!valid}

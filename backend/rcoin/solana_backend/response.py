@@ -1,5 +1,7 @@
 from typing import Any
 
+from rcoin.solana_backend.exceptions import UnwrapOnFailureException
+
 """
 This module contains an abstraction of a response received from any
 api call that is sent to the blockchain. A response can either be
@@ -12,9 +14,10 @@ contain a user-friendly description of the error.
 """
 
 SUCCESS = "success"
+EXCEPTION = "exception"
 
 
-class Response:
+class CustomResponse:
     def __init__(self, contents_name: str, contents: Any):
         self.contents_name = contents_name
         self.contents = contents
@@ -25,28 +28,34 @@ class Response:
     def __str__(self):
         return str(self.to_json())
 
+    def unwrap(self) -> Any:
+        pass # To be overridden by inheritors
 
-class Success(Response):
+
+
+class Success(CustomResponse):
     def to_json(self) -> dict[str, Any]:
         return {SUCCESS: True, self.contents_name: self.contents}
+    def unwrap(self) -> Any:
+        return self.contents
 
 
-class Failure(Response):
+class Failure(CustomResponse):
+    def __init__(self, contents):
+        super().__init__(EXCEPTION, contents)
     def to_json(self) -> dict[str, Any]:
         return {SUCCESS: False, self.contents_name: str(self.contents)}
-
+    def unwrap(self) -> Any:
+        raise UnwrapOnFailureException(str(self.to_json()))
 
 """
-Custom exception types for reporting the status of the creation of a new
-transaction which is then sent to phantom.
+Custom Response variant used for common response kinds of responses.
 """
 
-
-class CreateTransactionSuccess(Success):
+class TransactionConstructionSuccess(Success):
     def __init__(self, contents):
-        super().__init__("transaction_bytes", contents)
+        super().__init__("transaction", contents)
 
-
-class CreateTransactionFailure(Failure):
+class TransactionConstructionFailure(Failure):
     def __init__(self, contents):
-        super().__init__("exception", contents)
+        super().__init__(contents)

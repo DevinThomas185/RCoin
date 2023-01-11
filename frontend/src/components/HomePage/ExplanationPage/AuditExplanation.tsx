@@ -1,12 +1,28 @@
-import { HStack, Text, Image, Box, Grid, Button } from "@chakra-ui/react";
+import {
+  HStack,
+  Text,
+  Image,
+  Box,
+  Grid,
+  Button,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import "../../../main.css";
 
-const LeftPane = ({ onGetStarted }: { onGetStarted: () => void }) => {
+const AuditPointer = ({
+  imageHeight,
+  maxWidth,
+}: {
+  imageHeight?: string;
+  maxWidth?: string;
+}) => {
+  const width = maxWidth ? maxWidth : "35%";
   return (
-    <Grid gap={6}>
+    <Grid maxWidth={width} margin="auto">
       <Image
         src="blockchain_loop.png"
-        maxWidth="35%"
+        height={imageHeight}
         justifySelf="center"
         fit="contain"
       />
@@ -17,9 +33,25 @@ const LeftPane = ({ onGetStarted }: { onGetStarted: () => void }) => {
           </Button>
         </Link>
       </Box>
+    </Grid>
+  );
+};
+
+const GetStartedPointer = ({
+  imageHeight,
+  onGetStarted,
+  maxWidth,
+}: {
+  imageHeight?: string;
+  onGetStarted: () => void;
+  maxWidth?: string;
+}) => {
+  const width = maxWidth ? maxWidth : "35%";
+  return (
+    <Grid maxWidth={width} minWidth={width} margin="auto">
       <Image
         src="parity.png"
-        maxWidth="35%"
+        height={imageHeight}
         justifySelf="center"
         fit="contain"
       />
@@ -34,19 +66,77 @@ const LeftPane = ({ onGetStarted }: { onGetStarted: () => void }) => {
     </Grid>
   );
 };
+const MobileButtonGroup = ({ onGetStarted }: { onGetStarted: () => void }) => {
+  return (
+    <HStack marginTop="25px" marginBottom="25px">
+      <AuditPointer imageHeight="70px" maxWidth="50%" />
+      <GetStartedPointer
+        imageHeight="70px"
+        onGetStarted={onGetStarted}
+        maxWidth="50%"
+      />
+    </HStack>
+  );
+};
 
-const AuditDescription = () => {
+const ButtonGroup = ({ onGetStarted }: { onGetStarted: () => void }) => {
+  return (
+    <Grid gap={6}>
+      <AuditPointer />
+      <GetStartedPointer onGetStarted={onGetStarted} />
+    </Grid>
+  );
+};
+const MobileAuditDescription = ({
+  overrideWidth,
+}: {
+  overrideWidth?: string;
+}) => {
+  const width = overrideWidth ? overrideWidth : "fit-content";
+
+  const fontSize = "42px";
   return (
     <Box
       bg="white"
-      justifySelf="right"
-      alignItems="center"
-      width="56%"
+      // justifySelf="right"
+      // alignItems="center"
+      maxWidth={width}
+      height="fit-content"
+      padding="2"
+    >
+      <div className="mobileTitle" style={{ fontSize: fontSize }}>
+        <h1>Transparency in everything we do</h1>
+
+        <div className="glass-child glass"></div>
+      </div>
+      <Text>
+        Every transaction we make is visible on the blockchain ensuring fair
+        play. Our real-time auditing system shows every ZAR transfer flowing
+        into and out of our reserve account and the corresponding on-chain
+        transaction. This ensures that every RCoin we issue is backed by exactly
+        1 Rand. That way all of our users can withdraw their Rand anytime,
+        anywhere.
+      </Text>
+    </Box>
+  );
+};
+
+const AuditDescription = ({ overrideWidth }: { overrideWidth?: string }) => {
+  const width = overrideWidth ? overrideWidth : "fit-content";
+
+  return (
+    <Box
+      bg="white"
+      maxWidth="50%"
       height="fit-content"
       padding="3"
       borderRadius="25"
     >
-      <Image src="transparency.png" maxWidth="350px" fit="contain" />
+      <div className="title">
+        <h1>Transparency in everything we do</h1>
+
+        <div className="glass-child glass"></div>
+      </div>
       <Text alignSelf="center">
         Every transaction we make is visible on the blockchain ensuring fair
         play. Our real-time auditing system shows every ZAR transfer flowing
@@ -59,12 +149,42 @@ const AuditDescription = () => {
   );
 };
 
-const AuditExplanation = ({ onGetStarted }: { onGetStarted: () => void }) => {
+const MobileAuditExplanation = ({
+  onGetStarted,
+}: {
+  onGetStarted: () => void;
+}) => {
+  return (
+    <Grid>
+      <MobileAuditDescription />
+      <MobileButtonGroup onGetStarted={onGetStarted} />
+    </Grid>
+  );
+};
+
+const DesktopAuditExplanation = ({
+  onGetStarted,
+}: {
+  onGetStarted: () => void;
+}) => {
   return (
     <HStack>
-      <LeftPane onGetStarted={onGetStarted} />
-      <AuditDescription />
+      <ButtonGroup onGetStarted={onGetStarted} />
+      <AuditDescription overrideWidth="56%" />
     </HStack>
+  );
+};
+
+const AuditExplanation = ({ onGetStarted }: { onGetStarted: () => void }) => {
+  const useMobileView = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+
+  return useMobileView ? (
+    <MobileAuditExplanation onGetStarted={onGetStarted} />
+  ) : (
+    <DesktopAuditExplanation onGetStarted={onGetStarted} />
   );
 };
 

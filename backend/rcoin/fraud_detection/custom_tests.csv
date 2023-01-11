@@ -1,0 +1,4 @@
+time,type,amount,sender,balance_before,balance_after,receiver,isFraud
+0,ISSUE,100,0,0,100,1,0
+1,TRADE,50,1,50,50,2,0
+2,REDEEM,50,1,50,0,0,0

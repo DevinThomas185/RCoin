@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View} from 'react-native-ui-lib';
+import {Card, Image, Text, View} from 'react-native-ui-lib';
 import styles from '../../style/style';
 
 const IssueReceipt = ({
@@ -18,16 +18,36 @@ const IssueReceipt = ({
   };
 
   return (
-    <View center>
-      <Text>You are purchasing</Text>
-      <Text text40 color={styles.rcoin}>
-        {numberWithCommas(coins_to_issue)} RCoin
-      </Text>
-      <Text>for</Text>
-      <Text text40 color={styles.rcoin}>
-        {numberWithCommas(rand_to_pay)} Rand
-      </Text>
-    </View>
+    <Card enableShadow>
+      <View center padding-10>
+        <View marginH-5 marginV-10>
+          <Text text60 center color={styles.rcoin}>
+            You are converting
+          </Text>
+          <Text text60 center color={styles.rcoin}>
+            ZAR {numberWithCommas(rand_to_pay)}
+          </Text>
+        </View>
+        <Image
+          source={require('../../style/ZAR-RCoin.png')}
+          style={{width: '60%', height: 130 * 0.6}}
+        />
+        <View>
+          <Text text60 center color={styles.rcoin}>
+            into
+          </Text>
+        </View>
+        <View marginH-5 marginB-10 row center>
+          <Image
+            source={require('../../style/Logo.png')}
+            style={{width: 40, height: 40}}
+          />
+          <Text text60 color={styles.rcoin}>
+            {numberWithCommas(coins_to_issue)}
+          </Text>
+        </View>
+      </View>
+    </Card>
   );
 };
 

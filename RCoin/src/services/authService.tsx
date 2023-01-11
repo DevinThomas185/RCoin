@@ -6,7 +6,15 @@ export type AuthData = {
   token_info: TokenInfo;
 };
 
-export type TokenInfo = {user_id: string; email: string; name: string};
+export type TokenInfo = {
+  user_id: string;
+  email: string;
+  name: string;
+  trust_score: number;
+  suspended: boolean;
+  wallet_id: string;
+  is_merchant: boolean;
+};
 
 // Returns undefined promise if login is unsuccessful
 const signIn = (
@@ -15,7 +23,7 @@ const signIn = (
 ): Promise<AuthData | undefined> => {
   return new Promise(resolve => {
     setTimeout(() => {
-      fetch(`${Config.API_URL}:8000/api/login`, {
+      fetch(`${Config.API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +44,7 @@ const signIn = (
           return res.json();
         })
         .then(data => {
-          fetch(`${Config.API_URL}:8000/api/user`, {
+          fetch(`${Config.API_URL}/api/user`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -57,6 +65,10 @@ const signIn = (
                   user_id: data_['user_id'],
                   email: data_['email'],
                   name: data_['name'],
+                  trust_score: data_['trust_score'],
+                  suspended: data_['suspended'],
+                  wallet_id: data_['walled_id'],
+                  is_merchant: data_['is_merchant'],
                 },
               });
             })
