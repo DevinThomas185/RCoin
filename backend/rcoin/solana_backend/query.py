@@ -199,9 +199,9 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
         processed_transactions.append(
             {
                 "signature": signature,
-                "sender": transaction_details.sender,
-                "recipient": transaction_details.recipient,
-                "amount": transaction_details.amount,
+                "sender": transaction_details["sender"],
+                "recipient": transaction_details["recipient"],
+                "amount": transaction_details["amount"],
                 "block_time": block_time,
             }
         )
