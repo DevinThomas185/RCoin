@@ -9,10 +9,13 @@ from solders.transaction import Transaction as SoldersTransaction
 from solana.publickey import PublicKey
 from solana.keypair import Keypair
 
-from rcoin.solana_backend.api import construct_token_transfer_transaction
+# from rcoin.solana_backend.api import construct_token_transfer_transaction
+from rcoin.solana_backend.api import Solana
 from rcoin.solana_backend import api
 from rcoin.solana_backend.response import Failure, CustomResponse, Success
 from rcoin.solana_backend.transaction import get_associated_token_account
+
+solana_api = Solana()
 
 TEST_USERS_FILE = "rcoin/solana_backend/users.txt"
 TEST_USERS_NUMBER = 10
@@ -21,6 +24,7 @@ from rcoin.solana_backend.common import (
     SOLANA_CLIENT,
     MINT_ACCOUNT,
 )
+
 
 class Wallet:
     def __init__(self, public_key, secret_key):
@@ -104,6 +108,7 @@ def fund_user(username, amount):
     if isinstance(resp, Failure):
         print("Failed to fund user account: {}".format(resp.to_json()["exception"]))
 
+
 def fund_account(public_key, amount):
     public_key = PublicKey(public_key)
     try:
@@ -131,12 +136,14 @@ def fund_account(public_key, amount):
         print(e)
         return Failure("exception", e)
 
+
 def load_wallet(sender_username):
     """Loads the test user wallet stored in the file system."""
 
     with open(TEST_USERS_FILE) as users_file:
         users = json.load(users_file)
         return Wallet.from_json(users[sender_username])
+
 
 def provision_test_users():
     """Creates and funds TEST_USERS_NUMBER test user accounts."""
@@ -162,7 +169,7 @@ def get_user_balance(username):
 
         key_str = wallet.public_key
 
-        balance = (str(SOLANA_CLIENT.get_balance(PublicKey(key_str))))
+        balance = str(SOLANA_CLIENT.get_balance(PublicKey(key_str)))
         print("Your Solana account {} balance is {} SOL".format(key_str, balance))
         return balance
 
@@ -171,9 +178,11 @@ def get_user_balance(username):
 
 
 def unwrap_transaction_from_response(response: CustomResponse) -> Transaction:
-    assert(isinstance(response, Success))
+    assert isinstance(response, Success)
     transaction_bytes = response.contents
-    return Transaction.from_solders(SoldersTransaction.from_bytes(bytes(transaction_bytes)))
+    return Transaction.from_solders(
+        SoldersTransaction.from_bytes(bytes(transaction_bytes))
+    )
 
 
 def issue_stablecoins_to(username, amount):
@@ -191,6 +200,7 @@ def issue_stablecoins_to(username, amount):
 
     api.construct_issue_transaction(str(user_wallet.public_key), amount)
 
+
 def transfer_stablecoins(sender, amount, recipient):
     """It is a wrapper for the construct_stablecoin_transaction and
         should only be used for debugging.
@@ -203,15 +213,15 @@ def transfer_stablecoins(sender, amount, recipient):
     sender_wallet = load_wallet(sender)
     recipient_wallet = load_wallet(recipient)
 
-    resp = construct_token_transfer_transaction(
+    resp = solana_api.construct_token_transfer_transaction(
         sender_wallet.public_key, amount, recipient_wallet.public_key
     )
 
     transaction = unwrap_transaction_from_response(resp)
 
     owner = Keypair.from_secret_key(sender_wallet.secret_key)
-    #TODO: fix this by replacing with proper multisig.
-    #token_owner = Keypair.from_secret_key(SECRET_KEY)
+    # TODO: fix this by replacing with proper multisig.
+    # token_owner = Keypair.from_secret_key(SECRET_KEY)
     token_owner = None
 
     resp = SOLANA_CLIENT.send_transaction(
@@ -223,10 +233,11 @@ def transfer_stablecoins(sender, amount, recipient):
 
     print("Transaction finished with response: {}".format(resp))
 
+
 def inspect_token_accounts_for(username):
-    ''' Executes a query to the Solana network to find all Stablecoin token
-        accounts which are associated with the account of the user
-    '''
+    """Executes a query to the Solana network to find all Stablecoin token
+    accounts which are associated with the account of the user
+    """
     try:
         wallet = load_wallet(username)
 
@@ -235,13 +246,18 @@ def inspect_token_accounts_for(username):
             return
 
         public_key = PublicKey(wallet.public_key)
-        print(SOLANA_CLIENT.get_token_accounts_by_owner(public_key, TokenAccountOpts(mint=MINT_ACCOUNT)))
+        print(
+            SOLANA_CLIENT.get_token_accounts_by_owner(
+                public_key, TokenAccountOpts(mint=MINT_ACCOUNT)
+            )
+        )
 
     except Exception as e:
         print(e)
 
+
 def get_token_account_for(username):
-    ''' Return the account able to send/receive stablecoin tokens owned by
+    """Return the account able to send/receive stablecoin tokens owned by
         the specified user.
 
     This function is a wrapper for get_token_account_owned_by and should
@@ -249,7 +265,7 @@ def get_token_account_for(username):
     by specifying the wallet address (PublicKey) of the account that owns
     the associated token account.
 
-    '''
+    """
     try:
         wallet = load_wallet(username)
 
@@ -262,4 +278,3 @@ def get_token_account_for(username):
 
     except Exception as e:
         print(e)
-

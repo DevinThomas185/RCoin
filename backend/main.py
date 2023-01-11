@@ -27,12 +27,12 @@ import pandas as pd
 # import datetime
 from datetime import timezone, datetime, timedelta
 
-from rcoin.solana_backend.api import (
-    get_recipient_for_trade_transaction,
-    get_total_tokens_issued,
-    get_transfer_amount_for_transaction,
-    get_user_token_balance,
-)
+# from rcoin.solana_backend.api import (
+#     get_recipient_for_trade_transaction,
+#     get_total_tokens_issued,
+#     get_transfer_amount_for_transaction,
+#     get_user_token_balance,
+# )
 
 from rcoin.solana_backend.response import Success, Failure
 import sqlalchemy.orm as orm
@@ -78,7 +78,7 @@ import redis
 # Solana backend imports
 from rcoin.solana_backend.response import Failure, CustomResponse, Success
 
-import rcoin.solana_backend.api as solana_api
+# import rcoin.solana_backend.api as solana_api
 
 from rcoin.solana_backend.exceptions import UnwrapOnFailureException
 
@@ -100,6 +100,10 @@ else:
 
 # Set recalculation count to 0
 r.set("reserve_ratio_count", 0)
+
+from rcoin.solana_backend.api import Solana
+
+solana_api = Solana()
 
 
 def update_reserve_ratio():
@@ -199,7 +203,7 @@ def not_fraudulent(func):
         response = kwargs["response"]
         user = kwargs["user"] if "user" in kwargs else kwargs["sender"]
         assert isinstance(user, User)
-        balance = get_user_token_balance(user.wallet_id).contents
+        balance = solana_api.get_user_token_balance(user.wallet_id).contents
 
         if "issue_transaction" in kwargs:
             data = kwargs["issue_transaction"]
@@ -682,7 +686,9 @@ async def complete_trade(
     # signatures obtained from both servers.
     res = solana_api.add_signature_and_send(transaction, signature, sender.wallet_id)
 
-    recipient_res = get_recipient_for_trade_transaction(str(res.to_json()["signature"]))
+    recipient_res = solana_api.get_recipient_for_trade_transaction(
+        str(res.to_json()["signature"])
+    )
 
     if isinstance(recipient_res, Failure):
         return recipient_res.to_json()
@@ -699,7 +705,7 @@ async def complete_trade(
     sender_tokens = list(map(lambda d: d.device_token, sender_devices))
     reciever_tokens = list(map(lambda d: d.device_token, reciever_devices))
 
-    amount_resp = get_transfer_amount_for_transaction(res.contents)
+    amount_resp = solana_api.get_transfer_amount_for_transaction(res.contents)
 
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()

@@ -9,7 +9,7 @@ from rcoin.database_api import (
 )
 
 # import rcoin.database_api as database_api
-from rcoin.solana_backend.api import TransactionType, get_stablecoin_transactions
+from rcoin.solana_backend.api import TransactionType, Solana
 
 import time
 
@@ -55,7 +55,7 @@ async def get_should_issue_stage(
         # time.sleep(TWO_MINUTES)
 
         # !!! We need to get ALL transactions for a user until a "certain" point, for now 1000
-        blockchain_transactions_resp = get_stablecoin_transactions(
+        blockchain_transactions_resp = solana_api.get_stablecoin_transactions(
             user.wallet_id, 1000
         ).to_json()
 
