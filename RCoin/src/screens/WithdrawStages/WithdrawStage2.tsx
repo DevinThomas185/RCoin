@@ -50,7 +50,7 @@ const WithdrawStage2 = ({
         if (res.status == 409) {
           throw new SuspectedFraudError();
         } else if (!res.ok) {
-          throw new Error('initial redeem failed');
+          throw new Error('Initial Withdraw Failed');
         }
         return res.json();
       })
@@ -84,7 +84,7 @@ const WithdrawStage2 = ({
             })
               .then(res => {
                 if (!res.ok) {
-                  throw new Error('Complete redeem failed');
+                  throw new Error('Complete Withdraw failed');
                 }
                 return res.json();
               })
@@ -96,6 +96,8 @@ const WithdrawStage2 = ({
                   setConfirmClicked(false);
                   setResponseState(0);
                   nextStage();
+                } else {
+                  throw new Error('Confirm Withdraw Failed');
                 }
               })
               .catch(error => {
@@ -104,6 +106,8 @@ const WithdrawStage2 = ({
                 console.log(error);
               });
           }
+        } else {
+          throw new Error('Initial Withdraw Failed');
         }
       })
       .catch(error => {
@@ -131,20 +135,20 @@ const WithdrawStage2 = ({
       </View>
 
       <View flex>
-        {loading ? (
+        {confirm_clicked ? (
           <PendingLoader
             loading={loading}
             show={confirm_clicked}
             response_state={response_state}
             loading_page_message={loading_page_message}
-            custom_fail_message="Withdraw failed, please confirm again"
+            custom_fail_message="Withdraw failed, please try again later"
           />
         ) : (
           <ChangingBalanceCard increment={-coins_to_withdraw} />
         )}
       </View>
 
-      <View flex bottom marginV-10>
+      <View bottom marginV-10>
         <Button
           onPress={() => {
             setIsModalVisible(true);

@@ -101,6 +101,8 @@ const Transfer2Confirm = ({
                   setConfirmClicked(false);
                   setResponseState(0);
                   nextStage();
+                } else {
+                  throw new Error('Completing Trade Failed');
                 }
               })
               .catch(error => {
@@ -109,6 +111,8 @@ const Transfer2Confirm = ({
                 console.log(error);
               });
           }
+        } else {
+          throw new Error('Completing Trade Failed');
         }
       })
       .catch(error => {
@@ -135,19 +139,19 @@ const Transfer2Confirm = ({
       </View>
 
       <View flex>
-        {loading ? (
+        {confirm_clicked ? (
           <PendingLoader
             loading={loading}
             show={confirm_clicked}
             response_state={response_state}
             loading_page_message={loading_page_message}
-            custom_fail_message="Transfer failed, please confirm again"
+            custom_fail_message="Transfer failed, please try again later"
           />
         ) : (
           <ChangingBalanceCard increment={-amount} />
         )}
       </View>
-      <View flex bottom marginV-10>
+      <View bottom marginV-10>
         <Button
           onPress={() => setIsModalVisible(true)}
           label={

@@ -1,12 +1,12 @@
 version: "3.8"
 services:
   signer-backend:
-    image: 146.169.40.88:5000/rcoin-signer-backend:${CI_COMMIT_SHA}
+    image: 146.169.40.88:5000/rcoin-signer-backend-${CI_COMMIT_SHA}
     environment:
       - SIGNER_2=${SIGNER_2}
 
   signer-proxy:
-    image: 146.169.40.88:5000/rcoin-signer-proxy:${CI_COMMIT_SHA}
+    image: 146.169.40.88:5000/rcoin-signer-proxy-${CI_COMMIT_SHA}
     ports:
       - 80:80
     depends_on:

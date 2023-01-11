@@ -75,10 +75,11 @@ const FriendsScreen = () => {
           ))}
         </ScrollView>
         <TextField
-          placeholder="Friend's Email"
+          placeholder="Quick Contact Email"
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
+          placeholderTextColor={'gray'}
           onChangeText={(email: string) => {
             setNewFriendEmail(email);
           }}
@@ -99,7 +100,7 @@ const FriendsScreen = () => {
         <Button
           onPress={addFriend}
           disabled={!valid}
-          label="Add Friend"
+          label="Add Contact"
           backgroundColor={styles.rcoin}
         />
       </View>

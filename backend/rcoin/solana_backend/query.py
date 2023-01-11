@@ -40,7 +40,7 @@ def execute_query(query_function: Callable[[], CustomResponse]) -> CustomRespons
         return query_function()
 
     except BlockchainQueryFailedException as exception:
-        return Failure("exception", exception)
+        return Failure(exception)
 
 
 def get_balance(public_key: PublicKey) -> int:
@@ -193,8 +193,9 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
         if not is_relevant:
             continue
 
-        transaction_details = extract_transaction_details(pre_token_balances, post_token_balances)
-
+        transaction_details = extract_transaction_details(
+            pre_token_balances, post_token_balances
+        )
 
         processed_transactions.append(
             {
@@ -208,14 +209,15 @@ def get_processed_transactions_for_account(public_key: PublicKey, limit: int):
 
     return processed_transactions
 
+
 def extract_transaction_details(pre_token_balances, post_token_balances) -> Any:
     def get_balances_map(balances_list):
-            balance_map = {}
-            for token_balance in balances_list:
-                owner: str = str(token_balance.owner)
-                balance_map[owner] = int(token_balance.ui_token_amount.amount)
+        balance_map = {}
+        for token_balance in balances_list:
+            owner: str = str(token_balance.owner)
+            balance_map[owner] = int(token_balance.ui_token_amount.amount)
 
-            return balance_map
+        return balance_map
 
     pre_balances_map = get_balances_map(pre_token_balances)
     post_balances_map = get_balances_map(post_token_balances)
@@ -269,6 +271,7 @@ def extract_transaction_details(pre_token_balances, post_token_balances) -> Any:
         "recipient": recipient,
         "amount": amount,
     }
+
 
 def get_transaction_details(transaction_signature: Signature) -> GetTransactionResp:
     try:

@@ -23,7 +23,7 @@ const AuditCardBase = ({colour, ratio}: {colour: string; ratio: number}) => {
         center
         style={{
           flexDirection: 'row',
-          borderColor: styles.success,
+          borderColor: colour,
           borderWidth: 1,
         }}
         activeOpacity={1}

@@ -180,7 +180,8 @@ const PasswordPopup = ({
               </Text>
               <TextInput
                 style={styles.input}
-                placeholder="password"
+                placeholder="Password"
+                placeholderTextColor={'gray'}
                 keyboardType="default"
                 textContentType="password"
                 secureTextEntry={true}
