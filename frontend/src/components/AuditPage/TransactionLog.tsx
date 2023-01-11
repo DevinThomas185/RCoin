@@ -204,7 +204,8 @@ const TransactionDetailsList = ({ transaction }: { transaction: any }) => {
   const width = isMobileView ? "150px" : "fit-content";
 
   const IDEntry = ({ title, id }: { title: string; id: string }) => {
-    const text = isMobileView ? `${id.slice(0, 20)}...` : id;
+    const id_string = id === null ? "" : id;
+    const text = isMobileView ? `${id_string.slice(0, 20)}...` : id_string;
     return (
       <Flex direction={direction} width={width}>
         <Text
