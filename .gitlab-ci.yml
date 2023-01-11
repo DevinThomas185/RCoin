@@ -12,37 +12,37 @@ stages:
 #     - npm install prettier
 #     - npx prettier --check "RCoin/src/**/*.tsx" --config RCoin/.prettierrc.js
 
-# build-frontend:
-#   image: docker/compose:debian-1.29.2
-#   stage: build
-#   script:
-#     - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
-#     - eval $(ssh-agent -s)
-#     - echo "$ID_RSA" | tr -d '\r' | ssh-add -
-#     - echo "$ID_RSA_SIGNER_PROD" | tr -d '\r' | ssh-add -
-#     - mkdir -p ~/.ssh
-#     - chmod 700 ~/.ssh
-#     - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
-#     - chmod 644 ~/.ssh/known_hosts
-#     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker build -t rcoin-frontend ./frontend
-#     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-frontend 146.169.40.88:5000/rcoin-frontend:$CI_COMMIT_SHA
-#     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-frontend:$CI_COMMIT_SHA
+build-frontend:
+  image: docker/compose:debian-1.29.2
+  stage: build
+  script:
+    - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
+    - eval $(ssh-agent -s)
+    - echo "$ID_RSA" | tr -d '\r' | ssh-add -
+    - echo "$ID_RSA_SIGNER_PROD" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker build -t rcoin-frontend ./frontend
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-frontend 146.169.40.88:5000/rcoin-frontend:$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-frontend:$CI_COMMIT_SHA
 
-# build-backend:
-#   image: docker/compose:debian-1.29.2
-#   stage: build
-#   script:
-#     - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
-#     - eval $(ssh-agent -s)
-#     - echo "$ID_RSA" | tr -d '\r' | ssh-add -
-#     - echo "$ID_RSA_SIGNER_PROD" | tr -d '\r' | ssh-add -
-#     - mkdir -p ~/.ssh
-#     - chmod 700 ~/.ssh
-#     - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
-#     - chmod 644 ~/.ssh/known_hosts
-#     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker build -t rcoin-backend ./backend
-#     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-backend 146.169.40.88:5000/rcoin-backend:$CI_COMMIT_SHA
-#     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-backend:$CI_COMMIT_SHA
+build-backend:
+  image: docker/compose:debian-1.29.2
+  stage: build
+  script:
+    - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
+    - eval $(ssh-agent -s)
+    - echo "$ID_RSA" | tr -d '\r' | ssh-add -
+    - echo "$ID_RSA_SIGNER_PROD" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker build -t rcoin-backend ./backend
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-backend 146.169.40.88:5000/rcoin-backend:$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-backend:$CI_COMMIT_SHA
 
 build-signer:
   image: docker/compose:debian-1.29.2
