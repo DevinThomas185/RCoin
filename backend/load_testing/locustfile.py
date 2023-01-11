@@ -5,15 +5,13 @@ load_dotenv()
 
 import random
 from locust import HttpUser, task, between
-from rcoin.solana_backend.api import issue_stablecoins
+
 from user_generator import FakeUser
 from solana.transaction import Transaction
 from solders.transaction import Transaction as SoldersTx
 import ed25519
 import uuid
 
-# from nacl.signing import SigningKey
-# from nacl.bindings.crypto_sign_seed_keypair import
 import nacl.bindings
 
 
@@ -28,7 +26,7 @@ class RCoinUser(HttpUser):
     balance: float
 
     def signup(self):
-        self.client.post(
+        res = self.client.post(
             "/api/signup",
             json={
                 "email": self.fake_user.email,
@@ -40,6 +38,7 @@ class RCoinUser(HttpUser):
                 "sort_code": self.fake_user.sort_code,
                 "document_number": self.fake_user.document_number,
                 "recipient_code": self.fake_user.recipient_code,
+                "is_merchant": False,
             },
         )
 
@@ -62,14 +61,6 @@ class RCoinUser(HttpUser):
         self.login()
         print("Logged in")
 
-        #         @app.get("/api/user")
-        # async def get_user(user: User = Depends(get_current_user)):
-        #     return {
-        #         "user_id": user.id,
-        #         "email": user.email,
-        #         "name": f"{user.first_name} {user.last_name}",
-        #     }
-
         res = self.client.get(
             "/api/user",
             headers={"Authorization": "Bearer " + self.login_token},
@@ -80,10 +71,11 @@ class RCoinUser(HttpUser):
         print("Sleeping for 20 seconds")
         time.sleep(20)
 
-        amount = random.randint(1, 200)
-        issue_stablecoins(self.fake_user.wallet_id, amount)
-        self.balance += amount
-        print("Issued stablecoins")
+        # amount = random.randint(1, 200)
+        # issue_stablecoins(self.fake_user.wallet_id, amount)
+        # self.balance += amount
+        # print("Issued stablecoins")
+        self.deposit()
 
         print("Sleeping for 10 seconds")
         time.sleep(10)
@@ -93,6 +85,13 @@ class RCoinUser(HttpUser):
     def get_balance(self):
         self.client.get(
             "/api/get_token_balance",
+            headers={"Authorization": "Bearer " + self.login_token},
+        )
+
+    @task(20)
+    def get_history(self):
+        self.client.get(
+            "/api/transaction_history",
             headers={"Authorization": "Bearer " + self.login_token},
         )
 
@@ -136,7 +135,7 @@ class RCoinUser(HttpUser):
 
         print("send response was", res_2)
 
-    @task
+    @task(1)
     def withdraw(self):
         if self.balance <= 0:
             return
@@ -180,13 +179,7 @@ class RCoinUser(HttpUser):
 
     @task(1)
     def deposit(self):
-        amount = random.randint(1, 5)
-        # issue_stablecoins(self.fake_user.wallet_id, amount)
-        # self.balance += amount
-
-        # /api/paystack-webhook
-
-        # data["data"]["metadata"]["custom_fields"][0]["variable_name"]
+        amount = random.randint(1, 100)
 
         json_data = {
             "event": "charge.success",
@@ -204,5 +197,8 @@ class RCoinUser(HttpUser):
             json=json_data,
             headers={"Authorization": "Bearer " + self.login_token},
         )
+
+        time.sleep(30)
+        self.balance += amount
 
         print("deposit response was", res)
