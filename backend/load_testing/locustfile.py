@@ -106,7 +106,7 @@ class RCoinUser(HttpUser):
             "/api/trade",
             json={
                 "coins_to_transfer": amount,
-                "recipient_email": "email@email.com",
+                "recipient_email": "ksksks@email.com",
             },
             headers={"Authorization": "Bearer " + self.login_token},
         ).json()
@@ -185,8 +185,11 @@ class RCoinUser(HttpUser):
             "event": "charge.success",
             "data": {
                 "reference": str(uuid.uuid4()),
-                "amount": amount * 100,
-                "metadata": {"custom_fields": [{"variable_name": self.user_id}]},
+                "metadata": {
+                    "custom_fields": [
+                        {"variable_name": str(self.user_id) + "X" + str(amount)}
+                    ]
+                },
             },
         }
 
