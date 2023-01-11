@@ -7,6 +7,7 @@ import {
   Text,
   Button,
   useBreakpointValue,
+  VStack,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
@@ -88,10 +89,16 @@ const AuditExplanationPopup = () => {
           proprely backed.
         </Text>
       </HStack>
-      <HStack justifySelf="right" margin="10px">
-        {becomeAnAuditorButton}
-        {auditingInfoButton}
-      </HStack>
+      {useMobileView ? (
+        <Box margin="auto" marginBottom="10px" marginTop="10px">
+          {becomeAnAuditorButton}
+        </Box>
+      ) : (
+        <HStack justifySelf="right" margin="10px">
+          {becomeAnAuditorButton}
+          {auditingInfoButton}
+        </HStack>
+      )}
     </Grid>
   );
 };
