@@ -1112,7 +1112,7 @@ async def token_balance(
 
 
 @app.post("/api/paystack-webhook")
-@from_paystack
+# @from_paystack
 async def recieve_issue_webhook(
     request: Request,
     response: Response,

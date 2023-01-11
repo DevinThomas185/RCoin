@@ -133,6 +133,6 @@ deploy-prod:
     # Ensure all containers running on signer backend
     - if [[ $(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP_SIGNER_PROD" docker service ls | grep rcoin_signer-proxy | awk '{print $4}' | head -c 1) -eq 0 ]]; then echo "signer nginx container not running" && exit 1; else echo "signer nginx container check successful"; fi
     - if [[ $(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP_SIGNER_PROD" docker service ls | grep rcoin_signer-backend | awk '{print $4}' | head -c 1) -eq 0 ]]; then echo "signer backend container not running" && exit 1; else echo "signer backend container check successful"; fi
-  only:
-    - master
-  when: manual
+  # only:
+  #   - master
+  # when: manual
