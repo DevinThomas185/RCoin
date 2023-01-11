@@ -648,6 +648,7 @@ async def get_second_signature(transaction: Transaction) -> Transaction:
         response = await client.post(
             SIGNER_BACKEND_URL + "/api/sign-transaction",
             json={"transaction_bytes": transaction_bytes},
+            timeout=None,
         )
         signed_transaction_bytes = bytes(response.json()["transaction_bytes"])
         return solana_api.transaction_from_bytes(signed_transaction_bytes)
