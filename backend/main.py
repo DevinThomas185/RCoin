@@ -142,7 +142,6 @@ def verify_password(password: str, hashed_password: bytes) -> bool:
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -159,7 +158,7 @@ async def get_current_user(
         raise credentials_exception
 
     # TODO[Karim] this get_user_by_id should return None if no user
-    user = await database_api.get_user_by_id(id=user_id, db=db)
+    user = await database_api.get_user_by_id(id=user_id)
     if user is None:
         raise credentials_exception
     return user
@@ -224,7 +223,7 @@ def not_fraudulent(func):
             data = kwargs["trade_transaction"]
             assert isinstance(data, TradeTransaction)
             assert isinstance(user, User)
-            receiver = await database_api.get_user(data.recipient_email, db=db)
+            receiver = await database_api.get_user(data.recipient_email)
 
             transaction = pd.DataFrame(
                 data={
@@ -284,7 +283,7 @@ Time: {t}
 Date: {date}
             """
             response.status_code = 409
-            database_api.suspend_user(user.id, db=db)
+            database_api.suspend_user(user.id)
             send_email(subject, message, user.email)
             return {"status": "fraud"}
 
@@ -340,9 +339,8 @@ async def create_sol_account():
 async def device_token(
     register_device_token: RegisterDeviceToken,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ):
-    await database_api.add_device_to_user(register_device_token, user.id, db)
+    await database_api.add_device_to_user(register_device_token, user.id)
     # What to return
     return {}
 
@@ -353,7 +351,6 @@ async def device_token(
 @app.post("/api/signup")
 async def signup(
     user: UserInformation,
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
     # verify = paystack_api.verify_account_ZA(
     #     bank_code=user.sort_code,
@@ -384,7 +381,7 @@ async def signup(
     )
     temp.password = hash_password(user.password)
 
-    db_user_id = await database_api.create_user(user=temp, db=db)
+    db_user_id = await database_api.create_user(user=temp)
 
     bank_account = BankAccount.parse_obj(
         {
@@ -396,7 +393,7 @@ async def signup(
         }
     )
 
-    await database_api.add_bank_account(bank_account=bank_account, db=db)
+    await database_api.add_bank_account(bank_account=bank_account)
 
     response: CustomResponse = solana_api.construct_create_account_transaction(
         user.wallet_id
@@ -447,10 +444,9 @@ class JwtToken:
 @app.post("/api/login", response_model=TokenResponse)
 async def login(
     login: LoginInformation,
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
 
-    match = await database_api.get_user(email=login.email, db=db)
+    match = await database_api.get_user(email=login.email)
     if not match or not verify_password(login.password, match.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -536,11 +532,9 @@ DEFAULT_INITIAL_AUDIT_TRANSACTIONS = 20
 
 
 @app.get("/api/audit/transactions")
-async def auditTransactions(
-    db: orm.Session = Depends(database_api.connect_to_DB),
-) -> dict:
+async def auditTransactions() -> dict:
     transactions = await database_api.get_audit_transactions(
-        0, DEFAULT_INITIAL_AUDIT_TRANSACTIONS, datetime.now(), db
+        0, DEFAULT_INITIAL_AUDIT_TRANSACTIONS, datetime.now()
     )
 
     print(transactions)
@@ -551,13 +545,11 @@ async def auditTransactions(
 @app.post("/api/audit/more_transactions")
 async def moreAuditTransactions(
     audit_transactions_request: AuditTransactionsRequest,
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     transactions = await database_api.get_audit_transactions(
         audit_transactions_request.offset,
         audit_transactions_request.limit,
         audit_transactions_request.first_query_time,
-        db,
     )
     print(transactions)
     print("\n")
@@ -568,25 +560,20 @@ async def moreAuditTransactions(
 @app.get("/api/transaction_history")
 async def transactionHistory(
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict:
     wallet_id = user.wallet_id
     transaction_history = solana_api.get_stablecoin_transactions(wallet_id).to_json()[
         "transaction_history"
     ]
     for transaction in transaction_history:
-        sender = await database_api.get_user_by_wallet_id(transaction["sender"], db=db)
-        recipient = await database_api.get_user_by_wallet_id(
-            transaction["recipient"], db=db
-        )
+        sender = await database_api.get_user_by_wallet_id(transaction["sender"])
+        recipient = await database_api.get_user_by_wallet_id(transaction["recipient"])
         if sender is not None:
             transaction["sender"] = sender.email
         if recipient is not None:
             transaction["recipient"] = recipient.email
 
-    pending_transactions = await database_api.get_pending_transactions(
-        user_id=user.id, db=db
-    )
+    pending_transactions = await database_api.get_pending_transactions(user_id=user.id)
 
     return {
         "transaction_history": transaction_history,
@@ -602,11 +589,8 @@ async def trade(
     trade_transaction: TradeTransaction,
     response: Response,
     sender: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    recipient = await database_api.get_user(
-        email=trade_transaction.recipient_email, db=db
-    )
+    recipient = await database_api.get_user(email=trade_transaction.recipient_email)
 
     if recipient is None:
         return Failure(ValueError("Recipient not present in the database!")).to_json()
@@ -630,9 +614,8 @@ async def redeem(
     redeem_transaction: RedeemTransaction,
     response: Response,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
-    redeemer = await database_api.get_user(email=user.email, db=db)
+    redeemer = await database_api.get_user(email=user.email)
     if redeemer is None:
         # return some error
         pass
@@ -677,7 +660,6 @@ async def get_second_signature(transaction: Transaction) -> Transaction:
 async def complete_trade(
     trade_transaction: CompleteTradeTransaction,
     sender: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
     signature = bytes(trade_transaction.signature)
     transaction = bytes(trade_transaction.transaction_bytes)
@@ -694,12 +676,10 @@ async def complete_trade(
 
     recipient_wallet = str(recipient_res.contents)
 
-    recipient_user: User = await database_api.get_user_by_wallet_id(
-        recipient_wallet, db=db
-    )
+    recipient_user: User = await database_api.get_user_by_wallet_id(recipient_wallet)
 
-    sender_devices = await database_api.get_user_devices(sender.id, db=db)
-    reciever_devices = await database_api.get_user_devices(recipient_user.id, db=db)
+    sender_devices = await database_api.get_user_devices(sender.id)
+    reciever_devices = await database_api.get_user_devices(recipient_user.id)
 
     sender_tokens = list(map(lambda d: d.device_token, sender_devices))
     reciever_tokens = list(map(lambda d: d.device_token, reciever_devices))
@@ -724,14 +704,13 @@ async def complete_trade(
 async def is_trade_email_valid(
     email_valid: TradeEmailValid,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ):
     email = email_valid.email
 
     if user.email == email:
         return {"valid": False}
 
-    reciever = await database_api.get_user(email, db)
+    reciever = await database_api.get_user(email)
 
     if not reciever:
         return {"valid": False}
@@ -746,7 +725,6 @@ async def is_trade_email_valid(
 async def complete_redeem(
     redeem_transaction: CompleteRedeemTransaction,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
     signature = bytes(redeem_transaction.signature)
     transaction = bytes(redeem_transaction.transaction_bytes)
@@ -761,9 +739,7 @@ async def complete_redeem(
     if isinstance(amount_resp, Failure):
         return amount_resp.to_json()
 
-    default_bank_account = await database_api.get_default_bank_account_for_id(
-        user.id, db=db
-    )
+    default_bank_account = await database_api.get_default_bank_account_for_id(user.id)
 
     reference = paystack_api.initiate_transfer(
         abs(float(amount_resp.contents)),
@@ -786,10 +762,9 @@ async def complete_redeem(
         blockchain_transaction_id=resp.contents,
         date=datetime.now(),
         amount=amount_resp.contents,
-        db=db,
     )
 
-    devices = await database_api.get_user_devices(user.id, db=db)
+    devices = await database_api.get_user_devices(user.id)
     device_tokens = list(map(lambda d: d.device_token, devices))
     notify_withdrawn(device_tokens, amount_resp.contents)
 
@@ -802,19 +777,15 @@ async def complete_redeem(
 @app.get("/api/get_bank_accounts")
 async def get_bank_accounts(
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
 
-    return {
-        "bank_accounts": await database_api.get_bank_accounts_for_id(id=user.id, db=db)
-    }
+    return {"bank_accounts": await database_api.get_bank_accounts_for_id(id=user.id)}
 
 
 @app.post("/api/add_bank_account")
 async def add_bank_account(
     bank_account: BankAccount,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
 
     recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
@@ -826,19 +797,17 @@ async def add_bank_account(
 
     bank_account.recipient_code = recipient_code
 
-    await database_api.add_bank_account(bank_account=bank_account, db=db)
+    await database_api.add_bank_account(bank_account=bank_account)
 
 
 @app.post("/api/delete_bank_account")
 async def delete_bank_accounts(
     bank_account: AlterBankAccount,
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     await database_api.delete_bank_account(
         user_id=bank_account.user_id,
         bank_account=bank_account.bank_account,
         sort_code=bank_account.sort_code,
-        db=db,
     )
 
 
@@ -846,10 +815,9 @@ async def delete_bank_accounts(
 @app.get("/api/get_default_bank_account")
 async def get_default_bank_account(
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
 
-    bank_account = await database_api.get_default_bank_account_for_id(id=user.id, db=db)
+    bank_account = await database_api.get_default_bank_account_for_id(id=user.id)
 
     return {
         "bank_account": bank_account.bank_account,
@@ -860,13 +828,11 @@ async def get_default_bank_account(
 @app.post("/api/set_default_bank_account")
 async def set_default_bank_account(
     bank_account: AlterBankAccount,
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
     await database_api.set_default_bank_account_for_id(
         id=bank_account.user_id,
         bank_account=bank_account.bank_account,
         sort_code=bank_account.sort_code,
-        db=db,
     )
 
 
@@ -874,18 +840,16 @@ async def set_default_bank_account(
 @app.get("/api/get_friends")
 async def get_friends(
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
-    return {"friends": await database_api.get_friends_of_id(id=user.id, db=db)}
+    return {"friends": await database_api.get_friends_of_id(id=user.id)}
 
 
 @app.get("/api/get_n_friends")
 async def get_friends(
     n: int,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
-    return {"friends": await database_api.get_n_friends_of_id(id=user.id, n=n, db=db)}
+    return {"friends": await database_api.get_n_friends_of_id(id=user.id, n=n)}
 
 
 @app.post("/api/add_friend")
@@ -893,13 +857,12 @@ async def add_friend(
     friend: Friend,
     response: Response,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
-    friend = await database_api.get_user(friend.email, db=db)
+    friend = await database_api.get_user(friend.email)
     if not friend:
         response.status_code = 500
     else:
-        await database_api.add_friend(person_id=user.id, friend_id=friend.id, db=db)
+        await database_api.add_friend(person_id=user.id, friend_id=friend.id)
         response.status_code = 200
 
 
@@ -908,13 +871,12 @@ async def delete_friend(
     friend: Friend,
     response: Response,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> list[dict[str, Any]]:
-    friend = await database_api.get_user(friend.email, db=db)
+    friend = await database_api.get_user(friend.email)
     if not friend:
         response.status_code = 500
     else:
-        await database_api.delete_friend(person_id=user.id, friend_id=friend.id, db=db)
+        await database_api.delete_friend(person_id=user.id, friend_id=friend.id)
         response.status_code = 200
 
 
@@ -1097,7 +1059,6 @@ async def sign_merchant_transaction(mt: MerchantTransaction) -> dict[str, Any]:
 @app.get("/api/get_token_balance")
 async def token_balance(
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
 
     token_balance_resp = solana_api.get_user_token_balance(user.wallet_id)
@@ -1120,7 +1081,6 @@ async def recieve_issue_webhook(
     request: Request,
     response: Response,
     # user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> Any:
 
     data = await request.json()
@@ -1145,7 +1105,7 @@ async def recieve_issue_webhook(
         user_id = metadata[0]
         amount = float(metadata[1])
 
-        user: User = await database_api.get_user_by_id(user_id, db=db)
+        user: User = await database_api.get_user_by_id(user_id)
 
         if not user:
             # Got paid and it was not from our app since no user
@@ -1158,7 +1118,7 @@ async def recieve_issue_webhook(
         lock_name = f"{user_id} {amount}"
         async with redis_lock(lock_name, timeout=THIRTY_MINUTES) as lock:
 
-            issue_check = await get_should_issue_stage(transaction_id, user, amount, db)
+            issue_check = await get_should_issue_stage(transaction_id, user, amount)
             if not issue_check:
                 response.status_code = 500
                 return "failed checking issue stage"
@@ -1177,7 +1137,6 @@ async def recieve_issue_webhook(
                     user_id=user_id,
                     bank_transaction_id=transaction_id,
                     date=datetime.now(),
-                    db=db,
                 )
 
             if (
@@ -1210,10 +1169,10 @@ async def recieve_issue_webhook(
 
             # We always need to complete
             await database_api.complete_issue_transaction(
-                transaction_id, associated_issue, db=db
+                transaction_id, associated_issue
             )
 
-        devices = await database_api.get_user_devices(user_id, db=db)
+        devices = await database_api.get_user_devices(user_id)
         device_tokens = list(map(lambda d: d.device_token, devices))
         notify_issued(device_tokens, amount)
 
@@ -1228,12 +1187,11 @@ async def change_email(
     request: Request,
     response: Response,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
 
     data = await request.json()
 
-    await database_api.change_email(user.id, data["new_email"], db=db)
+    await database_api.change_email(user.id, data["new_email"])
 
 
 @app.post("/api/change_name", status_code=status.HTTP_200_OK)
@@ -1241,13 +1199,12 @@ async def change_name(
     request: Request,
     response: Response,
     user: User = Depends(get_current_user),
-    db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> None:
 
     data = await request.json()
 
     await database_api.change_name(
-        user.id, data["new_first_name"], data["new_last_name"], db=db
+        user.id, data["new_first_name"], data["new_last_name"]
     )
 
 

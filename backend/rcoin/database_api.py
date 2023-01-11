@@ -9,6 +9,7 @@ import rcoin.data_models as data_models
 import uuid
 from typing import List, Optional, Tuple
 import os
+from contextlib import contextmanager
 
 
 def get_dummy_id() -> str:
@@ -18,7 +19,7 @@ def get_dummy_id() -> str:
 
 DB_URL = os.getenv("DATABASE_URL")
 
-engine = sql.create_engine(DB_URL)
+engine = sql.create_engine(DB_URL, pool_size=3, max_overflow=2)
 
 SessionLocal = orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative.declarative_base()
@@ -149,6 +150,7 @@ def _add_tables():
     return Base.metadata.create_all(bind=engine)
 
 
+@contextmanager
 def connect_to_DB():
     """
     Connect to database, adding tables if not already exists
@@ -161,10 +163,7 @@ def connect_to_DB():
         db.close()
 
 
-async def create_user(
-    user: data_models.UserTableInfo,
-    db: "Session",
-):
+async def create_user(user: data_models.UserTableInfo):
     """
     Create a user for the stablecoin
 
@@ -172,135 +171,156 @@ async def create_user(
     :param db: The database session to utilise
     :return: The user information
     """
-    wid = user.wallet_id
-    user = User(**user.dict())
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    db_user = await get_user_by_wallet_id(wallet_id=wid, db=db)
-    return db_user.id
+    with connect_to_DB() as db:
+        wid = user.wallet_id
+        user = User(**user.dict())
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        db_user = await get_user_by_wallet_id(wallet_id=wid)
+        return db_user.id
 
 
 async def add_bank_account(
     bank_account: data_models.BankAccount,
-    db: "Session",
 ) -> data_models.BankAccount:
     """
     Add a bank account for a user
     """
-    account = BankAccount(**bank_account.dict())
-    db.add(account)
-    db.commit()
-    db.refresh(account)
+    with connect_to_DB() as db:
+        account = BankAccount(**bank_account.dict())
+        db.add(account)
+        db.commit()
+        db.refresh(account)
 
 
 async def delete_bank_account(
     user_id: str,
     bank_account: str,
     sort_code: str,
-    db: "Session",
 ) -> None:
-    db.query(BankAccount).filter(BankAccount.user_id == user_id).filter(
-        BankAccount.bank_account == bank_account
-    ).filter(BankAccount.sort_code == sort_code).delete()
-    db.commit()
+    with connect_to_DB() as db:
+        db.query(BankAccount).filter(BankAccount.user_id == user_id).filter(
+            BankAccount.bank_account == bank_account
+        ).filter(BankAccount.sort_code == sort_code).delete()
+        db.commit()
 
 
 async def get_bank_accounts_for_id(
     id: str,
-    db: "Session",
 ) -> List[BankAccount]:
-    return (
-        db.query(BankAccount)
-        .filter(BankAccount.user_id == id)
-        .order_by(BankAccount.id)
-        .all()
-    )
+    with connect_to_DB() as db:
+        return (
+            db.query(BankAccount)
+            .filter(BankAccount.user_id == id)
+            .order_by(BankAccount.id)
+            .all()
+        )
 
 
 async def get_default_bank_account_for_id(
     id: str,
-    db: "Session",
 ) -> BankAccount:
-    return (
-        db.query(BankAccount)
-        .filter(BankAccount.user_id == id)
-        .filter(BankAccount.default == True)
-        .first()
-    )
+    with connect_to_DB() as db:
+
+        return (
+            db.query(BankAccount)
+            .filter(BankAccount.user_id == id)
+            .filter(BankAccount.default == True)
+            .first()
+        )
 
 
 async def set_default_bank_account_for_id(
     id: str,
     bank_account: str,
     sort_code: str,
-    db: "Session",
 ) -> None:
+    with connect_to_DB() as db:
 
-    db.query(BankAccount).filter(BankAccount.user_id == id).filter(
-        BankAccount.default == True
-    ).update({BankAccount.default: False}, synchronize_session=False)
+        db.query(BankAccount).filter(BankAccount.user_id == id).filter(
+            BankAccount.default == True
+        ).update({BankAccount.default: False}, synchronize_session=False)
 
-    db.query(BankAccount).filter(BankAccount.user_id == id).filter(
-        BankAccount.bank_account == bank_account
-    ).filter(BankAccount.sort_code == sort_code).update(
-        {BankAccount.default: True}, synchronize_session=False
-    )
-    db.commit()
-
-
-async def get_friends_of_id(id: str, db: "Session") -> List[Friend]:
-    return (
-        db.query(User.id, User.first_name, User.last_name, User.email, User.wallet_id)
-        .join(Friend, Friend.friend_id == User.id)
-        .filter(Friend.person_id == id)
-        .all()
-    )
-
-
-async def get_n_friends_of_id(id: str, n: int, db: "Session") -> List[Friend]:
-    return (
-        db.query(User.id, User.first_name, User.last_name, User.email)
-        .join(Friend, Friend.friend_id == User.id)
-        .filter(Friend.person_id == id)
-        .limit(n)
-        .all()
-    )
-
-
-async def add_friend(person_id: str, friend_id: str, db: "Session") -> None:
-    friend_entry = Friend(person_id=person_id, friend_id=friend_id)
-
-    # If not already friends, add friend
-    if (
-        not db.query(Friend)
-        .filter(Friend.person_id == person_id)
-        .filter(Friend.friend_id == friend_id)
-        .first()
-    ):
-        db.add(friend_entry)
+        db.query(BankAccount).filter(BankAccount.user_id == id).filter(
+            BankAccount.bank_account == bank_account
+        ).filter(BankAccount.sort_code == sort_code).update(
+            {BankAccount.default: True}, synchronize_session=False
+        )
         db.commit()
-        db.refresh(friend_entry)
 
 
-async def delete_friend(person_id: str, friend_id: str, db: "Session") -> None:
-    db.query(Friend).filter(Friend.person_id == person_id).filter(
-        Friend.friend_id == friend_id
-    ).delete()
-    db.commit()
+async def get_friends_of_id(id: str) -> List[Friend]:
+    with connect_to_DB() as db:
+
+        return (
+            db.query(
+                User.id, User.first_name, User.last_name, User.email, User.wallet_id
+            )
+            .join(Friend, Friend.friend_id == User.id)
+            .filter(Friend.person_id == id)
+            .all()
+        )
 
 
-async def get_user_by_id(id: str, db: "Session") -> User:
-    return db.query(User).filter(User.id == id).first()
+async def get_n_friends_of_id(id: str, n: int) -> List[Friend]:
+    with connect_to_DB() as db:
+
+        return (
+            db.query(User.id, User.first_name, User.last_name, User.email)
+            .join(Friend, Friend.friend_id == User.id)
+            .filter(Friend.person_id == id)
+            .limit(n)
+            .all()
+        )
 
 
-async def get_user_by_wallet_id(wallet_id: str, db: "Session") -> User:
-    return db.query(User).filter(User.wallet_id == wallet_id).first()
+async def add_friend(
+    person_id: str,
+    friend_id: str,
+) -> None:
+    with connect_to_DB() as db:
+
+        friend_entry = Friend(person_id=person_id, friend_id=friend_id)
+
+        # If not already friends, add friend
+        if (
+            not db.query(Friend)
+            .filter(Friend.person_id == person_id)
+            .filter(Friend.friend_id == friend_id)
+            .first()
+        ):
+            db.add(friend_entry)
+            db.commit()
+            db.refresh(friend_entry)
+
+
+async def delete_friend(
+    person_id: str,
+    friend_id: str,
+) -> None:
+    with connect_to_DB() as db:
+
+        db.query(Friend).filter(Friend.person_id == person_id).filter(
+            Friend.friend_id == friend_id
+        ).delete()
+        db.commit()
+
+
+async def get_user_by_id(id: str) -> User:
+    with connect_to_DB() as db:
+
+        return db.query(User).filter(User.id == id).first()
+
+
+async def get_user_by_wallet_id(wallet_id: str) -> User:
+    with connect_to_DB() as db:
+
+        return db.query(User).filter(User.wallet_id == wallet_id).first()
 
 
 async def get_user(
     email: str,
-    db: "Session",
 ) -> User:
     """
     Get a user from the database using their email
@@ -309,51 +329,59 @@ async def get_user(
     :param db: The database session to utilise
     :return: The user information found
     """
-    return db.query(User).filter(User.email == email).first()
+    with connect_to_DB() as db:
+
+        return db.query(User).filter(User.email == email).first()
 
 
 # Device
 async def add_device_to_user(
-    register: data_models.RegisterDeviceToken, user_id: str, db: "Session"
+    register: data_models.RegisterDeviceToken,
+    user_id: str,
 ) -> None:
-    current_time = datetime.now()
-    device = Device(
-        device_token=register.device_token,
-        user_id=user_id,
-        date_registered=current_time,
-    )
+    with connect_to_DB() as db:
 
-    statement = (
-        insert(Device)
-        .values(
-            [
-                {
-                    "device_token": device.device_token,
-                    "date_registered": device.date_registered,
-                    "user_id": device.user_id,
-                }
-            ]
+        current_time = datetime.now()
+        device = Device(
+            device_token=register.device_token,
+            user_id=user_id,
+            date_registered=current_time,
         )
-        .on_conflict_do_update(
-            index_elements=["user_id", "device_token"],
-            set_=dict(date_registered=device.date_registered),
+
+        statement = (
+            insert(Device)
+            .values(
+                [
+                    {
+                        "device_token": device.device_token,
+                        "date_registered": device.date_registered,
+                        "user_id": device.user_id,
+                    }
+                ]
+            )
+            .on_conflict_do_update(
+                index_elements=["user_id", "device_token"],
+                set_=dict(date_registered=device.date_registered),
+            )
         )
-    )
-    res = db.execute(statement)
+        res = db.execute(statement)
 
-    # Remove old account device if exists
-    db.query(Device).filter(Device.device_token == register.device_token).filter(
-        Device.user_id != user_id
-    ).delete()
+        # Remove old account device if exists
+        db.query(Device).filter(Device.device_token == register.device_token).filter(
+            Device.user_id != user_id
+        ).delete()
 
-    db.commit()
-    return res
+        db.commit()
+        return res
 
 
-async def get_user_devices(user_id: str, db: "Session") -> Optional[List[Device]]:
-    devices = db.query(Device).filter(Device.user_id == user_id)
+async def get_user_devices(user_id: str) -> Optional[List[Device]]:
 
-    return devices
+    with connect_to_DB() as db:
+
+        devices = db.query(Device).filter(Device.user_id == user_id)
+
+        return devices
 
 
 # Issue
@@ -362,7 +390,6 @@ async def create_issue_transaction(
     user_id: str,
     bank_transaction_id: str,
     date: datetime,
-    db: "Session",
 ) -> Issue:
     # user = await get_user(email=user_email, db=db)
     # bank_transaction_id = sql.Column(sql.Text, unique=True)
@@ -375,54 +402,60 @@ async def create_issue_transaction(
     # end date should be later on
     # we should not take blockchain_transaction as we do not add it immediately.
 
-    issue_transaction = Issue(
-        user_id=user_id,
-        bank_transaction_id=bank_transaction_id,
-        date=date,
-        amount=issue.amount_in_rands,
-    )
+    with connect_to_DB() as db:
 
-    db.add(issue_transaction)
-    db.commit()
-    db.refresh(issue_transaction)
-    return issue_transaction
+        issue_transaction = Issue(
+            user_id=user_id,
+            bank_transaction_id=bank_transaction_id,
+            date=date,
+            amount=issue.amount_in_rands,
+        )
+
+        db.add(issue_transaction)
+        db.commit()
+        db.refresh(issue_transaction)
+        return issue_transaction
 
 
 async def complete_issue_transaction(
-    bank_transaction_id: str, blockchain_transaction_id: str, db: "Session"
+    bank_transaction_id: str,
+    blockchain_transaction_id: str,
 ):
-    # We have now issued the coins so should update the corresponding row
-    db.query(Issue).filter(Issue.bank_transaction_id == bank_transaction_id).update(
-        {"blockchain_transaction_id": blockchain_transaction_id}
-    )
-    db.commit()
+    with connect_to_DB() as db:
+
+        # We have now issued the coins so should update the corresponding row
+        db.query(Issue).filter(Issue.bank_transaction_id == bank_transaction_id).update(
+            {"blockchain_transaction_id": blockchain_transaction_id}
+        )
+        db.commit()
 
 
 async def get_user_issue_for_bank_transaction(
     user_id: str,
     bank_transaction_id: str,
-    db: "Session",
 ) -> Optional[Issue]:
-    issue = (
-        db.query(Issue)
-        .filter(Issue.user_id == user_id)
-        .filter(Issue.bank_transaction_id == bank_transaction_id)
-        .first()
-    )
+    with connect_to_DB() as db:
 
-    db.commit()
-    return issue
+        issue = (
+            db.query(Issue)
+            .filter(Issue.user_id == user_id)
+            .filter(Issue.bank_transaction_id == bank_transaction_id)
+            .first()
+        )
+
+        db.commit()
+        return issue
 
 
 async def get_issue_transactions_for_user(
     user_id: str,
-    db: "Session",
 ) -> Optional[List[Issue]]:
+    with connect_to_DB() as db:
 
-    issues = db.query(Issue).filter(Issue.id == user_id)
-    db.commit()
+        issues = db.query(Issue).filter(Issue.id == user_id)
+        db.commit()
 
-    return issues
+        return issues
 
 
 # Redeem
@@ -433,53 +466,52 @@ async def create_redeem_transaction(
     blockchain_transaction_id: str,
     date: datetime,
     amount: float,
-    db: "Session",
 ) -> Redeem:
-    user = await get_user(email=email, db=db)
+    with connect_to_DB() as db:
+        user = await get_user(email=email)
 
-    redeem_transaction = Redeem(
-        user_id=user.id,
-        bank_transaction_id=bank_transaction_id,
-        blockchain_transaction_id=blockchain_transaction_id,
-        date=date,
-        amount=amount,
-    )
+        redeem_transaction = Redeem(
+            user_id=user.id,
+            bank_transaction_id=bank_transaction_id,
+            blockchain_transaction_id=blockchain_transaction_id,
+            date=date,
+            amount=amount,
+        )
 
-    db.add(redeem_transaction)
-    db.commit()
+        db.add(redeem_transaction)
+        db.commit()
 
-    return redeem_transaction
+        return redeem_transaction
 
 
 async def get_pending_transactions(
     user_id: int,
-    db: "Session",
 ) -> List[Tuple]:
     """Gets pending transactions for a user"""
+    with connect_to_DB() as db:
 
-    QUERY = """
-    SELECT 'redeem' AS type, amount, date
-    FROM redeem
-    WHERE user_id = :user_id
-    AND bank_transaction_id IS NULL
-    UNION
-    SELECT 'issue' AS type, amount, date 
-    FROM issue
-    WHERE user_id = :user_id
-    AND blockchain_transaction_id IS NULL
-    ORDER BY date DESC
-    """
+        QUERY = """
+        SELECT 'redeem' AS type, amount, date
+        FROM redeem
+        WHERE user_id = :user_id
+        AND bank_transaction_id IS NULL
+        UNION
+        SELECT 'issue' AS type, amount, date 
+        FROM issue
+        WHERE user_id = :user_id
+        AND blockchain_transaction_id IS NULL
+        ORDER BY date DESC
+        """
 
-    res = db.execute(QUERY, {"user_id": user_id})
-    db.commit()
-    return list(res)
+        res = db.execute(QUERY, {"user_id": user_id})
+        db.commit()
+        return list(res)
 
 
 async def get_audit_transactions(
     offset: int,
     limit: int,
     query_date: datetime,
-    db: "Session",
 ) -> List[Tuple]:
     """Gets sorted (descending) issue and redeem transactions
 
@@ -494,22 +526,23 @@ async def get_audit_transactions(
         List[Tuple]: [(type, bank_transaction_id, blockchain_transaction_id, amount, date)]
     """
 
-    QUERY = """
-    SELECT 'redeem' AS type, bank_transaction_id, blockchain_transaction_id, amount, date 
-    FROM redeem
-    UNION
-    SELECT 'issue' AS type, bank_transaction_id, blockchain_transaction_id, amount, date 
-    FROM issue
-    WHERE date <= :query_date
-    ORDER BY date DESC
-    LIMIT :limit OFFSET :offset;
-    """
+    with connect_to_DB() as db:
+        QUERY = """
+        SELECT 'redeem' AS type, bank_transaction_id, blockchain_transaction_id, amount, date 
+        FROM redeem
+        UNION
+        SELECT 'issue' AS type, bank_transaction_id, blockchain_transaction_id, amount, date 
+        FROM issue
+        WHERE date <= :query_date
+        ORDER BY date DESC
+        LIMIT :limit OFFSET :offset;
+        """
 
-    res = db.execute(
-        QUERY, {"query_date": query_date, "limit": limit, "offset": offset}
-    )
-    db.commit()
-    return list(res)
+        res = db.execute(
+            QUERY, {"query_date": query_date, "limit": limit, "offset": offset}
+        )
+        db.commit()
+        return list(res)
 
 
 # Change Account Details
@@ -518,42 +551,43 @@ async def get_audit_transactions(
 async def change_email(
     user_id: int,
     new_email: str,
-    db: "Session",
 ) -> None:
-    db.query(User).filter(User.id == user_id).update(
-        {User.email: new_email}, synchronize_session=False
-    )
-    db.commit()
+    with connect_to_DB() as db:
+        db.query(User).filter(User.id == user_id).update(
+            {User.email: new_email}, synchronize_session=False
+        )
+        db.commit()
 
 
 async def change_name(
     user_id: int,
     new_first_name: str,
     new_last_name: str,
-    db: "Session",
 ) -> None:
-    db.query(User).filter(User.id == user_id).update(
-        {User.first_name: new_first_name, User.last_name: new_last_name},
-        synchronize_session=False,
-    )
-    db.commit()
+    with connect_to_DB() as db:
+        db.query(User).filter(User.id == user_id).update(
+            {User.first_name: new_first_name, User.last_name: new_last_name},
+            synchronize_session=False,
+        )
+        db.commit()
 
 
 async def suspend_user(
     user_id: int,
-    db: "Session",
 ) -> None:
-    db.query(User).filter(User.id == user_id).update(
-        {User.suspended: True}, synchronize_session=False
-    )
-    db.commit()
+    with connect_to_DB() as db:
+        db.query(User).filter(User.id == user_id).update(
+            {User.suspended: True}, synchronize_session=False
+        )
+        db.commit()
 
 
 async def unsuspend_user(
     user_id: int,
-    db: "Session",
 ) -> None:
-    db.query(User).filter(User.id == user_id).update(
-        {User.suspended: False}, synchronize_session=False
-    )
-    db.commit()
+
+    with connect_to_DB() as db:
+        db.query(User).filter(User.id == user_id).update(
+            {User.suspended: False}, synchronize_session=False
+        )
+        db.commit()
