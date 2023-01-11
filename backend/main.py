@@ -361,12 +361,15 @@ async def signup(
     #     account_name=user.first_name + " " + user.last_name,
     #     document_number=user.document_number
     # )
-    recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
-        first_name=user.first_name,
-        last_name=user.last_name,
-        account_number=user.bank_account,
-        bank_code=user.sort_code,
-    )
+
+    # recipient_code = paystack_api.create_transfer_recipient_by_bank_account(
+    #     first_name=user.first_name,
+    #     last_name=user.last_name,
+    #     account_number=user.bank_account,
+    #     bank_code=user.sort_code,
+    # )
+
+    recipient_code = "RCP_8j93r6ejwxpektt"
 
     temp = UserTableInfo.parse_obj(
         {
