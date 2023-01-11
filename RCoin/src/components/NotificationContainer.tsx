@@ -58,6 +58,14 @@ export const NotificationContainer = ({children}: {children: JSX.Element}) => {
     //     console.log(`Notification opened with an action identifier: ${action.identifier} and response text: ${action.text}`);
     //     completion();
     // });
+    Notifications.events().registerNotificationReceivedForeground(
+      (notification: Notification, completion: (response: any) => void) => {
+        console.log(JSON.stringify(notification.payload));
+
+        // Calling completion on iOS with `alert: true` will present the native iOS inApp notification.
+        completion({alert: true, sound: true, badge: false});
+      },
+    );
 
     Notifications.events().registerNotificationReceivedBackground(
       (notification: Notification, completion: (response: any) => void) => {
