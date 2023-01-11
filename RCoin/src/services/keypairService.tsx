@@ -144,7 +144,7 @@ const readPair = async (
 ): Promise<Keypair | undefined> => {
   const mnemonic = await readMnemonic(decryptionKey, pk);
 
-  if (mnemonic === undefined) {
+  if (!mnemonic) {
     return undefined;
   }
 

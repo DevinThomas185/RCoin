@@ -187,6 +187,7 @@ const BankAccounts = () => {
             <TextField
               marginV-5
               placeholder="Account Number"
+              placeholderTextColor={'gray'}
               style={styles.input}
               onChangeText={(value: string) => {
                 setNewBankAccount(value);
@@ -196,6 +197,7 @@ const BankAccounts = () => {
             <TextField
               placeholder="Sortcode"
               style={styles.input}
+              placeholderTextColor={'gray'}
               onChangeText={(value: string) => {
                 setNewSortcode(value);
               }}

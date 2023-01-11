@@ -162,7 +162,7 @@ def add_signature_and_send(
         return send_and_confirm_transaction(transaction)
 
     except Exception as e:
-        return Failure("exception", e)
+        return Failure(e)
 
 
 def construct_create_account_transaction(public_key: str) -> CustomResponse:
@@ -349,7 +349,7 @@ def get_stablecoin_transactions(public_key: str, limit: int = 10) -> CustomRespo
         )
 
     except BlockchainQueryFailedException as exception:
-        return Failure("exception", exception)
+        return Failure(exception)
 
 
 def get_transfer_amount_for_transaction(signature: str) -> CustomResponse:

@@ -273,7 +273,7 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
       })
       .then(data_ => {
         if (authData) {
-          setAuthData({
+          const new_auth = {
             token: authData.token,
             token_type: authData.token_type,
             token_info: {
@@ -285,7 +285,8 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
               wallet_id: data_['walled_id'],
               is_merchant: data_['is_merchant'],
             },
-          });
+          };
+          setAuthData(new_auth);
         }
       })
       .catch(error => {

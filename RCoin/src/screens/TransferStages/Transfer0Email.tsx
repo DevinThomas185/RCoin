@@ -79,6 +79,7 @@ const Transfer0Email = ({
             style={styles.input}
             keyboardType="email-address"
             autoCapitalize="none"
+            placeholderTextColor={'gray'}
             onChangeText={(email: string) => {
               setRecipient(email);
             }}

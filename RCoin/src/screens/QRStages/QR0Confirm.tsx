@@ -95,7 +95,7 @@ const QR0Confirm = ({
     })
       .then(res => {
         if (!res.ok) {
-          throw new Error('initial redeem failed');
+          throw new Error('Initial Trade Failed');
         }
         return res.json();
       })
@@ -129,7 +129,7 @@ const QR0Confirm = ({
             })
               .then(res => {
                 if (!res.ok) {
-                  throw new Error('Complete redeem failed');
+                  throw new Error('Complete trade failed');
                 }
                 return res.json();
               })
@@ -143,6 +143,8 @@ const QR0Confirm = ({
                   setConfirmClicked(false);
                   setResponseState(0);
                   // nextStage(); is done inside sign_merchant_transaction
+                } else {
+                  throw new Error('Complete trade failed');
                 }
               })
               .catch(error => {
@@ -151,6 +153,8 @@ const QR0Confirm = ({
                 console.log(error);
               });
           }
+        } else {
+          throw new Error('Initial Trade Failed');
         }
       })
       .catch(error => {

@@ -25,8 +25,8 @@ build-frontend:
     - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker build -t rcoin-frontend ./frontend
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-frontend 146.169.40.88:5000/rcoin-frontend:$CI_COMMIT_SHA
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-frontend:$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-frontend 146.169.40.88:5000/rcoin-frontend-$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-frontend-$CI_COMMIT_SHA
 
 build-backend:
   image: docker/compose:debian-1.29.2
@@ -41,8 +41,8 @@ build-backend:
     - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker build -t rcoin-backend ./backend
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-backend 146.169.40.88:5000/rcoin-backend:$CI_COMMIT_SHA
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-backend:$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-backend 146.169.40.88:5000/rcoin-backend-$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-backend-$CI_COMMIT_SHA
 
 build-signer:
   image: docker/compose:debian-1.29.2
@@ -58,12 +58,12 @@ build-signer:
     - chmod 644 ~/.ssh/known_hosts
     # Signer backend image
     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker build -t rcoin-signer-backend ./signer
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-signer-backend 146.169.40.88:5000/rcoin-signer-backend:$CI_COMMIT_SHA
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-signer-backend:$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-signer-backend 146.169.40.88:5000/rcoin-signer-backend-$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-signer-backend-$CI_COMMIT_SHA
     # Signer proxy Image
     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker build -t rcoin-signer-proxy ./signer/nginx
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-signer-proxy 146.169.40.88:5000/rcoin-signer-proxy:$CI_COMMIT_SHA
-    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-signer-proxy:$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker image tag rcoin-signer-proxy 146.169.40.88:5000/rcoin-signer-proxy-$CI_COMMIT_SHA
+    - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker push 146.169.40.88:5000/rcoin-signer-proxy-$CI_COMMIT_SHA
 
 test-backend:
   stage: test
@@ -102,6 +102,8 @@ deploy-dev:
     - INFO=$(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_SIGNER_DEV" docker ps)
     - if [[ $(echo $INFO | grep stablecoin_signer-proxy_1 | wc -l) -ne 1 ]]; then echo "signer nginx container not running" && exit 1; else echo "signer nginx container check successful"; fi
     - if [[ $(echo $INFO | grep stablecoin_signer-backend_1 | wc -l) -ne 1 ]]; then echo "signer backend container not running" && exit 1; else echo "signer backend container check successful"; fi
+  only:
+    - master
 
 deploy-prod:
   image: docker/compose:debian-1.29.2

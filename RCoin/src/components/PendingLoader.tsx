@@ -1,4 +1,5 @@
 import {LoaderScreen, Text, View} from 'react-native-ui-lib';
+import {useAuth} from '../contexts/Auth';
 import Style from '../style/style';
 
 const PendingLoader = ({
@@ -14,6 +15,8 @@ const PendingLoader = ({
   loading_page_message: string;
   custom_fail_message: string;
 }) => {
+  const auth = useAuth();
+
   if (show || loading) {
     if (response_state == 0) {
       return (
@@ -35,6 +38,7 @@ const PendingLoader = ({
       );
     } else if (response_state == -2) {
       // Suspected Fraud
+      auth.refresh();
       return (
         <View flex margin-20 center>
           <Text center text70 color={Style.failed}>

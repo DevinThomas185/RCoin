@@ -67,6 +67,7 @@ const NameDetail = () => {
             placeholder="New First Name"
             style={styles.input}
             value={new_first_name}
+            placeholderTextColor={'gray'}
             onChangeText={(value: string) => {
               setNewFirstName(value);
             }}
@@ -77,6 +78,7 @@ const NameDetail = () => {
             placeholder="New Last Name"
             style={styles.input}
             value={new_last_name}
+            placeholderTextColor={'gray'}
             onChangeText={(value: string) => {
               setNewLastName(value);
             }}

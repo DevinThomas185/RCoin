@@ -123,8 +123,7 @@ CHECK IMMEDIATELY!
 def ratio_check() -> None:
     update_reserve_ratio()
     if float(r.get("reserve_ratio")) < 1:
-        send_ratio_email()
-    print("Checked ratio")
+        print("Ratio Dropped")
 
 
 # Password functions
@@ -282,7 +281,7 @@ Time: {t}
 Date: {date}
             """
             response.status_code = 409
-            database_api.suspend_user(user.id, db=db)
+            await database_api.suspend_user(user.id, db=db)
             send_email(subject, message, user.email)
             return {"status": "fraud"}
 
@@ -300,6 +299,7 @@ def not_suspended(func):
         assert isinstance(user, User)
 
         if user.suspended:
+            kwargs["response"].status_code = 409
             return  # Do not continue if suspended
 
         return await func(*args, **kwargs)
@@ -322,7 +322,7 @@ def checkReserveRatio(func):
         if float(r.get("reserve_ratio")) >= 1:
             return await func(*args, **kwargs)
         else:
-            send_ratio_email()
+            print("Ratio Dropped")
             return Failure("all transactions paused").to_json()
 
     return inner
@@ -538,8 +538,6 @@ async def auditTransactions(
         0, DEFAULT_INITIAL_AUDIT_TRANSACTIONS, datetime.now(), db
     )
 
-    print(transactions)
-    print("\n")
     return {"transactions": transactions}
 
 
@@ -554,8 +552,6 @@ async def moreAuditTransactions(
         audit_transactions_request.first_query_time,
         db,
     )
-    print(transactions)
-    print("\n")
     return {"transactions": transactions}
 
 
@@ -671,6 +667,7 @@ async def get_second_signature(transaction: Transaction) -> Transaction:
 @checkReserveRatio
 async def complete_trade(
     trade_transaction: CompleteTradeTransaction,
+    response: Response,
     sender: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:
@@ -740,6 +737,7 @@ async def is_trade_email_valid(
 @checkReserveRatio
 async def complete_redeem(
     redeem_transaction: CompleteRedeemTransaction,
+    response: Response,
     user: User = Depends(get_current_user),
     db: orm.Session = Depends(database_api.connect_to_DB),
 ) -> dict[str, Any]:

@@ -58,6 +58,7 @@ const EmailDetail = () => {
             placeholder="New Email"
             style={styles.input}
             value={new_email}
+            placeholderTextColor={'gray'}
             onChangeText={(value: string) => {
               setNewEmail(value);
             }}
