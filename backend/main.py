@@ -940,13 +940,13 @@ def get_rand_to_pay(
     #     c = 0 if a < 1000 else 100
     #     return math.ceil((a - (1.15 * (math.ceil(0.029 * a) + c))) / 100)
 
-    res = amount_in_coins
+    # res = amount_in_coins
     # after_fee = receive_after_fee(res)
     # while after_fee < amount_in_coins:
     #     res += 1
     #     after_fee = receive_after_fee(res)
 
-    return res * user.trust_score
+    return math.ceil(amount_in_coins * user.trust_score * 100) / 100
 
 
 # GET AMOUNT OF RAND TO RETURN - REDEEM

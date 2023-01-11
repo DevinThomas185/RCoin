@@ -52,11 +52,11 @@ const IssueAmount = ({
       });
   };
 
-  const receive_after_fee = (x: number) => {
-    const a = x * 100;
-    const c = a < 1000 ? 0 : 100;
-    return Math.ceil((a - 1.15 * (Math.ceil(0.029 * a) + c)) / 100);
-  };
+  // const receive_after_fee = (x: number) => {
+  //   const a = x * 100;
+  //   const c = a < 1000 ? 0 : 100;
+  //   return Math.ceil((a - 1.15 * (Math.ceil(0.029 * a) + c)) / 100);
+  // };
 
   const validate = () => {
     let valid = false;
@@ -68,16 +68,16 @@ const IssueAmount = ({
 
   const pre_calculated_rand_to_pay = () => {
     let res = coins_to_issue;
-    let after_fee = receive_after_fee(res);
+    // let after_fee = receive_after_fee(res);
     // while (after_fee < coins_to_issue) {
     //   res += 1;
     //   after_fee = receive_after_fee(res);
     // }
 
     if (auth.authData) {
-      return res * auth.authData.token_info.trust_score;
+      return Math.ceil(res * auth.authData.token_info.trust_score * 100) / 100;
     } else {
-      return res * 1.05;
+      return Math.ceil(res * 1.05 * 100) / 100;
     }
   };
 

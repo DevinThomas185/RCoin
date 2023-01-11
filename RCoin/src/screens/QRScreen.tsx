@@ -41,7 +41,7 @@ const AccountScreen = ({
 
   async function getMerchantTransaction(transaction_id: string): Promise<void> {
     fetch(
-      `${Config.API_URL}/api/complete_merchant_transaction/?transaction_id=` +
+      `${Config.API_URL}/api/complete_merchant_transaction?transaction_id=` +
         transaction_id,
       {
         method: 'GET',
@@ -110,6 +110,9 @@ const AccountScreen = ({
         }}
         onRead={async contents => {
           //Only if we are in scanning mode and the QR code has changed
+          console.log(contents.data);
+          console.log(data);
+          console.log(showCode);
           if (!showCode && contents.data != data) {
             setData(contents.data);
             console.log('data straight from QR Code: ' + contents.data);
