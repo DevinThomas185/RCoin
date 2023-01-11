@@ -35,13 +35,17 @@ def notify_transacted(
     receiverEmail: str,
     amount: float,
 ):
-    sendPushNotification(
-        senderTokens,
-        title="RCoin Sent",
-        body=f"You sent {amount} RCoin to {receiverEmail}.",
-    )
-    sendPushNotification(
-        recieverTokens,
-        title="RCoin Received",
-        body=f"You received {amount} RCoin from {senderEmail}.",
-    )
+    try:
+        sendPushNotification(
+            senderTokens,
+            title="RCoin Sent",
+            body=f"You sent {amount} RCoin to {receiverEmail}.",
+        )
+        sendPushNotification(
+            recieverTokens,
+            title="RCoin Received",
+            body=f"You received {amount} RCoin from {senderEmail}.",
+        )
+    except Exception as e:
+        print("An error while sending a notification occurred.")
+        print(e)

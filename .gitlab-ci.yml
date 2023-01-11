@@ -102,8 +102,6 @@ deploy-dev:
     - INFO=$(COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER_DEV@$SERVER_IP_SIGNER_DEV" docker ps)
     - if [[ $(echo $INFO | grep stablecoin_signer-proxy_1 | wc -l) -ne 1 ]]; then echo "signer nginx container not running" && exit 1; else echo "signer nginx container check successful"; fi
     - if [[ $(echo $INFO | grep stablecoin_signer-backend_1 | wc -l) -ne 1 ]]; then echo "signer backend container not running" && exit 1; else echo "signer backend container check successful"; fi
-  only:
-    - master
 
 deploy-prod:
   image: docker/compose:debian-1.29.2
@@ -116,7 +114,7 @@ deploy-prod:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$KNOWN_HOSTS" >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts    
+    - chmod 644 ~/.ssh/known_hosts
     # Docker Swarm Main backend
     - COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" CI_COMMIT_SHA=$CI_COMMIT_SHA FEE_ACCOUNT=$PROD_FEE_ACCOUNT SIGNER_BACKEND_URL=$PROD_SIGNER_BACKEND_URL MINT_ACCOUNT=$PROD_MINT_ACCOUNT SOLANA_CLIENT=$SOLANA_CLIENT RESERVE_ACCOUNT=$PROD_RESERVE_ACCOUNT TOKEN_OWNER=$PROD_TOKEN_OWNER MULTISIG_ACCOUNT=$PROD_MULTISIG_ACCOUNT SIGNER_1=$PROD_SIGNER_1 SIGNER_2=$PROD_SIGNER_2 SIGNER_1_PUBKEY=$PROD_SIGNER_1_PUBKEY SIGNER_2_PUBKEY=$PROD_SIGNER_2_PUBKEY  PAYSTACK_SECRET_KEY=${PROD_PAYSTACK_SECRET_KEY} DATABASE_URL=${DATABASE_URL} REDIS_PASS=${REDIS_PASS} GMAIL_PASSWORD=${PROD_GMAIL_PASSWORD} FIREBASE_JSON=${FIREBASE_JSON} PAYSTACK_EMAIL=${PAYSTACK_EMAIL} PAYSTACK_PASSWORD=${PAYSTACK_PASSWORD} PAYSTACK_INTEGRATION=${PAYSTACK_INTEGRATION_PROD} docker stack deploy --compose-file=docker-compose-main.yml rcoin
     - yes y | COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_HOST="ssh://$SERVER_USER@$SERVER_IP" docker system prune --all || true
